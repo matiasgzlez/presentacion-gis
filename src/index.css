@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* ——— GIS en Logística · torre de control ———
+   Fondo noche, un acento menta para "lo optimizado / lo que funciona",
+   coral para "lo de antes / el problema", ámbar para datos y alertas.
+   Todo en rem: la raíz crece con el viewport para el proyector del aula. */
+
+@theme inline {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Geist", ui-sans-serif, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --color-night: #060a12;
+  --color-night-2: #0b1220;
+  --color-panel: #0f1828;
+  --color-panel-2: #142034;
+  --color-line: #1e2c44;
+  --color-line-2: #2a3b58;
+  --color-fog: #8ea0bd;
+  --color-fog-2: #5d6f8c;
+  --color-snow: #eaf0fb;
+  --color-mint: #3cf2b5;
+  --color-mint-deep: #13a77a;
+  --color-coral: #ff7a59;
+  --color-amber: #ffc24b;
+  --color-sky: #5ab4ff;
+  --color-violet: #a98bff;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  font-size: clamp(14px, 0.55vw + 8px, 24px);
+  overflow: hidden;            /* modo presentación: se avanza con el teclado, no con scroll */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-night);
+  color: var(--color-snow);
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  overflow-x: clip;
+}
+
+::selection { background: var(--color-mint); color: var(--color-night); }
+
+:focus-visible {
+  outline: 2px solid var(--color-mint);
+  outline-offset: 3px;
+  border-radius: 0.4rem;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-mint);
+}
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* Grilla de coordenadas tenue: el "papel" de la torre de control */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgb(90 180 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(90 180 255 / 0.05) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+}
+
+.card {
+  background: linear-gradient(180deg, rgb(20 32 52 / 0.92), rgb(15 24 40 / 0.92));
+  border: 1px solid var(--color-line);
+  border-radius: 1.25rem;
+}
+
+.glow-mint { text-shadow: 0 0 0.6em rgb(60 242 181 / 0.45); }
+
+.text-gradient {
+  background: linear-gradient(100deg, #eaf0fb 10%, #3cf2b5 45%, #5ab4ff 75%, #eaf0fb 100%) 0 50% / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 8s linear infinite;
+}
+@keyframes shine { to { background-position: -200% 50%; } }
+@media (prefers-reduced-motion: reduce) { .text-gradient { animation: none; } }
+
+@keyframes ping-soft {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+.ping { animation: ping-soft 2.2s var(--ease-out-expo) infinite; }
+
+/* MapLibre: atribución discreta, coherente con el tema */
+.maplibregl-ctrl-attrib {
+  background: rgb(6 10 18 / 0.7) !important;
+  color: var(--color-fog-2) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: var(--color-fog) !important; }
+.maplibregl-ctrl-attrib-button { filter: invert(1); }
+.maplibregl-popup-content {
+  background: var(--color-panel-2) !important;
+  color: var(--color-snow);
+  border: 1px solid var(--color-line-2);
+  border-radius: 0.8rem !important;
+  font-family: var(--font-sans);
+  padding: 0.6rem 0.8rem !important;
+}
+.maplibregl-popup-tip { border-top-color: var(--color-panel-2) !important; border-bottom-color: var(--color-panel-2) !important; }
+
+.slide {
+  position: relative;
+  height: 100dvh;
+  overflow-y: auto;            /* las diapositivas viejas que no entran todavía se pueden leer */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4.5rem clamp(1rem, 4vw, 5rem) 2.5rem;
+}

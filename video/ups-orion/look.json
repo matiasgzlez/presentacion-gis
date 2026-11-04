@@ -1,0 +1,19 @@
+{
+  "name": "gis-noche",
+  "mood": "la paleta de la presentación GIS en Logística: noche de torre de control, menta = optimizado, coral = a ojo, violeta = depósito",
+  "color": {
+    "ground": "#060a12",
+    "deep": "#0b1220",
+    "card": "#0f1828",
+    "line": "#1e2c44",
+    "mute": "#8ea0bd",
+    "ink": "#eaf0fb",
+    "accent": "#3cf2b5",
+    "accent2": "#ff7a59"
+  },
+  "type": {
+    "display": { "face": "Geist", "weight": 600, "tracking": -0.04 },
+    "text": { "face": "Geist", "weight": 450, "tracking": -0.01 },
+    "mono": { "face": "Geist Mono", "weight": 500, "tracking": 0.12 }
+  }
+}

@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+.vercel
+
+# temporales de los renders de video (se regeneran; los videos finales están en public/videos)
+video/**/_frames/
+video/**/draft.mp4
+video/**/stills.png

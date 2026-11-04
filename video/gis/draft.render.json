@@ -1,0 +1,22 @@
+{
+ "comp": "/Users/matiasgonzalez/repos/presentacion-gis/video/gis/comp.html",
+ "fps": 30,
+ "scale": 1,
+ "size": [
+  1920,
+  1080
+ ],
+ "shutter": 180.0,
+ "samples": "adaptive",
+ "gap_px": 24.0,
+ "samples_per_moving_frame": {
+  "4": 335
+ },
+ "workers": 8,
+ "frames": 480,
+ "still_frames": 145,
+ "cut_frames": 59,
+ "captures": 1630,
+ "seconds": 18.2,
+ "final": false
+}

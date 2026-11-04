@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!-- GIS en Logística · caso UPS ORION · "lado a lado" · 20 s, mudo. Hecho con onetake (lib/motion.js). -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>UPS ORION · lado a lado</title>
+<style>
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#060a12}
+canvas{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#hud{position:absolute;right:14px;bottom:10px;font:13px monospace;color:#f66;display:none}
+</style>
+<script src="look.js"></script>
+<script src="motion.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script>
+const { clamp, lerp, seg, sstep, ease, spring } = OM;
+const W = 1920, H = 1080, DPR = window.devicePixelRatio || 1;
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+cv.width = W * DPR; cv.height = H * DPR;
+const C = { ground: '#060a12', deep: '#0b1220', card: '#0f1828', line: '#1e2c44', line2: '#2a3b58', mute: '#8ea0bd', ink: '#eaf0fb', mint: '#3cf2b5', coral: '#ff7a59', violet: '#a98bff' };
+
+// ───────────────────────── tiempos ─────────────────────────
+const T = {
+  depot: 0.35, stops: 0.6, line1: 0.5, line2: 1.9, textOut: 3.25,
+  split0: 3.5, split1: 4.6, labels: 4.45,
+  race: 4.9, naiveDur: 7.0,
+  stack0: 12.2, stack1: 13.0, lift0: 13.7, lift1: 14.5, ruler0: 14.5, ruler1: 15.3, rulerTxt: 14.75,
+  shrink0: 16.1, shrink1: 16.7, money: 16.45, sub: 17.05, end: 20.5,
+};
+
+// ───────────────────────── la ciudad (grilla) ─────────────────────────
+const COLS = 13, ROWS = 9, STEP = 56;
+const MW = COLS * STEP, MH = ROWS * STEP;                // 728 × 504
+const r = OM.rng(7);
+const cells = new Set(), STOPS = [];
+while (STOPS.length < 16) {
+  const i = 1 + Math.floor(r() * (COLS - 1)), j = Math.floor(r() * (ROWS - 1));
+  const k = i + ',' + j; if (cells.has(k)) continue; cells.add(k); STOPS.push([i * STEP, j * STEP]);
+}
+const DEPOT = [Math.round(COLS / 2) * STEP, ROWS * STEP];
+const BLOCKS = []; for (let i = 0; i < COLS; i++) for (let j = 0; j < ROWS; j++) BLOCKS.push([i, j, 0.55 + 0.45 * r()]);
+const man = (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+const tourLen = o => { let d = man(DEPOT, STOPS[o[0]]); for (let i = 1; i < o.length; i++) d += man(STOPS[o[i - 1]], STOPS[o[i]]); return d + man(STOPS[o[o.length - 1]], DEPOT); };
+// a ojo: lo que hace un chofer con experiencia, "voy a la parada más cercana"
+const NAIVE = (() => { const left = new Set(STOPS.map((_, i) => i)); let cur = DEPOT; const o = [];
+  while (left.size) { let b = -1, bd = 1e9; for (const i of left) { const d = Math.hypot(cur[0] - STOPS[i][0], cur[1] - STOPS[i][1]); if (d < bd) { bd = d; b = i; } } o.push(b); left.delete(b); cur = STOPS[b]; }
+  return o; })();
+const OPT = (() => {                                      // ORION (aquí: 2-opt sobre todo el recorrido)
+  const o = [...NAIVE];
+  let imp = true;
+  while (imp) { imp = false; for (let i = 0; i < o.length - 1; i++) for (let j = i + 1; j < o.length; j++) { const o2 = [...o.slice(0, i), ...o.slice(i, j + 1).reverse(), ...o.slice(j + 1)]; if (tourLen(o2) < tourLen(o) - 1e-9) { o.splice(0, o.length, ...o2); imp = true; } } }
+  return o;
+})();
+function path(order) {                                     // calles: primero en x, después en y
+  const seq = [DEPOT, ...order.map(i => STOPS[i]), DEPOT], pts = [seq[0]];
+  for (let i = 1; i < seq.length; i++) { const a = seq[i - 1], b = seq[i]; if (a[0] !== b[0] && a[1] !== b[1]) pts.push([b[0], a[1]]); pts.push(b); }
+  const cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + man(pts[i - 1], pts[i]));
+  return { pts, cum, len: cum[cum.length - 1], order };
+}
+const PN = path(NAIVE), PO = path(OPT);
+const SPEED = PN.len / T.naiveDur, OPT_DUR = PO.len / SPEED;
+const KM = 64 / PN.len;                                   // escala ilustrativa: el recorrido a ojo = 64 km
+const fmt = km => km.toFixed(1).replace('.', ',') + ' km';
+function at(P, d) {
+  d = clamp(d, 0, P.len); let i = 1; while (i < P.pts.length - 1 && P.cum[i] < d) i++;
+  const a = P.pts[i - 1], b = P.pts[i], k = (d - P.cum[i - 1]) / (P.cum[i] - P.cum[i - 1] || 1);
+  return { x: lerp(a[0], b[0], k), y: lerp(a[1], b[1], k), i };
+}
+// cuándo pasa cada camión por cada parada (para encenderla)
+function visitTimes(P) { const out = {}; let acc = 0; const seq = [DEPOT, ...P.order.map(i => STOPS[i])]; for (let k = 1; k < seq.length; k++) { acc += man(seq[k - 1], seq[k]); out[P.order[k - 1]] = T.race + acc / SPEED; } return out; }
+const VN = visitTimes(PN), VO = visitTimes(PO);
+
+// ───────────────────────── mundo ─────────────────────────
+const MAP_Y = 200;                                        // borde superior de los mapas
+const X_ONE = (W - MW) / 2, X_L = 960 - 70 - MW, X_R = 960 + 70;
+const BAR_Y = MAP_Y + MH + 92, BAR_MAX = 560;
+const STACK = { x: 960 - BAR_MAX / 2, yN: 760, yO: 806, h: 18 };
+
+const KEYS = [
+  { t: 0, x: 960, y: MAP_Y + MH / 2 + 40, zoom: 1.32 },
+  { t: T.split0, x: 960, y: MAP_Y + MH / 2 + 40, zoom: 1.32 },
+  { t: T.split1 + 0.15, x: 960, y: 540, zoom: 1, curve: ease.expoInOut },
+  { t: T.stack0, x: 960, y: 540, zoom: 1 },
+  { t: T.stack1 + 0.1, x: 960, y: 760, zoom: 1.28, curve: ease.cubicInOut },
+  { t: T.shrink0, x: 960, y: 760, zoom: 1.28 },
+  { t: T.shrink1 + 0.2, x: 960, y: 770, zoom: 1.4, curve: ease.cubicInOut },
+];
+const HITS = [[T.split1, 5, 9], [T.money + 0.12, 7, 8]];
+const handEnv = t => sstep(T.race, T.race + 0.8, t) * (1 - sstep(T.stack0 - 0.6, T.stack0, t));
+function camAt(t) {
+  const c = OM.camera(t, KEYS), e = handEnv(t) * 3.2;
+  let x = c.x + e * (Math.sin(1.7 * t) + 0.6 * Math.sin(2.9 * t + 1)) / c.zoom, y = c.y + e * (Math.sin(1.3 * t + 2) + 0.5 * Math.sin(3.3 * t)) / c.zoom, rot = c.rot;
+  for (const [th, amp, dec] of HITS) { const s = OM.shake(t, th, { amp, decay: dec, seed: Math.round(th * 100) }); x += s.x / c.zoom; y += s.y / c.zoom; rot += s.rot; }
+  return { x, y, zoom: c.zoom, rot };
+}
+
+// ───────────────────────── dibujo ─────────────────────────
+let VIEW = [1, 0, 0, 1, 0, 0];
+const mat = M => g.setTransform(DPR * M[0], DPR * M[1], DPR * M[2], DPR * M[3], DPR * M[4], DPR * M[5]);
+const rr = (x, y, w, h, rad) => { g.beginPath(); g.roundRect(x, y, Math.max(0, w), h, rad); };
+function text(s, x, y, role, size, color, { align = 'left', op = 1, track } = {}) {
+  if (op <= 0.001) return;
+  g.save(); g.globalAlpha *= op; g.font = LOOK.font(role, size); g.letterSpacing = track ?? LOOK.track(role, size);
+  g.fillStyle = color; g.textAlign = align; g.textBaseline = 'alphabetic'; g.fillText(s, x, y); g.restore();
+}
+function word(s, x, y, t, t0, tOut, role, size, color, align = 'center') {
+  const w = OM.wordRise(t, t0, { dist: 22 }), out = sstep(tOut, tOut + 0.35, t);
+  if (t < t0) return;
+  g.save(); g.translate(x, y + w.y - out * 14); g.scale(w.s, w.s); text(s, 0, 0, role, size, color, { align, op: w.op * (1 - out) }); g.restore();
+}
+
+function drawMap(ox, t, P, color, visits, showRoute) {
+  g.save(); g.translate(ox, MAP_Y);
+  // manzanas
+  for (const [i, j, k] of BLOCKS) { g.fillStyle = `rgba(20,32,52,${0.55 * k})`; rr(i * STEP + 5, j * STEP + 5, STEP - 10, STEP - 10, 4); g.fill(); }
+  // calles
+  g.strokeStyle = C.line; g.lineWidth = 1.2; g.beginPath();
+  for (let i = 0; i <= COLS; i++) { g.moveTo(i * STEP, 0); g.lineTo(i * STEP, MH); }
+  for (let j = 0; j <= ROWS; j++) { g.moveTo(0, j * STEP); g.lineTo(MW, j * STEP); }
+  g.stroke();
+  // ruta recorrida hasta ahora
+  if (showRoute) {
+    const d = clamp((t - T.race) * SPEED, 0, P.len);
+    if (d > 0) {
+      const p = at(P, d);
+      g.save(); g.strokeStyle = color; g.lineWidth = 5; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.shadowColor = color; g.shadowBlur = 14 * DPR * VIEW[0];
+      g.beginPath(); g.moveTo(...P.pts[0]); for (let i = 1; i < p.i; i++) g.lineTo(...P.pts[i]); g.lineTo(p.x, p.y); g.stroke(); g.restore();
+    }
+  }
+  // paradas
+  STOPS.forEach(([x, y], i) => {
+    const pop = OM.popIn(t, T.stops + i * 0.05, { rise: 14 });
+    if (t < T.stops + i * 0.05) return;
+    const v = visits && t >= visits[i], hit = visits ? OM.impact(t, visits[i], { sqx: 0.4, sqy: 0.4 }) : { r: 0 };
+    g.save(); g.globalAlpha *= pop.op; g.translate(x, y - pop.dy); g.scale(pop.s * (1 + (v ? hit.r * 0.5 : 0)), pop.s * (1 + (v ? hit.r * 0.5 : 0)));
+    g.fillStyle = v ? color : C.ink; g.beginPath(); g.arc(0, 0, 8, 0, 7); g.fill();
+    if (v) { g.strokeStyle = C.ground; g.lineWidth = 2.5; g.beginPath(); g.moveTo(-3.5, 0); g.lineTo(-1, 2.8); g.lineTo(4, -3); g.stroke(); }
+    g.restore();
+  });
+  // depósito
+  const dp = OM.popIn(t, T.depot, { rise: 18 });
+  if (t >= T.depot) { g.save(); g.globalAlpha *= dp.op; g.translate(DEPOT[0], DEPOT[1] - dp.dy); g.scale(dp.s, dp.s); g.fillStyle = C.violet; g.shadowColor = C.violet; g.shadowBlur = 18 * DPR * VIEW[0]; rr(-17, -17, 34, 34, 7); g.fill(); g.restore(); }
+  // camión
+  if (showRoute && t >= T.race) {
+    const d = clamp((t - T.race) * SPEED, 0, P.len), p = at(P, d), done = d >= P.len;
+    const back = done ? OM.impact(t, T.race + P.len / SPEED, { sqx: 0.3, sqy: 0.3 }).r : 0;
+    g.save(); g.translate(p.x, p.y); g.scale(1 + back * 0.6, 1 + back * 0.6);
+    g.fillStyle = C.ink; g.shadowColor = color; g.shadowBlur = 22 * DPR * VIEW[0]; g.beginPath(); g.arc(0, 0, 11, 0, 7); g.fill();
+    g.fillStyle = color; g.beginPath(); g.arc(0, 0, 6, 0, 7); g.fill(); g.restore();
+  }
+  g.restore();
+}
+
+function noise() {                                          // anti-banding: patrón fijo de grano
+  if (!noise.p) { const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), id = x.createImageData(256, 256), rn = OM.rng(3);
+    for (let i = 0; i < id.data.length; i += 4) { const v = rn() < 0.5 ? 255 : 0; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = Math.floor(rn() * 6); } x.putImageData(id, 0, 0); noise.p = g.createPattern(c, 'repeat'); }
+  g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = noise.p; g.fillRect(0, 0, cv.width, cv.height);
+}
+
+let CAM, TRACK = {};
+function seek(t) {
+  CAM = camAt(t);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const grd = g.createRadialGradient(cv.width * 0.5, cv.height * 0.42, 0, cv.width * 0.5, cv.height * 0.5, cv.width * 0.7);
+  grd.addColorStop(0, '#0d1626'); grd.addColorStop(1, C.ground); g.fillStyle = grd; g.fillRect(0, 0, cv.width, cv.height);
+  // retícula lejana
+  const L = OM.lattice(CAM, { depth: 1.2, spacing: 56, px: 1.3 }); mat(L.matrix); g.fillStyle = 'rgba(90,180,255,0.10)';
+  for (let x = L.x0; x <= L.x1; x += L.spacing) for (let y = L.y0; y <= L.y1; y += L.spacing) { g.beginPath(); g.arc(x, y, L.r, 0, 7); g.fill(); }
+
+  VIEW = OM.view(CAM); mat(VIEW);
+  const sp = ease.expoInOut(seg(t, T.split0, T.split1));
+  const xl = lerp(X_ONE, X_L, sp), xr = lerp(X_ONE, X_R, sp);
+  const dim = 1 - 0.78 * sstep(T.stack0, T.stack1, t);
+  const fadeAll = 1 - sstep(T.lift1, T.lift1 + 0.5, t);
+  const racing = t >= T.race;
+
+  g.save(); g.globalAlpha = dim * fadeAll;
+  if (sp > 0) drawMap(xr, t, PO, C.mint, racing ? VO : null, racing);
+  drawMap(xl, t, PN, C.coral, racing ? VN : null, racing);
+  // separador
+  if (sp > 0) { g.strokeStyle = C.line2; g.lineWidth = 1.5; g.globalAlpha *= sp; g.beginPath(); g.moveTo(960, MAP_Y - 30 + (1 - sp) * MH / 2); g.lineTo(960, MAP_Y + MH + 30 - (1 - sp) * MH / 2); g.stroke(); }
+  g.restore();
+
+  // textos iniciales (sobre el mapa único)
+  word('Un chofer. Sus paradas del día.', 960, MAP_Y - 34, t, T.line1, T.textOut, 'text', 34, C.mute);
+  word('¿En qué orden?', 960, MAP_Y + MH + 92, t, T.line2, T.textOut, 'display', 64, C.ink);
+  // etiquetas
+  if (t >= T.labels) {
+    g.save(); g.globalAlpha = dim * fadeAll;
+    word('A OJO', xl + MW / 2, MAP_Y - 34, t, T.labels, 99, 'mono', 26, C.coral);
+    word('ORION', xr + MW / 2, MAP_Y - 34, t, T.labels + 0.08, 99, 'mono', 26, C.mint);
+    g.restore();
+  }
+
+  // barras de kilómetros: crecen durante la carrera, después se apilan y comparan
+  const kmN = clamp((t - T.race) * SPEED, 0, PN.len) * KM, kmO = clamp((t - T.race) * SPEED, 0, PO.len) * KM;
+  const wN = BAR_MAX * kmN / 64, wO = BAR_MAX * kmO / 64, wOfin = BAR_MAX * PO.len * KM / 64;
+  if (racing) {
+    const appear = sstep(T.race - 0.2, T.race + 0.3, t);
+    const A1 = { x: xl, y: BAR_Y, w: wN, h: 14 }, A2 = { x: xr, y: BAR_Y, w: wO, h: 14 };
+    const sN = OM.morphRect(t, T.stack0, T.stack1, A1, { x: STACK.x, y: STACK.yN, w: wN, h: STACK.h });
+    const sO = OM.morphRect(t, T.stack0 + 0.06, T.stack1 + 0.06, A2, { x: STACK.x, y: STACK.yO, w: wO, h: STACK.h });
+    const fadeBars = 1 - sstep(T.lift0 + 0.3, T.lift1, t);
+    g.save(); g.globalAlpha = appear;
+    // pista
+    if (t < T.stack0) { g.fillStyle = 'rgba(42,59,88,0.5)'; rr(xl, BAR_Y, BAR_MAX, 14, 7); g.fill(); rr(xr, BAR_Y, BAR_MAX, 14, 7); g.fill(); }
+    // barra a ojo (la parte que ORION no necesita se corta al final)
+    g.globalAlpha = appear * fadeBars;
+    g.fillStyle = C.coral; rr(sN.x, sN.y, t >= T.lift0 ? Math.min(sN.w, wOfin) : sN.w, sN.h, sN.h / 2); g.fill();
+    g.fillStyle = C.mint; rr(sO.x, sO.y, sO.w, sO.h, sO.h / 2); g.fill();
+    // cuentakilómetros
+    const k = sstep(T.stack0, T.stack1, t);
+    text(fmt(kmN), lerp(xl, STACK.x + BAR_MAX + 24, k), lerp(BAR_Y + 54, STACK.yN + 16, k), 'display', lerp(38, 28, k), C.coral, { op: fadeBars });
+    text(fmt(kmO), lerp(xr, STACK.x + wOfin + 24, k), lerp(BAR_Y + 54, STACK.yO + 16, k), 'display', lerp(38, 28, k), C.mint, { op: fadeBars });
+    g.restore();
+    // etiquetas de la comparación
+    const kl = sstep(T.stack1 - 0.3, T.stack1 + 0.2, t) * fadeBars;
+    text('A OJO', STACK.x - 22, STACK.yN + 16, 'mono', 20, C.coral, { align: 'right', op: kl });
+    text('ORION', STACK.x - 22, STACK.yO + 16, 'mono', 20, C.mint, { align: 'right', op: kl });
+    // cuando ORION vuelve al depósito
+    const tDone = T.race + OPT_DUR;
+    if (t > tDone && t < T.stack0) { const w = OM.wordRise(t, tDone + 0.1); text('llegó antes', xr + MW - 4, BAR_Y + 54 + w.y, 'mono', 22, C.mint, { align: 'right', op: w.op }); }
+
+    // el sobrante: se separa, sube y se vuelve la regla de "1 milla"
+    if (t >= T.lift0 - 0.001) {
+      const piece0 = { x: STACK.x + wOfin, y: STACK.yN, w: BAR_MAX - wOfin, h: STACK.h };
+      const up = { x: 960 - piece0.w / 2, y: 700, w: piece0.w, h: STACK.h };
+      const ruler = { x: 960 - 300, y: 740, w: 600, h: 8 };
+      const dot = { x: 960, y: 744, w: 0, h: 8 };
+      let R = OM.morphRect(t, T.lift0, T.lift1, piece0, up, { curve: ease.expoInOut });
+      if (t >= T.ruler0) R = OM.morphRect(t, T.ruler0, T.ruler1, up, ruler, { curve: ease.expoOut });
+      if (t >= T.shrink0) R = OM.morphRect(t, T.shrink0, T.shrink1, ruler, dot, { curve: ease.expoIn });
+      const glow = sstep(T.ruler0, T.ruler1, t), col = glow > 0.5 ? C.mint : C.coral;
+      if (R.w > 0.5) {
+        g.save(); g.fillStyle = col; g.shadowColor = col; g.shadowBlur = 18 * DPR * VIEW[0]; rr(R.x, R.y, R.w, R.h, R.h / 2); g.fill(); g.restore();
+        // marcas de regla
+        const ticks = sstep(T.ruler1 - 0.3, T.ruler1 + 0.2, t) * (1 - sstep(T.shrink0, T.shrink0 + 0.2, t));
+        if (ticks > 0) { g.save(); g.globalAlpha = ticks; g.strokeStyle = C.mint; g.lineWidth = 2; for (let i = 0; i <= 10; i++) { const x = R.x + R.w * i / 10, h = i % 5 === 0 ? 26 : 13; g.beginPath(); g.moveTo(x, R.y - h); g.lineTo(x, R.y); g.stroke(); } g.restore(); }
+      }
+      TRACK.ruler = OM.projectBox(VIEW, { x: R.x, y: R.y - 26, w: Math.max(R.w, 1), h: 34 });
+    }
+  }
+  // texto de la regla → se vuelve el arranque de la ecuación final
+  if (t >= T.rulerTxt) {
+    const up = ease.expoInOut(seg(t, T.shrink0, T.shrink1));
+    const w = OM.wordRise(t, T.rulerTxt);
+    g.save(); g.translate(960, lerp(688, 664, up) + w.y);
+    text('1 milla menos por chofer, por día', 0, 0, 'display', lerp(46, 34, up), lerp(0, 1, up) > 0.5 ? C.mute : C.ink, { align: 'center', op: w.op });
+    g.restore();
+  }
+  // US$ 50 M al año
+  if (t >= T.money) {
+    const s = 'US$ 50 M al año', size = 104;
+    g.save(); g.font = LOOK.font('display', size); g.letterSpacing = LOOK.track('display', size);
+    const tw = g.measureText(s).width; let x = 960 - tw / 2;
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i], cw = g.measureText(ch).width, d = OM.letterDrop(t, T.money, i, { stagger: 0.035 });
+      if (d.op > 0) { g.save(); g.translate(x + cw / 2, 790 + d.y); g.scale(d.sx, d.sy); g.globalAlpha = d.op; g.fillStyle = i < 8 ? C.mint : C.ink; g.textAlign = 'center'; g.fillText(ch, 0, 0); g.restore(); }
+      x += cw;
+    }
+    g.restore();
+    TRACK.money = OM.projectBox(VIEW, { x: 960 - tw / 2, y: 700, w: tw, h: 110 });
+    const w2 = OM.wordRise(t, T.sub);
+    if (t >= T.sub) text('UPS · ORION', 960, 856 + w2.y, 'mono', 22, C.mute, { align: 'center', op: w2.op * 0.9 });
+  }
+
+  // seguimiento para probe / motion
+  const tn = at(PN, clamp((t - T.race) * SPEED, 0, PN.len)), to = at(PO, clamp((t - T.race) * SPEED, 0, PO.len));
+  if (racing && t < T.stack1) {
+    TRACK.truckA = OM.projectBox(VIEW, { x: xl + tn.x - 11, y: MAP_Y + tn.y - 11, w: 22, h: 22 });
+    TRACK.truckB = OM.projectBox(VIEW, { x: xr + to.x - 11, y: MAP_Y + to.y - 11, w: 22, h: 22 });
+  }
+  TRACK.mapL = OM.projectBox(VIEW, { x: xl, y: MAP_Y, w: MW, h: MH });
+  noise();
+  if (HUD) document.getElementById('hud').textContent = t.toFixed(2) + ' s';
+}
+
+// ───────────────────────── contrato ─────────────────────────
+const Q = new URLSearchParams(location.search), HUD = Q.has('hud');
+if (HUD) document.getElementById('hud').style.display = 'block';
+window.__meta = { dur: T.end, fps: 30, inFrame: { money: [T.money + 0.5, T.end, 'whole'] } };
+window.__seek = async t => { TRACK = {}; seek(t); return true; };
+window.__track = t => { TRACK = {}; seek(t); return { ...TRACK }; };
+window.__motion = (t0, t1) => {
+  const c0 = camAt(t0), c1 = camAt(t1), cm = camAt((t0 + t1) / 2);
+  let m = OM.screenTravel(c0, c1, cm);
+  TRACK = {}; seek(t0); const A = { ...TRACK }; TRACK = {}; seek(t1); const B = { ...TRACK };
+  for (const k in A) if (B[k]) m = Math.max(m, Math.abs(A[k].x - B[k].x) + Math.abs(A[k].w - B[k].w), Math.abs(A[k].y - B[k].y) + Math.abs(A[k].h - B[k].h));
+  return m;
+};
+window.__ready = LOOK.ready.then(() => { seek(Number(Q.get('t') || 0)); return true; });
+if (Q.has('play')) window.__ready.then(() => { const t0 = performance.now(); const loop = () => { seek(((performance.now() - t0) / 1000) % T.end); requestAnimationFrame(loop); }; loop(); });
+</script>
+</body>
+</html>

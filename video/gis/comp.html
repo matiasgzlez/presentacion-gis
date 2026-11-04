@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!-- GIS en Logística · diapositiva 2 · "¿Qué es un GIS aplicado a la logística?" · loop de 16 s, mudo.
+     Estilo: fondo blanco, trazo negro, cuatro colores fuertes, letras grandes.
+     Cuatro capas del mismo lugar (calles, clientes, tránsito, camiones) aparecen una por una,
+     se apilan en un solo mapa y del cruce sale la mejor ruta. Empieza y termina en blanco. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>GIS · capas</title>
+<style>
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#fff}
+canvas{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#hud{position:absolute;left:14px;bottom:10px;font:13px monospace;color:#f00;display:none}
+</style>
+<script src="look.js"></script>
+<script src="motion.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script>
+const { clamp, lerp, seg, sstep, ease, spring } = OM;
+const W = 1920, H = 1080, DPR = window.devicePixelRatio || 1, DUR = 16, TAU = Math.PI * 2;
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+cv.width = W * DPR; cv.height = H * DPR;
+const INK = '#111111', BLUE = '#2563eb', RED = '#ef3b2c', ORANGE = '#f59e0b', GREEN = '#16a34a';
+const F = (k, px) => (window.LOOK ? LOOK.font(k, px) : `600 ${px}px sans-serif`);
+
+// ───────────────────────── tiempos ─────────────────────────
+const T = { in: [0.35, 2.0, 3.4, 4.8], collapse: 7.4, route: [8.9, 11.9], out: 14.3, end: 15.3 };
+
+// ───────────────────────── isométrico ─────────────────────────
+const S = 295, CX = 800, CY = 700, GAP = 92, C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+const P = (x, y, z = 0) => [CX + (x - y) * C30 * S, CY + (x + y) * S30 * S - z];
+
+// el barrio: una grilla simple
+const LINES = [-0.75, -0.25, 0.25, 0.75];
+const STREETS = [...LINES.map(v => [[v, -1], [v, 1]]), ...LINES.map(v => [[-1, v], [1, v]])];
+const DEPOT = [-0.75, -0.75];
+const CLIENTS = [[-0.25, -0.75], [0.75, -0.75], [0.75, 0.25], [0.25, 0.75], [-0.75, 0.25]];
+const TRAFFIC = [[[-0.75, -0.25], [0.75, -0.25]], [[0.25, -0.25], [0.25, 0.75]], [[-0.25, 0.25], [0.25, 0.25]]];
+const ROUTE = (() => { const pts = [DEPOT, [0.75, -0.75], [0.75, 0.75], [-0.75, 0.75], DEPOT], cum = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return { pts, cum, len: cum[cum.length - 1] }; })();
+const along = d => { d = clamp(d, 0, ROUTE.len); let i = 1; while (i < ROUTE.pts.length - 1 && ROUTE.cum[i] < d) i++; const a = ROUTE.pts[i - 1], b = ROUTE.pts[i], k = (d - ROUTE.cum[i - 1]) / (ROUTE.cum[i] - ROUTE.cum[i - 1]); return [lerp(a[0], b[0], k), lerp(a[1], b[1], k)]; };
+const clientD = CLIENTS.map(c => { let best = 0, bd = 9; for (let d = 0; d <= ROUTE.len; d += 0.01) { const p = along(d), e = Math.hypot(p[0] - c[0], p[1] - c[1]); if (e < bd) { bd = e; best = d; } } return best; });
+
+const LAYERS = [
+  { name: 'Calles', color: INK },
+  { name: 'Clientes', color: BLUE },
+  { name: 'Tránsito', color: RED },
+  { name: 'Camiones', color: ORANGE },
+];
+
+// cada capa cae a su lugar, después todas se juntan en una, al final el mapa se va
+const inK = (i, t) => spring(t - T.in[i], 0.62, 12);
+const sep = (i, t) => 1 - spring(t - (T.collapse + 0.08 * (3 - i)), 0.8, 11);
+const zOf = (i, t) => i * GAP * sep(i, t) + (1 - inK(i, t)) * 260;
+const vis = (i, t) => clamp(inK(i, t) * 3) * (1 - sstep(T.out, T.out + 0.6, t));
+
+// ───────────────────────── dibujos ─────────────────────────
+function plate(z, a, fillA, shadow) {
+  const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, y]) => P(x, y, z));
+  if (shadow) { g.globalAlpha = a * 0.10; g.fillStyle = INK;              // sombra (solo la base)
+  g.beginPath(); [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, y]) => P(x, y, -14)).forEach((p, i) => (i ? g.lineTo(p[0], p[1] + 10) : g.moveTo(p[0], p[1] + 10))); g.closePath(); g.fill(); }
+  g.globalAlpha = a * fillA; g.fillStyle = '#ffffff';
+  g.beginPath(); q.forEach((p, i) => (i ? g.lineTo(...p) : g.moveTo(...p))); g.closePath(); g.fill();
+  g.globalAlpha = a; g.strokeStyle = INK; g.lineWidth = 3; g.lineJoin = 'round'; g.stroke();
+  g.globalAlpha = 1;
+}
+function seg3(a, b, z) { const p = P(a[0], a[1], z), q = P(b[0], b[1], z); g.moveTo(...p); g.lineTo(...q); }
+function pin(x, y, z, a, color, k, done) {
+  const [sx, sy] = P(x, y, z), s = Math.max(0, k);
+  if (a <= 0 || s <= 0) return;
+  g.globalAlpha = a;
+  g.fillStyle = 'rgba(0,0,0,0.18)'; g.beginPath(); g.ellipse(sx, sy, 17 * s, 7 * s, 0, 0, TAU); g.fill();
+  const h = 82 * s, r = 25 * s;
+  g.fillStyle = done ? GREEN : color; g.beginPath();
+  g.moveTo(sx, sy); g.bezierCurveTo(sx - r * 0.6, sy - h * 0.45, sx - r, sy - h + r * 0.9, sx - r, sy - h + r * 0.2);
+  g.arc(sx, sy - h + r * 0.2, r, Math.PI, 0); g.bezierCurveTo(sx + r, sy - h + r * 0.9, sx + r * 0.6, sy - h * 0.45, sx, sy); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(sx, sy - h + r * 0.2, r * 0.42, 0, TAU); g.fill();
+  if (done) { g.strokeStyle = GREEN; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.moveTo(sx - 7, sy - h + r * 0.2); g.lineTo(sx - 1.5, sy - h + r * 0.2 + 5.5); g.lineTo(sx + 8, sy - h + r * 0.2 - 5.5); g.stroke(); }
+  g.globalAlpha = 1;
+}
+function truck(x, y, z, a, k, dir = 1) {
+  const [sx, sy] = P(x, y, z), s = Math.max(0, k); if (a <= 0 || s <= 0) return;
+  g.save(); g.translate(sx, sy); g.scale(1.7 * s * dir, 1.7 * s); g.globalAlpha = a;
+  g.fillStyle = 'rgba(0,0,0,0.18)'; g.beginPath(); g.ellipse(0, 0, 34, 8, 0, 0, TAU); g.fill();
+  g.fillStyle = ORANGE; g.strokeStyle = INK; g.lineWidth = 3; g.lineJoin = 'round';
+  g.beginPath(); g.roundRect(-34, -44, 44, 34, 4); g.fill(); g.stroke();                       // caja
+  g.beginPath(); g.moveTo(10, -10); g.lineTo(10, -34); g.lineTo(24, -34); g.lineTo(34, -22); g.lineTo(34, -10); g.closePath(); g.fill(); g.stroke();   // cabina
+  g.fillStyle = '#fff'; g.beginPath(); g.moveTo(15, -30); g.lineTo(23, -30); g.lineTo(29, -22); g.lineTo(15, -22); g.closePath(); g.fill();
+  g.fillStyle = INK; for (const wx of [-20, 22]) { g.beginPath(); g.arc(wx, -9, 7, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(wx, -9, 2.5, 0, TAU); g.fill(); g.fillStyle = INK; }
+  g.restore(); g.globalAlpha = 1;
+}
+function depot(z, a) {
+  const [sx, sy] = P(...DEPOT, z); if (a <= 0) return;
+  g.save(); g.translate(sx, sy); g.scale(1.7, 1.7); g.translate(-sx, -sy);
+  g.globalAlpha = a; g.fillStyle = INK;
+  g.beginPath(); g.moveTo(sx - 22, sy); g.lineTo(sx - 22, sy - 26); g.lineTo(sx, sy - 40); g.lineTo(sx + 22, sy - 26); g.lineTo(sx + 22, sy); g.closePath(); g.fill();
+  g.fillStyle = '#fff'; g.fillRect(sx - 8, sy - 16, 16, 16); g.restore(); g.globalAlpha = 1;
+}
+function label(i, z, a, t) {
+  if (a <= 0.01) return;
+  const [rx, ry] = P(1, -1, z), k = OM.wordRise(t, T.in[i] + 0.15);
+  const x = rx + 40, y = ry + (k.y || 0) * 0.5;
+  g.globalAlpha = a * (k.op ?? 1);
+  g.strokeStyle = INK; g.lineWidth = 2; g.beginPath(); g.moveTo(rx + 8, ry); g.lineTo(x - 6, y); g.stroke();
+  g.fillStyle = LAYERS[i].color; g.beginPath(); g.arc(x + 12, y, 11, 0, TAU); g.fill();
+  g.fillStyle = INK; g.font = F('display', 52); g.textBaseline = 'middle'; g.fillText(LAYERS[i].name, x + 36, y + 2);
+  g.globalAlpha = 1;
+}
+
+function layer(i, t) {
+  const z = zOf(i, t), a = vis(i, t); if (a <= 0) return;
+  const s = sep(i, t);
+  if (i === 0 || s > 0.02) plate(z, a, i === 0 ? 1 : clamp(s * 1.5) * 0.55, i === 0);
+  g.globalAlpha = a; g.lineCap = 'round';
+  if (i === 0) {
+    const draw = ease.cubicOut(seg(t, T.in[0] + 0.1, T.in[0] + 1.0));
+    g.strokeStyle = INK; g.lineWidth = 7; g.beginPath();
+    for (const [p, q] of STREETS) seg3(p, [lerp(p[0], q[0], draw), lerp(p[1], q[1], draw)], z);
+    g.stroke(); g.globalAlpha = 1;
+    depot(z, a * sstep(T.in[0] + 0.6, T.in[0] + 1.0, t));
+  } else if (i === 2) {
+    const k = ease.cubicOut(seg(t, T.in[2] + 0.1, T.in[2] + 0.9));
+    const fade = 1 - 0.55 * sstep(T.route[0], T.route[0] + 0.6, t);   // cuando sale la ruta, el tránsito pasa a segundo plano
+    g.globalAlpha = a * fade; g.strokeStyle = RED; g.lineWidth = 12; g.beginPath();
+    for (const [p, q] of TRAFFIC) seg3(p, [lerp(p[0], q[0], k), lerp(p[1], q[1], k)], z + 1);
+    g.stroke(); g.globalAlpha = 1;
+  }
+  g.globalAlpha = 1;
+}
+function layerIcons(i, t) {
+  const z = zOf(i, t), a = vis(i, t); if (a <= 0) return;
+  if (i === 1) CLIENTS.forEach((c, j) => {
+    const k = spring(t - (T.in[1] + 0.1 + j * 0.09), 0.5, 14);
+    const done = t >= routeT(clientD[j]);
+    pin(c[0], c[1], z, a, BLUE, k, done);
+  });
+  if (i === 3) {
+    const k = spring(t - (T.in[3] + 0.1), 0.5, 14);
+    const p = truckPos(t);
+    truck(p[0], p[1], z, a, k, p[2]);
+  }
+}
+// el camión: espera en el depósito; cuando sale la ruta la recorre
+const routeK = t => ease.sineInOut(seg(t, ...T.route));
+const routeT = d => { // en qué momento el camión pasa por la distancia d
+  let lo = T.route[0], hi = T.route[1]; for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (routeK(m) * ROUTE.len < d) lo = m; else hi = m; } return hi + 0.05;
+};
+function truckPos(t) {
+  const d = routeK(t) * ROUTE.len, p = along(d), q = along(d + 0.02);
+  const sp = P(p[0], p[1]), sq = P(q[0], q[1]);
+  return [p[0], p[1], sq[0] >= sp[0] ? 1 : -1];
+}
+
+function route(t) {
+  const k = routeK(t), a = 1 - sstep(T.out, T.out + 0.6, t); if (k <= 0 || a <= 0) return;
+  const d = k * ROUTE.len, z = zOf(0, t) + 2;
+  g.globalAlpha = a; g.strokeStyle = GREEN; g.lineWidth = 14; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); let first = true;
+  for (let i = 0; i < ROUTE.pts.length; i++) {
+    if (ROUTE.cum[i] > d) { const p = along(d); g.lineTo(...P(p[0], p[1], z)); break; }
+    const s = P(...ROUTE.pts[i], z); first ? g.moveTo(...s) : g.lineTo(...s); first = false;
+  }
+  g.stroke(); g.globalAlpha = 1;
+}
+function caption(t) {
+  const k = OM.wordRise(t, T.route[0] + 0.4), a = (k.op ?? 1) * (1 - sstep(T.out, T.out + 0.5, t));
+  if (t < T.route[0] + 0.4 || a <= 0) return;
+  const [rx, ry] = P(1, -1, 0), x = rx + 40, y = ry + (k.y || 0) * 0.5;
+  g.globalAlpha = a;
+  g.fillStyle = GREEN; g.font = F('display', 64); g.textBaseline = 'middle'; g.fillText('La mejor ruta', x, y - 24);
+  g.fillStyle = INK; g.font = F('text', 40); g.fillText('pasa por todos los clientes', x, y + 38);
+  g.fillText('y esquiva el tránsito', x, y + 88);
+  g.globalAlpha = 1;
+}
+
+let TRACK = {};
+function seek(t) {
+  t = ((t % DUR) + DUR) % DUR;
+  g.setTransform(DPR, 0, 0, DPR, 0, 0); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 4; i++) {
+    layer(i, t);
+    if (i === 0) route(t);
+    layerIcons(i, t);
+  }
+  const labA = t => 1 - sstep(T.collapse - 0.3, T.collapse + 0.1, t);
+  for (let i = 0; i < 4; i++) label(i, zOf(i, t), vis(i, t) * labA(t), t);
+  caption(t);
+  const p = truckPos(t), s = P(p[0], p[1], zOf(3, t)); TRACK.truck = { x: s[0] - 30, y: s[1] - 40, w: 60, h: 40, op: vis(3, t) };
+  if (HUD) document.getElementById('hud').textContent = `t ${t.toFixed(2)}`;
+}
+
+const Qs = new URLSearchParams(location.search), HUD = Qs.has('hud');
+if (HUD) document.getElementById('hud').style.display = 'block';
+window.__meta = { dur: DUR, fps: 30 };
+window.__seek = async (t) => { TRACK = {}; seek(t); return true; };
+window.__track = (t) => { seek(t); return { ...TRACK }; };
+window.__motion = (t0, t1) => {
+  let m = 0; for (let i = 0; i < 4; i++) m = Math.max(m, Math.abs(zOf(i, t1) - zOf(i, t0)));
+  const a = truckPos(t0), b = truckPos(t1), sa = P(a[0], a[1]), sb = P(b[0], b[1]);
+  return Math.max(m, Math.hypot(sb[0] - sa[0], sb[1] - sa[1]));
+};
+window.__ready = (window.LOOK ? LOOK.ready : Promise.resolve()).then(() => { seek(Number(Qs.get('t') || 0)); return true; });
+if (Qs.has('play')) window.__ready.then(() => { const t0 = performance.now(); const f = () => { seek((performance.now() - t0) / 1000); requestAnimationFrame(f); }; f(); });
+</script>
+</body>
+</html>

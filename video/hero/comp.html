@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!-- GIS en Logística · fondo de la portada · "Del planeta a la puerta" · loop de 16 s, mudo.
+     Un solo plano: la Tierra de noche (NASA Black Marble) → Argentina → Chaco → Resistencia (calles de OSM)
+     → hexágonos de demanda → la ruta optimizada llega a la última puerta → la puerta se abre y adentro está el planeta.
+     El último cuadro es el primero. Hecho con onetake (lib/motion.js). -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Hero · del planeta a la puerta</title>
+<style>
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#03050b}
+canvas{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#hud{position:absolute;left:14px;bottom:10px;font:13px monospace;color:#f66;display:none;z-index:9}
+</style>
+<script src="look.js"></script>
+<script src="motion.js"></script>
+<script src="data.js"></script>
+<script src="tex.js"></script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script>
+const { clamp, lerp, seg, sstep, ssstep, ease, spring } = OM;
+const W = 1920, H = 1080, DPR = window.devicePixelRatio || 1;
+const DUR = 16;
+const DEG = Math.PI / 180, LN = Math.log;
+
+// ───────────────────────── paleta: noche de sodio ─────────────────────────
+// el mundo es ámbar (luz de sodio, como en las fotos satelitales); menta es solo el punto y la ruta optimizada.
+const C = { space: [3, 5, 11], ink: '234,240,251', mint: '60,242,181', amber: '255,170,72', sodium: '255,142,54', warm: '255,226,180' };
+
+// ───────────────────────── escala y cámara ─────────────────────────
+const R = 360;                 // radio del globo a zoom 1 (px)
+const FOCAL = 1500;            // distancia focal de la perspectiva (px)
+const ZC = 1900;               // zoom de la ciudad
+const ZEND = 1.2e6;            // zoom final: la puerta ocupa todo y adentro está el globo a zoom 1
+const RING = 1750 / ZEND;      // radio de la puerta-portal en unidades de mundo
+const A0 = [1340, 540];        // dónde está la puerta en pantalla (globo, país, provincia)
+const AC = [1170, 800];        // y en la ciudad (para que la ruta, que va al norte, entre en cuadro)
+const DOOR = DATA.door, LAM_D = DOOR[0] * DEG, PHI_D = DOOR[1] * DEG;
+const ROT = { lam: 30 * DEG, phi: 22 * DEG, t1: 2.4 };   // el globo gira hasta poner la puerta de frente
+
+const T = {
+  settle: 0.9, dive1: [2.8, 4.3], dive2: [4.8, 6.15], dive3: [6.5, 8.3],
+  hex: 7.95, route: [8.75, 12.55], hold: [12.55, 13.35], dive4: [13.35, DUR],
+};
+
+// rotación del globo: quieto (fuera de la vista) antes de 0, gira hasta 2.4 s, después quieto en la puerta
+const spin = t => (t <= 0 ? 1 : 1 - ssstep(0, ROT.t1, t));
+const center = t => [LAM_D + ROT.lam * spin(t), PHI_D + ROT.phi * spin(t)];
+
+// log del zoom: tramos con su curva; los que tocan la costura del loop son Hermite con la misma pendiente
+const SEAM = 0.55;             // log-zoom por segundo en la costura (fin = principio)
+function herm(t, t0, t1, p0, p1, m0, m1) {
+  const h = t1 - t0, s = clamp((t - t0) / h), s2 = s * s, s3 = s2 * s;
+  return (2 * s3 - 3 * s2 + 1) * p0 + (s3 - 2 * s2 + s) * m0 * h + (-2 * s3 + 3 * s2) * p1 + (s3 - s2) * m1 * h;
+}
+const L1 = 0.16, L2 = LN(6), L3 = LN(40), L4 = LN(ZC), L4b = LN(ZC), LE = LN(ZEND);
+const LAND = OM.bezier(0.7, 0, 0.16, 1), WHIP = OM.bezier(0.8, 0, 0.2, 1), FALL = OM.bezier(0.62, 0, 0.12, 1);
+function logZoom(t) {
+  if (t < T.settle) return herm(t, 0, T.settle, 0, L1, SEAM, 0);
+  if (t < T.dive1[0]) return L1;
+  if (t < T.dive1[1]) return lerp(L1, L2, LAND(seg(t, ...T.dive1)));
+  if (t < T.dive2[0]) return L2;
+  if (t < T.dive2[1]) return lerp(L2, L3, WHIP(seg(t, ...T.dive2)));
+  if (t < T.dive3[0]) return L3;
+  if (t < T.dive3[1]) return lerp(L3, L4, FALL(seg(t, ...T.dive3)));
+  if (t < T.hold[0]) return lerp(L4, L4b, ease.sineInOut(seg(t, T.dive3[1], T.hold[0])));
+  if (t < T.dive4[0]) return L4b;
+  return herm(t, T.dive4[0], DUR, L4b, LE, 0, SEAM);
+}
+const key = (t, keys, f = ease.cubicInOut) => {          // [[t, v], …] con curva por tramo
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) if (t < keys[i][0]) return lerp(keys[i - 1][1], keys[i][1], (keys[i][2] || f)(seg(t, keys[i - 1][0], keys[i][0])));
+  return keys[keys.length - 1][1];
+};
+const PITCH = [[6.9, 0], [8.5, 0.92, FALL], [T.dive4[0] + 0.05, 0.92], [T.dive4[0] + 1.35, 0]];
+const BEAR = [[6.5, 0], [8.3, -0.42, FALL], [T.dive4[0], -0.42], [T.dive4[0] + 1.9, 0]];
+const AX = [[6.5, A0[0]], [8.3, AC[0], FALL], [T.dive4[0], AC[0]], [T.dive4[0] + 1.6, A0[0]]];
+const AY = [[6.5, A0[1]], [8.3, AC[1], FALL], [T.dive4[0], AC[1]], [T.dive4[0] + 1.6, A0[1]]];
+const HITS = [[4.3, 2.2, 8], [6.15, 3, 8], [T.route[1], 5, 7]];
+// la mano del operador: flota solo mientras la cámara viaja; cero en las pausas
+const handEnv = t => Math.max(sstep(2.8, 3.3, t) * (1 - sstep(4.1, 4.4, t)), sstep(4.8, 5.1, t) * (1 - sstep(5.95, 6.15, t)),
+  sstep(6.5, 7.0, t) * (1 - sstep(12.2, 12.55, t)), sstep(13.4, 13.9, t) * (1 - sstep(15.2, 15.8, t)));
+
+function camAt(t) {
+  const L = logZoom(t), zoom = Math.exp(L), e = handEnv(t) * 3.2;
+  let ax = key(t, AX) + e * (Math.sin(1.7 * t) + 0.6 * Math.sin(2.9 * t + 1));
+  let ay = key(t, AY) + e * (Math.sin(1.3 * t + 2) + 0.5 * Math.sin(3.3 * t));
+  let bear = key(t, BEAR);
+  for (const [th, amp, decay] of HITS) { const s = OM.shake(t, th, { amp, decay, seed: Math.round(th * 100) }); ax += s.x; ay += s.y; bear += s.rot; }
+  const [lam, phi] = center(t);
+  return { t, L, zoom, ax, ay, pitch: key(t, PITCH), bear, lam, phi };
+}
+
+// mundo (px a zoom 1, y hacia abajo) → pantalla, con altura h (px de mundo)
+function mk(cam, zmul = 1) {
+  const z = cam.zoom * zmul, cb = Math.cos(cam.bear), sb = Math.sin(cam.bear), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  const P = (x, y, h = 0) => {
+    const rx = (x * cb - y * sb) * z, ry = (x * sb + y * cb) * z, hh = h * z;
+    const d = FOCAL - ry * sp - hh * cp; if (d < 60) return null;
+    const f = FOCAL / d; return [cam.ax + rx * f, cam.ay + (ry * cp - hh * sp) * f, f];
+  };
+  // pantalla → mundo sobre el piso (h = 0)
+  const U = (sx, sy) => {
+    const X = sx - cam.ax, Y = sy - cam.ay, den = FOCAL * cp + Y * sp; if (den <= 1) return null;
+    const ry = Y * FOCAL / den, rx = X * (FOCAL - ry * sp) / FOCAL;
+    return [(rx * cb + ry * sb) / z, (-rx * sb + ry * cb) / z];
+  };
+  return { P, U, z };
+}
+
+// ───────────────────────── proyección ortográfica ─────────────────────────
+function ortho(lon, lat, l0, p0) {
+  const la = lat * DEG, dl = lon * DEG - l0, cl = Math.cos(la), sl = Math.sin(la), cp = Math.cos(p0), sp = Math.sin(p0), cd = Math.cos(dl);
+  return [R * cl * Math.sin(dl), -R * (cp * sl - sp * cl * cd), sp * sl + cp * cl * cd];
+}
+// todo lo vectorial se ve con el globo ya quieto: se proyecta una vez, centrado en la puerta
+function projFlat(flat) {
+  const n = flat.length / 2, out = new Float64Array(flat.length);
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (let i = 0; i < n; i++) {
+    const p = ortho(flat[2 * i], flat[2 * i + 1], LAM_D, PHI_D); out[2 * i] = p[0]; out[2 * i + 1] = p[1];
+    x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]);
+  }
+  out.bb = [x0, y0, x1, y1];
+  return out;
+}
+function withLength(a) {
+  const n = a.length / 2, cum = new Float64Array(n);
+  for (let i = 1; i < n; i++) cum[i] = cum[i - 1] + Math.hypot(a[2 * i] - a[2 * i - 2], a[2 * i + 1] - a[2 * i - 1]);
+  a.cum = cum; a.len = cum[n - 1]; return a;
+}
+const KM = R / 6371;            // 1 km en px de mundo
+let ARG, CHACO, STREETS, WATER, HEX, ROUTE, STOPS;
+function build() {
+  ARG = DATA.arg.map(projFlat).map(withLength).sort((a, b) => b.len - a.len);
+  CHACO = DATA.chaco.map(projFlat).map(withLength);
+  STREETS = DATA.streets.map(cls => cls.map(projFlat));
+  WATER = DATA.water.map(projFlat);
+  ROUTE = withLength(projFlat(DATA.route.flat()));
+  STOPS = DATA.stops.map(([lo, la, f]) => { const p = ortho(lo, la, LAM_D, PHI_D); return { x: p[0], y: p[1], f }; });
+  const dmax = Math.max(...DATA.hexes.map(([d, b]) => { const p = ortho(b[0][0], b[0][1], LAM_D, PHI_D); return Math.hypot(p[0], p[1]); }));
+  HEX = DATA.hexes.map(([d, b]) => {
+    const pts = b.map(([lo, la]) => ortho(lo, la, LAM_D, PHI_D));
+    const cx = pts.reduce((s, p) => s + p[0], 0) / pts.length, cy = pts.reduce((s, p) => s + p[1], 0) / pts.length;
+    return { d, pts, cx, cy, t0: T.hex + 0.85 * Math.hypot(cx, cy) / dmax, h: (0.08 + d * 0.011) * KM };
+  });
+}
+
+// ───────────────────────── WebGL: la Tierra de noche ─────────────────────────
+const glc = document.getElementById('gl');
+glc.width = W * DPR; glc.height = H * DPR;
+const gl = glc.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false });
+const VS = `#version 300 es
+in vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+const FS = `#version 300 es
+precision highp float;
+uniform vec2 uRes; uniform float uDPR;
+uniform vec2 uA; uniform float uZoom, uBear, uPitch, uFocal, uR;
+uniform vec2 uC, uCi; uniform float uRing, uZend, uTexA;
+uniform sampler2D tG, tR; uniform vec4 uReg;
+out vec4 o;
+const float PI = 3.14159265358979;
+const vec3 SPACE = vec3(${C.space.map(v => (v / 255).toFixed(4)).join(',')});
+vec3 toLin(vec3 c){ return pow(c, vec3(2.2)); }
+vec3 grade(vec3 s, float zoom){
+  // el negro del océano y el azul de la tierra bajan a un azul noche; las luces van a sodio
+  vec3 base = vec3(0.012, 0.020, 0.046) + s.b * vec3(0.045, 0.085, 0.200) + s.g * vec3(0.03, 0.04, 0.06);
+  float far = 1.0 - smoothstep(1.2, 5.0, zoom);
+  float m = smoothstep(mix(0.10, 0.035, far), mix(0.80, 0.45, far), s.r);
+  vec3 light = mix(vec3(0.95, 0.42, 0.10), vec3(1.0, 0.87, 0.64), smoothstep(0.55, 1.0, s.r));
+  return base * (1.0 - 0.6 * m) + light * m * (0.55 + 0.6 * s.r);
+}
+vec3 earth(vec2 g, vec2 c, float zoom){
+  vec2 q = vec2(g.x, -g.y) / uR;
+  float rho = length(q);
+  float px = (rho - 1.0) * uR * zoom;              // distancia al borde en px de pantalla
+  vec3 atm = vec3(0.16, 0.36, 0.75);
+  if (rho >= 1.0) return SPACE + atm * 0.10 * exp(-px / 14.0) + atm * 0.05 * exp(-px / 70.0);
+  float cc = asin(rho), sc = sin(cc), co = cos(cc);
+  float phi = rho < 1e-9 ? c.y : asin(clamp(co * sin(c.y) + q.y * sc * cos(c.y) / rho, -1.0, 1.0));
+  float lam = c.x + atan(q.x * sc, rho * co * cos(c.y) - q.y * sc * sin(c.y));
+  float lon = lam / PI * 180.0, lat = phi / PI * 180.0;
+  vec2 ug = vec2(fract((lam + PI) / (2.0 * PI)), (PI * 0.5 - phi) / PI);
+  vec3 s = texture(tG, ug).rgb;
+  vec2 ur = vec2((lon - uReg.x) / (uReg.z - uReg.x), (uReg.y - lat) / (uReg.y - uReg.w));
+  float inside = smoothstep(0.0, 0.03, min(min(ur.x, 1.0 - ur.x), min(ur.y, 1.0 - ur.y)));
+  float wr = inside * smoothstep(1.4, 2.6, zoom);
+  if (wr > 0.0) s = mix(s, texture(tR, ur).rgb, wr);
+  vec3 col = grade(s, zoom);
+  col *= 0.55 + 0.45 * sqrt(max(co, 0.0));        // el borde del disco se apaga un poco
+  col += atm * 0.16 * pow(rho, 6.0);                 // aire en el limbo
+  return col;
+}
+void main(){
+  vec2 sc = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uDPR;
+  float X = sc.x - uA.x, Y = sc.y - uA.y, cp = cos(uPitch), sp = sin(uPitch);
+  float den = uFocal * cp + Y * sp;
+  if (den <= 1.0) { o = vec4(SPACE, 1.0); return; }
+  float ry = Y * uFocal / den, rx = X * (uFocal - ry * sp) / uFocal;
+  float cb = cos(uBear), sb = sin(uBear);
+  vec2 g = vec2(rx * cb + ry * sb, -rx * sb + ry * cb) / uZoom;
+  vec3 col;
+  if (length(g) < uRing) col = earth(g * uZend, uCi, uZoom / uZend);       // adentro de la puerta: el planeta otra vez
+  else col = mix(SPACE * 0.8, earth(g, uC, uZoom), uTexA);
+  o = vec4(col, 1.0);
+}`;
+function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+const prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
+gl.useProgram(prog);
+const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const lp = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
+const U = {}; for (const n of ['uRes', 'uDPR', 'uA', 'uZoom', 'uBear', 'uPitch', 'uFocal', 'uR', 'uC', 'uCi', 'uRing', 'uZend', 'uTexA', 'tG', 'tR', 'uReg']) U[n] = gl.getUniformLocation(prog, n);
+function loadTex(src, unit) {
+  return new Promise(res => {
+    const im = new Image(); im.onload = () => {
+      const tx = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tx);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, im);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      res();
+    }; im.src = src;
+  });
+}
+function drawGL(cam, texA) {
+  gl.viewport(0, 0, glc.width, glc.height);
+  gl.uniform2f(U.uRes, glc.width, glc.height); gl.uniform1f(U.uDPR, DPR);
+  gl.uniform2f(U.uA, cam.ax, cam.ay); gl.uniform1f(U.uZoom, cam.zoom); gl.uniform1f(U.uBear, cam.bear); gl.uniform1f(U.uPitch, cam.pitch);
+  gl.uniform1f(U.uFocal, FOCAL); gl.uniform1f(U.uR, R);
+  gl.uniform2f(U.uC, cam.lam, cam.phi);
+  const ci = center(cam.t - DUR); gl.uniform2f(U.uCi, ci[0], ci[1]);
+  gl.uniform1f(U.uRing, cam.t > T.dive4[0] ? RING : 0); gl.uniform1f(U.uZend, ZEND); gl.uniform1f(U.uTexA, texA);
+  gl.uniform1i(U.tG, 0); gl.uniform1i(U.tR, 1); gl.uniform4f(U.uReg, ...DATA.region);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+// ───────────────────────── 2D: capas de datos encima ─────────────────────────
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+cv.width = W * DPR; cv.height = H * DPR;
+const off = document.createElement('canvas'); off.width = cv.width; off.height = cv.height;
+const o2 = off.getContext('2d');
+const GRAIN = (() => {                                   // grano fijo: evita que el degradado oscuro se escalone al codificar
+  const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), id = x.createImageData(256, 256), r = OM.rng(11);
+  for (let i = 0; i < 256 * 256; i++) { const w = r() < 0.5 ? 255 : 0; id.data[4 * i] = id.data[4 * i + 1] = id.data[4 * i + 2] = w; id.data[4 * i + 3] = Math.floor(r() * 6); }
+  x.putImageData(id, 0, 0); return c;
+})();
+
+function polyPath(ctx, P, a, upto = Infinity) {
+  const n = a.length / 2; let pen = false, last = null;
+  for (let i = 0; i < n; i++) {
+    let x = a[2 * i], y = a[2 * i + 1];
+    if (a.cum && a.cum[i] > upto) {                       // corta a mitad de tramo
+      const k = (upto - a.cum[i - 1]) / (a.cum[i] - a.cum[i - 1]);
+      x = lerp(a[2 * i - 2], x, k); y = lerp(a[2 * i - 1], y, k);
+      const s = P(x, y); if (s && pen) ctx.lineTo(s[0], s[1]); return s;
+    }
+    const s = P(x, y);
+    if (!s) { pen = false; continue; }
+    if (pen) ctx.lineTo(s[0], s[1]); else { ctx.moveTo(s[0], s[1]); pen = true; }
+    last = s;
+  }
+  return last;
+}
+function pointAt(a, d) {
+  const n = a.length / 2; d = clamp(d, 0, a.len); let i = 1; while (i < n - 1 && a.cum[i] < d) i++;
+  const k = (d - a.cum[i - 1]) / (a.cum[i] - a.cum[i - 1] || 1);
+  return [lerp(a[2 * i - 2], a[2 * i], k), lerp(a[2 * i - 1], a[2 * i + 1], k)];
+}
+function viewBox(V) {                                     // rectángulo de mundo que se ve (con margen)
+  const pts = [[-200, -200], [W + 200, -200], [-200, H + 200], [W + 200, H + 200], [W / 2, -200]].map(p => V.U(p[0], p[1])).filter(Boolean);
+  if (pts.length < 5) { const far = 1e9; return [-far, -far, far, far]; }
+  return [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))];
+}
+const hit = (bb, vb) => !(bb[2] < vb[0] || bb[0] > vb[2] || bb[3] < vb[1] || bb[1] > vb[3]);
+
+// la puerta en pantalla (mientras el globo gira se proyecta con el centro vivo)
+function doorScreen(cam, V, inner = false) {
+  const c = inner ? center(cam.t - DUR) : [cam.lam, cam.phi];
+  const p = ortho(DOOR[0], DOOR[1], c[0], c[1]); if (p[2] < 0.05) return null;
+  const s = V.P(p[0], p[1]); return s && { x: s[0], y: s[1], vis: sstep(0.05, 0.25, p[2]) };
+}
+const PINGS = [1.25, 4.35, 6.2, T.route[1]];
+function marker(ctx, x, y, t, a, big = 1) {
+  if (a <= 0) return;
+  const arr = t - T.route[1], pulse = arr > 0 ? 1 + 0.9 * Math.exp(-6 * arr) * Math.sin(Math.min(arr, 0.6) * 18) * 0.5 + 0.35 * (1 - spring(arr, 0.5, 16)) : 1;
+  for (const tp of PINGS) {
+    const u = t - tp; if (u < 0 || u > 1.4) continue;
+    const r = lerp(6, tp === T.route[1] ? 70 : 38, ease.expoOut(u / 1.4)) * big;
+    ctx.strokeStyle = `rgba(${C.mint},${0.55 * a * (1 - u / 1.4)})`; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
+  }
+  const halo = ctx.createRadialGradient(x, y, 0, x, y, 22 * pulse);
+  halo.addColorStop(0, `rgba(${C.mint},${0.42 * a})`); halo.addColorStop(1, `rgba(${C.mint},0)`);
+  ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(x, y, 22 * pulse, 0, 7); ctx.fill();
+  ctx.fillStyle = `rgba(${C.mint},${a})`; ctx.beginPath(); ctx.arc(x, y, 4.6 * pulse, 0, 7); ctx.fill();
+  ctx.fillStyle = `rgba(255,255,255,${0.85 * a})`; ctx.beginPath(); ctx.arc(x, y, 1.8 * pulse, 0, 7); ctx.fill();
+}
+
+function niceScale(mpp) {                                 // barra de escala: el largo "redondo" que entra en 150 px
+  const target = mpp * 150, p = Math.pow(10, Math.floor(Math.log10(target)));
+  const n = [5, 2, 1].map(k => k * p).find(v => v <= target) || p;
+  const txt = n >= 1000 ? (n / 1000).toLocaleString('es-AR') + ' km' : n + ' m';
+  return { px: n / mpp, txt };
+}
+
+let TRACK = {}, CAM = null;
+function seek(t) {
+  t = ((t % DUR) + DUR) % DUR;
+  const cam = CAM = camAt(t), V = mk(cam), L = cam.L;
+  const texA = 1 - sstep(LN(85), LN(330), L);
+  drawGL(cam, texA);
+
+  g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
+  const vb = viewBox(V);
+  // la puerta como portal (solo en la última zambullida)
+  const ringOn = t > T.dive4[0];
+  const ringPx = ringOn ? RING * cam.zoom : 0;
+  const ringPoly = ringOn && ringPx > 3 ? Array.from({ length: 120 }, (_, i) => V.P(RING * Math.cos(i / 120 * 2 * Math.PI), RING * Math.sin(i / 120 * 2 * Math.PI))).filter(Boolean) : null;
+  g.save();
+  if (ringPoly) { g.beginPath(); g.rect(-50, -50, W + 100, H + 100); ringPoly.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); g.clip('evenodd'); }
+
+  // ── Argentina y Chaco: la primera capa de datos se dibuja sola mientras bajamos
+  const aArg = sstep(LN(2.0), LN(4.2), L) * (1 - sstep(LN(70), LN(260), L));
+  if (aArg > 0) {
+    const k = ease.cubicOut(seg(t, T.dive1[0] + 0.25, T.dive1[1] + 0.2));
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    for (const a of ARG) { if (!hit(a.bb, vb)) continue; g.beginPath(); polyPath(g, V.P, a, a.len * k); g.strokeStyle = `rgba(${C.ink},${0.42 * aArg})`; g.lineWidth = 1; g.stroke(); }
+  }
+  const aCh = sstep(LN(9), LN(26), L) * (1 - sstep(LN(120), LN(400), L));
+  if (aCh > 0) {
+    const k = ease.cubicOut(seg(t, T.dive2[0] + 0.2, T.dive2[1] + 0.25));
+    for (const a of CHACO) {
+      g.beginPath(); polyPath(g, V.P, a); g.closePath(); g.fillStyle = `rgba(${C.amber},${0.018 * aCh * k})`; g.fill();
+      g.beginPath(); polyPath(g, V.P, a, a.len * k); g.strokeStyle = `rgba(${C.warm},${0.6 * aCh})`; g.lineWidth = 1.2; g.setLineDash([5, 4]); g.stroke(); g.setLineDash([]);
+    }
+  }
+
+  // ── la ciudad: agua, calles de sodio, hexágonos de demanda
+  const aCity = sstep(LN(95), LN(420), L) * (1 - sstep(L4b + 1.6, L4b + 3.4, L));
+  if (aCity > 0) {
+    g.fillStyle = `rgba(1,2,6,${0.85 * aCity})`;
+    for (const a of WATER) { if (!hit(a.bb, vb)) continue; g.beginPath(); polyPath(g, V.P, a); g.closePath(); g.fill(); }
+    o2.setTransform(DPR, 0, 0, DPR, 0, 0); o2.clearRect(0, 0, W, H); o2.lineCap = 'round'; o2.lineJoin = 'round';
+    const zw = Math.sqrt(clamp(cam.zoom / ZC, 0.35, 4));
+    const ST = [[2.0, 0.85], [1.5, 0.72], [1.05, 0.55], [0.7, 0.4]];
+    STREETS.forEach((cls, r) => {
+      o2.beginPath();
+      for (const a of cls) if (hit(a.bb, vb)) polyPath(o2, V.P, a);
+      o2.strokeStyle = r === 0 ? `rgba(${C.amber},${ST[r][1]})` : `rgba(${C.sodium},${ST[r][1]})`; o2.lineWidth = ST[r][0] * zw; o2.stroke();
+    });
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = 0.55 * aCity; g.filter = `blur(${38 * DPR}px)`; g.drawImage(off, 0, 0);
+    g.globalAlpha = 0.7 * aCity; g.filter = `blur(${7 * DPR}px)`; g.drawImage(off, 0, 0);
+    g.filter = 'none'; g.globalAlpha = aCity; g.drawImage(off, 0, 0);
+    g.restore();
+  }
+
+  // hexágonos H3: columnas de luz, la altura es la demanda
+  const aHex = sstep(LN(500), LN(1300), L) * (1 - sstep(L4b + 1.2, L4b + 2.8, L));
+  if (aHex > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const hx of HEX) {
+      const k = spring(t - hx.t0, 0.55, 13); if (k <= 0.001) continue;
+      const h = hx.h * Math.max(0, k), dk = clamp(hx.d / 90);
+      const col = `${Math.round(lerp(255, 255, dk))},${Math.round(lerp(120, 214, dk))},${Math.round(lerp(40, 150, dk))}`;
+      const bot = hx.pts.map(p => V.P(p[0], p[1], 0)), top = hx.pts.map(p => V.P(p[0], p[1], h));
+      if (bot.some(p => !p) || top.some(p => !p)) continue;
+      const a = aHex * clamp(k * 1.3);
+      g.fillStyle = `rgba(${col},${0.022 * a})`;
+      for (let i = 0; i < bot.length; i++) { const j = (i + 1) % bot.length; g.beginPath(); g.moveTo(...bot[i].slice(0, 2)); g.lineTo(...bot[j].slice(0, 2)); g.lineTo(...top[j].slice(0, 2)); g.lineTo(...top[i].slice(0, 2)); g.closePath(); g.fill(); }
+      g.beginPath(); top.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
+      g.fillStyle = `rgba(${col},${(0.035 + 0.10 * dk) * a})`; g.fill();
+      g.strokeStyle = `rgba(${col},${(0.18 + 0.4 * dk) * a})`; g.lineWidth = 0.8; g.stroke();
+    }
+    g.restore();
+  }
+
+  // ── la ruta optimizada: el camión la dibuja y termina en la puerta
+  const aRoute = sstep(LN(700), LN(1500), L) * (1 - sstep(L4b + 2.0, L4b + 3.6, L));
+  const rp = ease.sineInOut(seg(t, ...T.route));
+  if (aRoute > 0) {
+    const d = ROUTE.len * rp;
+    // paradas
+    for (const s of STOPS) {
+      const p = V.P(s.x, s.y); if (!p) continue;
+      const on = rp >= s.f - 1e-4, k = on ? spring(t - (T.route[0] + (T.route[1] - T.route[0]) * s.f), 0.5, 16) : 0;
+      const ap = aRoute * sstep(T.hex + 0.3, T.hex + 0.9, t);
+      g.strokeStyle = `rgba(${on ? C.mint : C.ink},${(on ? 0.9 : 0.55) * ap})`; g.lineWidth = 1.3;
+      g.beginPath(); g.arc(p[0], p[1], 4.2 + 2.5 * k * Math.exp(-2 * Math.max(0, k - 1)), 0, 7); g.stroke();
+      if (on) { g.fillStyle = `rgba(${C.mint},${0.9 * ap})`; g.beginPath(); g.arc(p[0], p[1], 2, 0, 7); g.fill(); }
+    }
+    if (rp > 0) {
+      o2.setTransform(DPR, 0, 0, DPR, 0, 0); o2.clearRect(0, 0, W, H); o2.lineCap = 'round'; o2.lineJoin = 'round';
+      o2.beginPath(); polyPath(o2, V.P, ROUTE, d); o2.strokeStyle = `rgba(${C.mint},1)`; o2.lineWidth = 3.2; o2.stroke();
+      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'lighter';
+      g.globalAlpha = 0.9 * aRoute; g.filter = `blur(${9 * DPR}px)`; g.drawImage(off, 0, 0);
+      g.filter = 'none'; g.globalAlpha = aRoute; g.drawImage(off, 0, 0); g.restore();
+      if (rp < 1) {
+        const [hx, hy] = pointAt(ROUTE, d), p = V.P(hx, hy);
+        if (p) {
+          const hal = g.createRadialGradient(p[0], p[1], 0, p[0], p[1], 26);
+          hal.addColorStop(0, `rgba(${C.mint},${0.55 * aRoute})`); hal.addColorStop(1, `rgba(${C.mint},0)`);
+          g.fillStyle = hal; g.beginPath(); g.arc(p[0], p[1], 26, 0, 7); g.fill();
+          g.fillStyle = `rgba(255,255,255,${aRoute})`; g.beginPath(); g.arc(p[0], p[1], 3.4, 0, 7); g.fill();
+          TRACK.truck = { x: p[0] - 6, y: p[1] - 6, w: 12, h: 12, op: aRoute };
+        }
+      }
+    }
+  }
+  g.restore();   // fin del recorte del portal
+
+  // ── la puerta: el punto menta que nunca sale de cuadro
+  const ds = doorScreen(cam, V);
+  const mA = sstep(20, 80, R * cam.zoom);
+  if (ds) {
+    const rr = ringPoly ? ringPx : 0;
+    const fill = 1 - sstep(5, 28, rr);                    // el punto se vuelve anillo y adentro aparece el planeta
+    if (rr > 4.6 && ringPoly) {
+      g.save(); g.globalCompositeOperation = 'lighter';
+      const fa = sstep(4.6, 9, rr) * (1 - sstep(1500, 1900, rr));
+      g.beginPath(); ringPoly.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath();
+      g.strokeStyle = `rgba(${C.mint},${0.5 * fa})`; g.lineWidth = 10; g.filter = 'blur(6px)'; g.stroke(); g.filter = 'none';
+      g.strokeStyle = `rgba(${C.mint},${0.95 * fa})`; g.lineWidth = 1.8; g.stroke();
+      if (fill > 0) { g.fillStyle = `rgba(${C.mint},${fill})`; g.fill(); }
+      g.restore();
+    } else marker(g, ds.x, ds.y, t, mA * ds.vis);
+    TRACK.door = { x: ds.x - 5, y: ds.y - 5, w: 10, h: 10, op: 1 };
+  }
+  // la puerta del planeta de adentro (es la del cuadro 0 del loop siguiente)
+  if (ringPoly) {
+    const Vi = mk(cam, 1 / ZEND), di = doorScreen(cam, Vi, true);
+    if (di) {
+      g.save(); g.beginPath(); ringPoly.forEach((p, i) => (i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]))); g.closePath(); g.clip();
+      marker(g, di.x, di.y, t - DUR, sstep(20, 80, R * cam.zoom / ZEND) * di.vis);
+      g.restore();
+    }
+  }
+
+  // ── escala y coordenadas (la escala salta al planeta de adentro cuando la puerta la pasa)
+  const SB = [1560, 905];
+  const inside = ringPoly && ringPx > Math.hypot(SB[0] - cam.ax, SB[1] - cam.ay) + 40;
+  const zEff = inside ? cam.zoom / ZEND : cam.zoom;
+  const ns = niceScale(6371000 / (R * zEff));
+  const hudA = 0.62;
+  g.font = (window.LOOK ? LOOK.font('mono', 12) : '12px monospace');
+  g.fillStyle = `rgba(${C.ink},${hudA})`; g.strokeStyle = `rgba(${C.ink},${hudA})`; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(SB[0], SB[1] - 5); g.lineTo(SB[0], SB[1]); g.lineTo(SB[0] + ns.px, SB[1]); g.lineTo(SB[0] + ns.px, SB[1] - 5); g.stroke();
+  g.textBaseline = 'alphabetic'; g.fillText(ns.txt, SB[0], SB[1] - 11);
+  g.fillStyle = `rgba(${C.ink},${hudA * 0.7})`; g.fillText('27,48° S · 59,01° O', SB[0], SB[1] + 22);
+
+  // ── viñeta y grano (pantalla)
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const vg = g.createRadialGradient(W * DPR * 0.62, H * DPR * 0.5, H * DPR * 0.35, W * DPR * 0.62, H * DPR * 0.5, W * DPR * 0.78);
+  vg.addColorStop(0, 'rgba(3,5,11,0)'); vg.addColorStop(1, 'rgba(3,5,11,0.55)');
+  g.fillStyle = vg; g.fillRect(0, 0, cv.width, cv.height);
+  g.fillStyle = g.createPattern(GRAIN, 'repeat'); g.fillRect(0, 0, cv.width, cv.height);
+
+  if (HUD) document.getElementById('hud').textContent = `t ${t.toFixed(2)} · zoom ${cam.zoom.toFixed(1)} · pitch ${cam.pitch.toFixed(2)} · ring ${ringPx.toFixed(0)}px`;
+}
+
+// ───────────────────────── contrato onetake ─────────────────────────
+const Q = new URLSearchParams(location.search), HUD = Q.has('hud');
+if (HUD) document.getElementById('hud').style.display = 'block';
+window.__meta = { dur: DUR, fps: 30, inFrame: { door: [0, 13.6] } };
+window.__seek = async (t) => { TRACK = {}; seek(t); gl.finish(); return true; };
+window.__track = (t) => { seek(t); return { ...TRACK }; };
+window.__motion = (t0, t1) => {
+  // cuánto se mueve la pantalla: el zoom en log y el desplazamiento del ancla, medidos en un punto a 800 px del ancla
+  const a = camAt(t0), b = camAt(t1);
+  const dz = Math.abs(b.L - a.L) * 1500, dp = Math.hypot(b.ax - a.ax, b.ay - a.ay), dr = Math.abs(b.bear - a.bear) * 900, dpi = Math.abs(b.pitch - a.pitch) * 700;
+  const dl = Math.hypot(b.lam - a.lam, b.phi - a.phi) * R * a.zoom;
+  const tr = ease.sineInOut(seg(t1, ...T.route)) - ease.sineInOut(seg(t0, ...T.route));
+  return Math.max(dz + dp + dr + dpi, dl, tr * ROUTE.len * a.zoom * 0.7);
+};
+const ready = Promise.all([loadTex(TEX.g, 0), loadTex(TEX.r, 1), window.LOOK ? LOOK.ready : Promise.resolve()]).then(() => { build(); seek(Number(Q.get('t') || 0)); return true; });
+window.__ready = ready;
+if (Q.has('play')) ready.then(() => { const t0 = performance.now(); const f = () => { seek((performance.now() - t0) / 1000); requestAnimationFrame(f); }; f(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "gis-sodio",
+  "mood": "noche de sodio: el mundo en ámbar como en las fotos satelitales nocturnas; menta solo para la puerta y la ruta optimizada",
+  "color": {
+    "ground": "#03050b",
+    "deep": "#070c18",
+    "card": "#0b1322",
+    "line": "#1e2c44",
+    "mute": "#8ea0bd",
+    "ink": "#eaf0fb",
+    "accent": "#3cf2b5",
+    "accent2": "#ffaa48"
+  },
+  "type": {
+    "display": { "face": "Geist", "weight": 600, "tracking": -0.04 },
+    "text": { "face": "Geist", "weight": 450, "tracking": -0.01 },
+    "mono": { "face": "Geist Mono", "weight": 500, "tracking": 0.08 }
+  }
+}
