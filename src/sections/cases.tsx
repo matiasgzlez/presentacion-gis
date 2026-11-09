@@ -8,15 +8,15 @@ type Logo = { src: string; h: string; white?: boolean };
 type Card = { id: string; name: string; use: string; bg: string; logos: Logo[]; extra?: string; badge?: string; hidden?: boolean };
 
 const CASES: Card[] = [
-  { id: "mercadolibre", name: "Mercado Libre", use: "Decidir dónde guardar", bg: "#ffe700", logos: [{ src: "/logos/mercadolibre.png", h: "38%" }] },
-  { id: "uber", name: "Uber", use: "Medir la ciudad en hexágonos", bg: "#000000", logos: [{ src: "/logos/uber.png", h: "34%" }] },
-  { id: "ups", name: "UPS", use: "Elegir el orden de las paradas", bg: "#330000", logos: [{ src: "/logos/ups.png", h: "80%" }] },
-  { id: "amazon", name: "Amazon", use: "Rutas que aprenden de los choferes", bg: "#232f3e", logos: [{ src: "/logos/amazon-white.svg", h: "26%" }] },
-  { id: "dhl", name: "DHL", use: "Ver los riesgos antes de que lleguen", bg: "#ffcc00", logos: [{ src: "/logos/dhl.svg", h: "30%" }] },
+  { id: "mercadolibre", name: "Mercado Libre", use: "Dónde poner la red y cómo repartir", bg: "#ffe700", logos: [{ src: "/logos/mercadolibre.png", h: "38%" }] },
+  { id: "uber", name: "Uber", use: "Medir la ciudad en vivo, en hexágonos", bg: "#000000", logos: [{ src: "/logos/uber.png", h: "34%" }] },
+  { id: "ups", name: "UPS", use: "El orden exacto de 120 paradas", bg: "#330000", logos: [{ src: "/logos/ups.png", h: "80%" }] },
+  { id: "maersk", name: "Maersk", use: "Seguir cada contenedor en el mar", bg: "#ffffff", logos: [{ src: "/logos/maersk.svg", h: "30%" }] },
+  { id: "walmart", name: "Walmart + Wing", use: "Repartir por el aire: el mapa del cielo", bg: "#0153e3", logos: [{ src: "/logos/walmart.png", h: "24%" }], extra: "+ Wing" },
   { hidden: true, id: "tesla", name: "Tesla", use: "Manejar dentro de una geocerca", bg: "#f2f2f2", logos: [{ src: "/logos/tesla.png", h: "78%" }] },
-  { hidden: true, id: "walmart", name: "Walmart + Wing", use: "Entregar por el aire con drones", bg: "#0153e3", logos: [{ src: "/logos/walmart.png", h: "24%" }], extra: "+ Wing" },
+  { hidden: true, id: "dhl", name: "DHL", use: "Ver los riesgos en el mapa del mundo", bg: "#ffcc00", logos: [{ src: "/logos/dhl.svg", h: "30%" }] },
   { hidden: true, id: "starlink", name: "Starlink + Geotab", use: "Rastrear sin señal de celular", bg: "#0e0e10", logos: [{ src: "/logos/starlink-wordmark.svg", h: "30%", white: true }], extra: "+ Geotab" },
-  { hidden: true, id: "maersk", name: "Maersk", use: "Seguir barcos en todo el mundo", bg: "#ffffff", logos: [{ src: "/logos/maersk.svg", h: "30%" }] },
+  { hidden: true, id: "amazon", name: "Amazon", use: "Rutas que aprenden de los choferes", bg: "#232f3e", logos: [{ src: "/logos/amazon-white.svg", h: "26%" }] },
   { hidden: true, id: "espana", name: "Trenes en España", use: "Saber dónde está no alcanza", bg: "#ffffff", logos: [{ src: "/logos/renfe.svg", h: "30%" }, { src: "/logos/iryo.svg", h: "34%" }], badge: "Caso reciente · 28 oct 2026" },
 ];
 

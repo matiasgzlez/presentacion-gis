@@ -22,8 +22,8 @@ Es una presentación web que se recorre como un PowerPoint, con animaciones 2D y
 | Mercado Libre | Decidir dónde poner los depósitos (ubicación) |
 | Uber | Medir la ciudad en hexágonos H3 (demanda) |
 | UPS · ORION | El mejor orden de paradas (rutas) |
-| Amazon | Rutas que aprenden de los choferes (última milla) |
-| DHL · Resilience360 | Ver los riesgos de la cadena antes de que lleguen |
+| Maersk | Seguir cada contenedor en el mar (seguimiento y ruteo marítimo) |
+| Walmart + Wing | Repartir por el aire: área de cobertura y mapa del cielo |
 
 Cada caso tiene la misma estructura: quién es la empresa, para qué usa el GIS (las capas que cruza), cómo lo hace, qué logra en su logística y las tecnologías. A la izquierda va una guía corta de lo que se dice y a la derecha la animación. Cierra con las tecnologías que están saliendo, libros, herramientas para practicar y los videos de cada caso, separados por tema.
 
@@ -58,7 +58,7 @@ Para generar la versión de producción: `npm run build` (queda en `dist/`).
 
 | Carpeta / archivo | Qué hay |
 |---|---|
-| `src/sections/` | Portada, qué es un GIS, herramientas, los casos, lo que viene, videos y cierre |
+| `src/sections/` | Portada, qué es un GIS, herramientas, los casos, libros, para probar, videos y cierre |
 | `src/cases/` | Un archivo por caso. En `src/App.tsx` se elige cuáles se muestran (`show: true` / `false`) |
 | `src/scenes/` | Las animaciones: mapas en canvas 2D y escenas 3D con three.js |
 | `src/components/` | El modo presentación (diapositivas y pasos), el estilo de los casos (texto 30 % · animación 70 %) y el visor de videos |
@@ -76,5 +76,8 @@ Hecho con React, Vite, Tailwind CSS, Motion, three.js y MapLibre.
 - Las cifras de cada caso y sus fuentes están detalladas en `exposicion.md`.
 - Las imágenes de what3words, Plus Codes y Kepler.gl son de sus sitios (what3words.com, maps.google.com/pluscodes, docs.kepler.gl).
 - MarineTraffic: capturas de [Wikimedia Commons](https://commons.wikimedia.org) ("AIS ship tracking", CC0; "Ever Given - Havarie im Suez-Kanal", OpenSeaMap, CC BY-SA 2.0; "MarineTraffic AIS receiver"); fotos del Ever Given desde satélite y desde la Estación Espacial (NASA), también de Commons.
+- Fotos de Walmart + Wing: sitio de Wing (wing.com), usadas con fines educativos.
+- Fotos de UPS y Maersk: [Wikimedia Commons](https://commons.wikimedia.org) (camión de UPS en Fresno, CC BY 4.0; Worldport, CC BY-SA 2.5; chofer de UPS, dominio público; barcos y contenedores de Maersk, CC BY-SA 2.0/4.0).
+- Fotos de Mercado Libre: prensa de Mercado Libre (publicadas por The Logistics World, 2023) y Gobierno del Estado de São Paulo ([Wikimedia Commons](https://commons.wikimedia.org), CC BY 2.0).
 - Los logos y las tapas de libros pertenecen a sus respectivos dueños y se usan solo con fines educativos.
 - Los comercios del ejemplo de Resistencia y algunos mapas (Austin, la ciudad de Uber) son ilustrativos.

@@ -1,119 +1,103 @@
-import { Warehouse, Timer, Route, BrainCircuit, CalendarDays, Globe2, Truck } from "lucide-react";
+import { Warehouse, Package, ScanLine, Truck } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
+import { CaseIntro, NEON } from "@/components/neon";
+import { GisSlide, JourneySlide, type Station } from "@/components/journey";
+import { ExplainSlide } from "@/components/explain";
 import { ArgMap } from "@/scenes/arg-neon";
-import { LayerStack } from "@/scenes/layers-neon";
+import { MeliRoutes } from "@/scenes/meli-routes";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 01 · Mercado Libre · cómo usa el GIS para decidir dónde poner sus depósitos.
-   Las animaciones corren solas en bucle; a la izquierda, solo la guía. Lo que se dice está en exposicion.md. */
+/* Caso 01 · Mercado Libre · cómo usa el GIS en su logística.
+   El hilo: 1 el viaje de un paquete (fotos reales) → 2 en qué partes del viaje entra el GIS → 3 decisión 1: dónde poner un centro
+   → 4 decisión 2: las rutas del día. Cada decisión muestra las tecnologías que usa ahí mismo.
+   No se explica quién es (todos la conocen). Las animaciones corren solas en bucle. Lo que se dice está en exposicion.md.
+   Fotos: prensa de Mercado Libre (vía The Logistics World, 2023) y Gobierno de São Paulo (Wikimedia Commons, CC BY 2.0). */
 
 const LOGO = "/logos/mercadolibre.png";
 export const MELI_VIDEO: CaseVideo = { title: "Así funciona el centro logístico de Mercado Libre en Cyber Monday (A24)", youtube: "kpDNNx3uju0" };
 const L = { logo: LOGO };
+const AMBER = NEON.amber, GREEN = NEON.green;
 
-const Intro = () => <CaseIntro id="mercadolibre" {...L} n="01" company="Mercado Libre" title="Depósitos" pill="¿Dónde conviene guardar los productos?" bg={<ArgMap scene="intro" step={0} />} />;
+const Intro = () => <CaseIntro id="mercadolibre" {...L} n="01" company="Mercado Libre" title="Depósitos y rutas" pill="¿Cómo llega rápido tu compra?" bg={<ArgMap scene="intro" step={0} />} />;
 
-const Quien = () => (
-  <CompanySlide
-    id="mercadolibre-quien"
+/* ── 1 · El viaje de un paquete ── */
+const VIAJE: Station[] = [
+  { icon: Warehouse, b: "Se guarda", t: <>en un <b>centro de distribución</b>, antes de venderse.</>, img: "/photos/meli/centro-cajamar.jpg", cap: "Centro de distribución de Cajamar, São Paulo" },
+  { icon: Package, b: "Se prepara", t: <>alguien compra: se <b>embala y se etiqueta</b>.</>, img: "/photos/meli/preparar.jpg", cap: "Preparando pedidos" },
+  { icon: ScanLine, b: "Se clasifica", t: <>de noche, en el <b>centro de última milla</b>, por zona.</>, img: "/photos/meli/clasificar.jpg", cap: "Centro de última milla: cada estante es una ruta" },
+  { icon: Truck, b: "Se reparte", t: <>cada camioneta, <b>+100 paquetes</b> por día.</>, img: "/photos/meli/reparto-calle.jpg", cap: "Una camioneta de Mercado Libre repartiendo" },
+];
+
+const Viaje = () => <JourneySlide id="mercadolibre-viaje" {...L} name="Mercado Libre" color={AMBER} part="El viaje de un paquete" stations={VIAJE} />;
+
+/* ── 2 · El hilo: en qué partes del viaje entra el GIS ── */
+const DondeGis = () => (
+  <GisSlide
+    id="mercadolibre-donde-gis"
     {...L}
     name="Mercado Libre"
-    color={NEON.amber}
-    items={[
-      <>La <b>tienda online</b> más grande de Latinoamérica.</>,
-      <>También <b>Mercado Pago</b> (pagos) y <b>Mercado Envíos</b>.</>,
-      <>Casi todo lo que vende viaja por <b>su propia red</b> de envíos.</>,
-    ]}
-    facts={[
-      { icon: CalendarDays, n: "1999", d: "nace en Buenos Aires" },
-      { icon: Globe2, n: "18 países", d: "de Latinoamérica" },
-      { icon: Warehouse, n: "+100.000 m²", d: "su centro de Escobar, el más grande del país" },
-      { icon: Truck, n: "Red propia", d: "depósitos, camiones, aviones y repartidores" },
+    color={AMBER}
+    title="El GIS detrás de cada envío"
+    stations={VIAJE}
+    questions={[
+      { at: [1], fn: "Análisis de ubicación", q: "¿Dónde va el próximo centro?", c: GREEN },
+      { at: [3, 4], fn: "Ruteo dinámico", q: "¿Cómo se arman las rutas del día?", c: AMBER },
     ]}
   />
 );
 
-const ParaQue = () => (
-  <CaseSlide
-    id="mercadolibre-gis"
-    {...L}
-    label="¿Para qué usa el GIS?"
-    title="Elegir dónde guardar"
-    color={NEON.blue}
-    items={[<>Capa: <b>compradores</b></>, <>Capa: <b>rutas</b></>, <>Capa: <b>tiempo de viaje</b></>, <>Decide: <b>dónde va el depósito</b></>]}
-    scene={(s) => (
-      <LayerStack
-        step={s}
-        layers={[
-          { name: "Compradores", kind: "puntos", color: NEON.blue },
-          { name: "Rutas", kind: "rutas", color: NEON.amber },
-          { name: "Tiempo de viaje", kind: "tiempo", color: NEON.green },
-        ]}
-        decision={{ text: "Acá va el depósito", at: [0.05, -0.1] }}
-      />
-    )}
-  />
-);
-
-const Como1 = () => (
-  <CaseSlide
+/* ── 3 · Decisión 1: dónde poner un centro ── */
+const Ubicacion = () => (
+  <ExplainSlide
     id="mercadolibre-ubicacion"
     {...L}
-    label="¿Cómo lo hace?"
-    title="El mejor lugar"
-    color={NEON.blue}
-    items={[<>Dónde están los <b>compradores</b></>, <>Hasta dónde llega un camión <b>en un día</b></>, <>Gana el lugar con <b>más compradores cerca</b>: Córdoba</>]}
-    scene={(s) => <ArgMap scene="solucion" step={s} />}
-  />
-);
-
-const Como2 = () => (
-  <CaseSlide
-    id="mercadolibre-tiempo"
-    {...L}
-    label="¿Cómo lo hace?"
-    title="Tiempo, no distancia"
-    color={NEON.green}
-    items={[<>Círculo = <b>misma distancia</b></>, <>Por ruta se llega más lejos: <b>isócrona</b></>]}
-    scene={(s) => <ArgMap scene="tiempo" step={s} />}
-  />
-);
-
-const Logistica = () => (
-  <CaseSlide
-    id="mercadolibre-logistica"
-    {...L}
-    label="En su logística"
-    title="Una red de depósitos"
-    color={NEON.green}
-    items={[<>Centro grande → <b>centros regionales</b></>, <>De cada uno, <b>los repartos del día</b></>]}
-    dato={{ n: "US$ 3.400 M", d: "invierte Mercado Libre en Argentina en 2026, sobre todo en logística." }}
-    scene={(s) => <ArgMap scene="logistica" step={s} />}
-  />
-);
-
-const Tecnologias = () => (
-  <TechSlide
-    id="mercadolibre-tecnologias"
-    logo={LOGO}
-    label="Tecnologías · Mercado Libre"
-    bg={<ArgMap scene="intro" step={0} />}
-    techs={[
-      { icon: Warehouse, name: "Análisis de ubicación", d: "Compara lugares posibles para poner un centro nuevo.", gis: true, c: NEON.blue },
-      { icon: Timer, name: "Isócronas", d: "Hasta dónde se llega en un tiempo dado, siguiendo las rutas.", gis: true, c: NEON.green },
-      { icon: Route, name: "Ruteo dinámico", d: "Arma todos los días los recorridos de los repartidores.", gis: true, c: NEON.amber },
-      { icon: BrainCircuit, name: "Predicción con IA", d: "Pone el stock cerca de quien lo va a comprar, antes de que compre.", c: NEON.red },
+    pill="Función GIS 1"
+    title="Análisis de ubicación"
+    question={<>Ya tiene un centro en Buenos Aires. <b>¿Dónde va el próximo?</b></>}
+    color={GREEN}
+    points={[
+      { b: "Compradores", t: <>dónde vive la gente.</> },
+      { b: "Rutas", t: <>por dónde van los camiones.</> },
+      { b: "Un día de camión", t: <>hasta dónde llega desde cada ciudad.</> },
+      { b: "Se elige", t: <>gana <b>Córdoba</b>: suma más gente nueva.</> },
     ]}
+    techs={[
+      { name: "Capas", gis: true },
+      { name: "Isócronas", gis: true },
+      { name: "Análisis de ubicación", gis: true },
+    ]}
+    scene={(s) => <ArgMap scene="ubicacion" step={s} />}
+  />
+);
+
+/* ── 4 · Decisión 2: las rutas del día ── */
+const Rutas = () => (
+  <ExplainSlide
+    id="mercadolibre-rutas"
+    {...L}
+    pill="Función GIS 2"
+    title="Ruteo dinámico"
+    question={<>De madrugada: <b>¿cómo se reparten los paquetes del día?</b></>}
+    color={AMBER}
+    points={[
+      { b: "Cada compra, un punto", t: <>la dirección, en el mapa.</> },
+      { b: "Zonas", t: <>una zona por camioneta.</> },
+      { b: "Orden", t: <>el mejor recorrido, con el tránsito.</> },
+      { b: "Recalcula", t: <>si se corta una calle.</> },
+    ]}
+    techs={[
+      { name: "Geocodificación", gis: true },
+      { name: "Ruteo dinámico", gis: true },
+      { name: "Aprendizaje automático" },
+    ]}
+    scene={(s) => <MeliRoutes step={s} />}
   />
 );
 
 export const MELI_SLIDES: DeckSlide[] = [
-  { id: "mercadolibre", label: "Mercado Libre · Depósitos", C: Intro },
-  { id: "mercadolibre-quien", label: "Mercado Libre · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
-  { id: "mercadolibre-gis", label: "Mercado Libre · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
-  { id: "mercadolibre-ubicacion", label: "Mercado Libre · El mejor lugar", steps: 3, C: Como1 },
-  { id: "mercadolibre-tiempo", label: "Mercado Libre · Tiempo, no distancia", steps: 2, C: Como2 },
-  { id: "mercadolibre-logistica", label: "Mercado Libre · En su logística", steps: 2, C: Logistica },
-  { id: "mercadolibre-tecnologias", label: "Mercado Libre · Tecnologías", C: Tecnologias },
+  { id: "mercadolibre", label: "Mercado Libre · Depósitos y rutas", C: Intro },
+  { id: "mercadolibre-viaje", label: "Mercado Libre · El viaje de un paquete", steps: 4, phase: 4200, C: Viaje },
+  { id: "mercadolibre-donde-gis", label: "Mercado Libre · El GIS detrás de cada envío", steps: 2, phase: 5000, C: DondeGis },
+  { id: "mercadolibre-ubicacion", label: "Mercado Libre · Análisis de ubicación", steps: 4, phase: 4500, C: Ubicacion },
+  { id: "mercadolibre-rutas", label: "Mercado Libre · Ruteo dinámico", steps: 4, phase: 4500, C: Rutas },
 ];

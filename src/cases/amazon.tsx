@@ -1,6 +1,6 @@
-import { Route, MapPinned, BrainCircuit, Locate, CalendarDays, Package, Plane, Home } from "lucide-react";
+import { Route, MapPinned, BrainCircuit, Locate } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
+import { CaseIntro, CaseSlide, NEON, TechSlide } from "@/components/neon";
 import { AmazonMap } from "@/scenes/amazon-neon";
 import { LayerStack } from "@/scenes/layers-neon";
 import type { CaseVideo } from "@/components/video-peek";
@@ -14,26 +14,6 @@ const L = { logo: LOGO, logoClass: "h-[clamp(2.2rem,5.5vh,3.6rem)]" };
 const AMZ = "#ff9900";
 
 const Intro = () => <CaseIntro id="amazon" {...L} n="04" company="Amazon" title="Última milla" pill="Rutas que aprenden de los choferes" bg={<AmazonMap scene="intro" />} />;
-
-const Quien = () => (
-  <CompanySlide
-    id="amazon-quien"
-    {...L}
-    name="Amazon"
-    color={AMZ}
-    items={[
-      <>La <b>tienda online</b> más grande del mundo.</>,
-      <>Es de <b>Estados Unidos</b> (Seattle).</>,
-      <>Reparte con <b>su propia red</b>: depósitos, camionetas y aviones.</>,
-    ]}
-    facts={[
-      { icon: CalendarDays, n: "1994", d: "nace en Seattle" },
-      { icon: Package, n: "+13.000 M", d: "de productos entregados en el día o al día siguiente (2025)" },
-      { icon: Plane, n: "Red propia", d: "depósitos, camionetas y aviones (Amazon Air)" },
-      { icon: Home, n: "+4.000", d: "pueblos y ciudades chicas sumados al envío rápido en EE. UU. (2025)" },
-    ]}
-  />
-);
 
 const ParaQue = () => (
   <CaseSlide
@@ -111,7 +91,6 @@ const Tecnologias = () => (
 
 export const AMAZON_SLIDES: DeckSlide[] = [
   { id: "amazon", label: "Amazon · Última milla", C: Intro },
-  { id: "amazon-quien", label: "Amazon · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
   { id: "amazon-gis", label: "Amazon · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
   { id: "amazon-mapa", label: "Amazon · Lo que el mapa no sabe", steps: 3, phase: 4200, C: Como1 },
   { id: "amazon-aprende", label: "Amazon · Aprender de los choferes", steps: 3, phase: 4200, C: Como2 },

@@ -14,20 +14,19 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 | Portada · Qué es un GIS | 1 y 2 | ~1 min 45 s |
 | Herramientas: what3words, Plus Codes, MarineTraffic y Kepler.gl | 3 a 18 | ~4 min 30 s |
 | Los casos | 19 | ~20 s |
-| Caso 01 · Mercado Libre | 20 a 26 | ~1 min 45 s |
-| Caso 02 · Uber | 27 a 32 | ~1 min 30 s |
-| Caso 03 · UPS | 33 a 39 | ~1 min 45 s |
-| Caso 04 · Amazon | 40 a 46 | ~1 min 45 s |
-| Caso 05 · DHL | 47 a 53 | ~1 min 45 s |
-| Lo que viene | 54 | ~45 s |
-| Libros · Para hacer · Videos · Gracias | 55 a 58 | ~30 s |
-| **Total** | **58** | **~16 min 20 s** |
+| Caso 01 · Mercado Libre | 20 a 24 | ~2 min |
+| Caso 02 · Uber | 25 a 29 | ~1 min 45 s |
+| Caso 03 · UPS | 30 a 34 | ~1 min 30 s |
+| Caso 04 · Maersk | 35 a 39 | ~1 min 30 s |
+| Caso 05 · Walmart + Wing | 40 a 44 | ~1 min 30 s |
+| Libros · Para probar · Videos · Gracias | 45 a 48 | ~35 s |
+| **Total** | **48** | **~15 min 40 s** |
 
-**Ojo con el tiempo:** con las cuatro herramientas la expo pasa los 15 minutos. Para entrar: cada diapositiva de herramienta en ~15 s, y "Lo que viene" con 3 tarjetas.
+**Ojo con el tiempo:** con las cuatro herramientas la expo pasa los 15 minutos. Para entrar: cada diapositiva de herramienta en ~15 s.
 
-**Cómo funciona ahora la presentación:** las animaciones **corren solas, en bucle**; no hay que apretar nada para que avancen. Con → se pasa directo a la diapositiva siguiente. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 57.
+**Cómo funciona ahora la presentación:** las animaciones **corren solas, en bucle**; no hay que apretar nada para que avancen. Con → se pasa directo a la diapositiva siguiente. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 47.
 
-**Para llegar con margen:** las diapositivas de **Tecnologías** se pasan en ~5 segundos ("las azules son GIS"), y "Lo que viene" se puede contar con solo 3 tarjetas. Ensayar con cronómetro: está justo.
+**Para llegar con margen:** las diapositivas **¿Quién es?** se pasan en ~10 segundos, y Libros, Para probar y Videos se muestran sin leerlas. Ensayar con cronómetro: está justo.
 
 **Para revisar una animación quieta:** agregar `?paso=2` (o el paso que sea) a la dirección, antes del `#`.
 
@@ -258,246 +257,273 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 | # | Empresa | Para qué usa el GIS |
 |---|---|---|
-| 01 | Mercado Libre | Decidir dónde guardar (ubicación) |
-| 02 | Uber | Medir la ciudad en hexágonos (demanda) |
-| 03 | UPS | El orden de las paradas (rutas) |
-| 04 | Amazon | Rutas que aprenden de los choferes (última milla) |
-| 05 | DHL | Ver los riesgos antes de que lleguen (riesgos) |
+| 01 | Mercado Libre | Dónde poner la red y cómo repartir (el país y la ciudad) |
+| 02 | Uber | Medir la ciudad en vivo, en hexágonos |
+| 03 | UPS | El orden exacto de 120 paradas |
+| 04 | Maersk | Seguir cada contenedor en el mar |
+| 05 | Walmart + Wing | Repartir por el aire: el mapa del cielo |
 
-> Ahora, cinco empresas y cómo cada una usa el GIS en su logística: **dónde guardar, dónde hace falta gente, en qué orden repartir, cómo aprender de los choferes y cómo ver los problemas antes de que lleguen**.
+> Cinco empresas, y cada una muestra **algo distinto** del GIS en logística: **dónde poner la red**, **medir la ciudad en vivo**, **el orden exacto de las paradas**, **seguir la carga en el mar** y **repartir por el aire**. Por tierra, por mar y por aire.
 
-**Cómo está armado cada caso:** portada · **¿Quién es?** · **¿Para qué usa el GIS?** (las capas que cruza, como en el video de la diapositiva 2) · **¿Cómo lo hace?** · **En su logística** · Tecnologías (se pasa en 5 segundos: "las azules son GIS").
+**Cómo está armado cada caso:** portada · **¿Quién es?** (solo UPS, Maersk y Walmart + Wing, que acá se conocen menos) · **El GIS detrás de…** (el recorrido, con las funciones GIS que usa) · una diapositiva por **función GIS**, con sus tecnologías abajo.
 
 ---
 
-## Diapositivas 20 a 26 · Caso 01 · Mercado Libre · Depósitos
+## Diapositivas 20 a 24 · Caso 01 · Mercado Libre · Depósitos y rutas
+
+**Tiempo total:** ~2 minutos
+
+*No explicamos quién es Mercado Libre: todos la conocen. El hilo es: cómo viaja un paquete → en qué partes de ese viaje entra el GIS → cada una de esas dos decisiones, con las tecnologías que usa.*
+
+### Diapositiva 20 · Portada
+> Arrancamos con Mercado Libre. Todos compramos ahí; la pregunta es **cómo hace para que la compra llegue tan rápido**, y dónde entra el GIS en eso.
+
+### Diapositiva 21 · El viaje de un paquete
+*Arriba, el recorrido de 4 pasos que avanza solo; abajo, la foto real de cada paso.*
+> Primero, cómo viaja un paquete.
+- **Se guarda:** los vendedores dejan su mercadería en un **centro de distribución** de Mercado Libre, antes de venderla.
+- **Se prepara:** cuando alguien compra, se busca el producto, se embala y se etiqueta.
+- **Se clasifica:** de noche, un camión lo lleva al **centro de última milla** de la ciudad, y ahí se separa por zona.
+- **Se reparte:** a la mañana sale la camioneta. Cada una entrega **más de 100 paquetes** en 8 a 9 horas.
+
+### Diapositiva 22 · El GIS detrás de cada envío
+*El mismo recorrido; se ilumina en azul dónde entra cada función GIS: "Análisis de ubicación · ¿Dónde va el próximo centro?" y "Ruteo dinámico · ¿Cómo se arman las rutas del día?".*
+> Detrás de ese viaje hay **dos funciones de GIS**. Antes de vender, el **análisis de ubicación**: decidir dónde poner los centros para que el producto esté cerca. Y todos los días, el **ruteo dinámico**: armar las rutas de reparto.
+
+### Diapositiva 23 · Función GIS 1 · Análisis de ubicación
+*Mapa de Argentina en 4 pasos: compradores · rutas · zona a un día de camión · gana Córdoba (+3,4 M de personas nuevas).*
+> Ya tiene un centro grande en Buenos Aires. ¿Dónde va el próximo?
+- **Compradores:** se marca dónde vive la gente; el punto es más grande cuanta más gente hay.
+- **Rutas:** se suma la capa de rutas nacionales.
+- **Un día de camión:** desde cada ciudad posible se dibuja hasta dónde llega un camión en un día. Se estira por las rutas: es una **isócrona**.
+- **Se elige:** se cuenta la gente que queda adentro y que hoy no cubre Buenos Aires. Gana **Córdoba**, con unos 3,4 millones de personas nuevas; justo donde Mercado Libre anunció su próximo centro.
+
+### Diapositiva 24 · Función GIS 2 · Ruteo dinámico
+*Animación en 4 pasos: los pedidos como puntos · se pintan por zona · una ruta por camioneta · una calle cortada y la ruta se recalcula.*
+> Esto pasa todos los días, de madrugada, en el centro de última milla.
+- **Cada compra, un punto:** la dirección de cada paquete pasa a ser un punto en el mapa.
+- **Zonas:** se juntan las paradas cercanas; cada zona es una camioneta.
+- **Orden:** el sistema decide en qué orden ir, teniendo en cuenta el tránsito.
+- **Recalcula:** si una calle está cortada o la camioneta se desvía, arma un camino nuevo.
+
+**Tecnologías (para entenderlas nosotros, no se lee):**
+- **Capas:** cada tipo de dato es una "hoja" del mapa (compradores, rutas…). El GIS las superpone para cruzarlas.
+- **Isócrona:** la zona a la que se llega en un mismo tiempo (por ejemplo, un día de camión). No es un círculo porque por ruta se va más rápido.
+- **Análisis de ubicación:** comparar varios lugares posibles con los mismos datos y elegir el mejor.
+- **Geocodificación:** pasar una dirección escrita ("French 414, Resistencia") a un punto con coordenadas en el mapa.
+- **Ruteo dinámico:** calcular el orden de las paradas y el camino, y volver a calcularlo si algo cambia en la calle.
+- **Aprendizaje automático:** el sistema aprende de los viajes anteriores (por ejemplo, cuánto tarda cada calle a cada hora). No es GIS, pero usa sus datos.
+
+*Fuentes (no van en pantalla): The Logistics World (31/5/2023) y Expansión (26/5/2023), visitas al centro de última milla de Mercado Libre en Ciudad de México (ruteo dinámico, zonas, "olas", +100 paquetes por camioneta, recálculo si se desvía); DolarHoy, El Economista y The Logistics World (2026) sobre el centro de Córdoba. La animación de Córdoba usa la población de las ciudades de más de 90.000 habitantes (Natural Earth) y rutas simplificadas: es un ejemplo de cómo se hace el análisis, no el estudio real de la empresa. Fotos: prensa de Mercado Libre (vía The Logistics World) y Gobierno de São Paulo (Wikimedia Commons, CC BY 2.0).*
+
+---
+
+## Diapositivas 25 a 29 · Caso 02 · Uber · Hexágonos
 
 **Tiempo total:** ~1 minuto 45 segundos
 
-### Diapositiva 20 · Portada
-> Arrancamos con Mercado Libre. La pregunta es: **¿dónde conviene guardar los productos?**
+*No explicamos quién es Uber: todos la conocen. Mostramos qué pasa por dentro cuando pedís un Uber y dónde entra el GIS.*
 
-### Diapositiva 21 · ¿Quién es?
-*Datos: 1999 · 18 países · +100.000 m² en Escobar · red propia.*
-> Mercado Libre es la **tienda online más grande de Latinoamérica**. Nació en Buenos Aires en 1999 y hoy está en 18 países. Además de la tienda tiene Mercado Pago y **Mercado Envíos**: casi todo lo que vende viaja por **su propia red**, con depósitos, camiones, aviones y repartidores. Su centro de Escobar tiene más de 100.000 m².
+### Diapositiva 25 · Portada
+> El segundo caso es Uber. La pregunta: **¿qué pasa por dentro cuando pedís un Uber?**
 
-### Diapositiva 22 · ¿Para qué usa el GIS?
-*Animación: se apilan las capas compradores, rutas y tiempo de viaje; se juntan y aparece "Acá va el depósito".*
-> Usa el GIS para **elegir dónde guardar**. Cruza tres capas: **dónde están los compradores**, **por dónde van las rutas** y **hasta dónde se llega en un tiempo de viaje**. Del cruce sale la decisión: **dónde va cada depósito**.
+### Diapositiva 26 · El GIS detrás de cada viaje
+*El recorrido de un pedido: Pedís · Elige quién va · Va en camino · Llega. Se ilumina en azul dónde entra cada función GIS: "Análisis por hexágonos · ¿Dónde faltan autos?" y "Ruteo y tiempo de llegada · ¿Qué auto lleva el pedido?".*
+> Cuando pedís un viaje o comida pasan cuatro cosas. Detrás hay **dos funciones de GIS**: el **análisis por hexágonos**, que dice dónde faltan autos (y define el precio que ves al pedir), y el **ruteo**, que elige qué auto lleva tu pedido. Las dos se apoyan en algo que inventó Uber: **H3**.
 
-### Diapositiva 23 · ¿Cómo lo hace? · El mejor lugar
-*Animación: el mapa de Argentina; crecen las ciudades (compradores), aparecen círculos de "un día de camión" y gana Córdoba.*
-> Primero mira **dónde están los compradores**. Después marca **hasta dónde llega un camión en un día** desde cada lugar posible. Y elige el que deja **más compradores cerca**: en el ejemplo, Córdoba, donde Mercado Libre anunció su próximo centro.
+### Diapositiva 27 · ¿Qué es H3?
+*Animación en 4 pasos: el mapa se llena de hexágonos · uno se ilumina con su código (8928308280fffff) · cuadrados vs. hexágonos (8 vecinos con 2 distancias vs. 6 vecinos todos iguales) · un hexágono se parte en 7 más chicos, y esos en 7 más.*
+> **H3** es el sistema que inventó Uber para **partir todo el planeta en hexágonos**. Lo liberó gratis en 2018 y hoy lo usan muchas empresas.
+- **Hexágonos:** el mapa se cubre con celdas iguales.
+- **Un código:** cada hexágono tiene su número. Así, en vez de guardar "latitud y longitud", se guarda "en qué hexágono está", y se puede contar cuántos pedidos o autos hay en cada uno.
+- **Vecinos iguales:** ¿por qué hexágonos? En un cuadrado, los vecinos de las esquinas están más lejos que los de los costados. En un hexágono, los 6 vecinos están a la misma distancia. Eso hace que buscar "lo que hay alrededor" sea justo para todos lados.
+- **16 tamaños:** cada hexágono tiene 7 más chicos adentro. El más grande es más grande que un país; el más chico mide menos de 1 m². Uber elige el tamaño según lo que necesita medir.
 
-### Diapositiva 24 · ¿Cómo lo hace? · Tiempo, no distancia
-*Animación: un círculo de misma distancia se transforma en una estrella que se estira por las rutas.*
-> Lo que importa no es la distancia sino **el tiempo**. Por la ruta el camión va más rápido, así que lo que se alcanza en un día **se estira por las rutas**. En GIS eso se llama **isócrona**.
+### Diapositiva 28 · Función GIS 1 · Análisis por hexágonos
+*Animación 3D: la ciudad en hexágonos; la altura es la cantidad de pedidos; el color compara con los autos libres (verde alcanza, naranja o rojo faltan).*
+- **Hexágonos:** Uber parte la ciudad en hexágonos iguales, cada uno con su código. Ese sistema es **H3** y lo creó Uber.
+- **Pedidos:** cada hexágono cuenta sus pedidos; la altura es la demanda.
+- **Color:** se compara con los autos libres. Verde: alcanza. Naranja o rojo: faltan autos, **sube el precio** y eso atrae más autos a esa zona.
+> ¿Por qué hexágonos y no barrios? Porque los barrios tienen tamaños distintos; los hexágonos son todos iguales y se pueden comparar.
 
-### Diapositiva 25 · En su logística
-*Animación: del centro grande salen líneas a los centros regionales, y de cada uno, los repartos del día. Dato: US$ 3.400 M.*
-> Así arma una **red**: un centro grande abastece a centros regionales, y de cada uno salen **los repartos del día**. Este año Mercado Libre invierte **US$ 3.400 millones en Argentina**, sobre todo en logística.
+### Diapositiva 29 · Función GIS 2 · Ruteo y tiempo de llegada
+*Animación en 4 pasos: llega un pedido · se iluminan los hexágonos de alrededor y los autos libres A y B · A está más cerca en línea recta pero hay un río (8 min); B llega en 3 min · va B.*
+- **Llega un pedido:** con su ubicación.
+- **Busca cerca:** mira los autos libres en los hexágonos de al lado, no en toda la ciudad.
+- **Mide por las calles:** A está más cerca en línea recta, pero tiene que cruzar por el puente: tarda 8 minutos. B tarda 3.
+- **Elige:** va B, y la app te muestra cuánto tarda en llegar.
 
-### Diapositiva 26 · Tecnologías
-> Análisis de ubicación, isócronas y ruteo son GIS; la IA predice qué se va a comprar y dónde.
+**Tecnologías (para entenderlas nosotros, no se lee):**
+- **H3:** la grilla de hexágonos de Uber. Cada hexágono tiene un código; sirve para contar cosas por zona y para buscar "los hexágonos de al lado". Uber la liberó gratis en 2018.
+- **Índice espacial:** una forma de ordenar los datos por lugar (por ejemplo, por hexágono) para encontrar rápido qué hay en cada zona, sin recorrer todo el mapa.
+- **GPS:** la ubicación en vivo de cada auto y de cada pedido.
+- **Ruteo (tiempo estimado de llegada):** calcular cuánto se tarda por las calles reales, no en línea recta.
+- **Precio dinámico:** la regla que sube la tarifa donde faltan autos. No es GIS, pero usa el mapa de hexágonos.
+- **Asignación:** la regla que decide qué auto toma cada pedido. No es GIS, pero usa el tiempo calculado por el mapa.
 
-*Fuentes (no van en pantalla): DolarHoy, El Economista, The Logistics World (2026): centro de Escobar (+100.000 m², 130.000 productos por día), inversión de US$ 3.400 M en 2026, centro de Córdoba.*
+*Fuentes (no van en pantalla): Uber Engineering, blog "H3: Uber’s Hexagonal Hierarchical Spatial Index" (2018) y documentación de H3 (16 resoluciones, de la 0 a la 15; cada hexágono tiene 7 hijos; las celdas más chicas miden menos de 1 m²; el código 8928308280fffff es el ejemplo de la documentación). El ejemplo del río es ilustrativo.*
 
 ---
 
-## Diapositivas 27 a 32 · Caso 02 · Uber · Hexágonos
+## Diapositivas 30 a 34 · Caso 03 · UPS · ORION · Rutas
 
 **Tiempo total:** ~1 minuto 30 segundos
 
-### Diapositiva 27 · Portada
-> El segundo caso es Uber, que partió las ciudades en **hexágonos**.
+*Lo distinto de este caso: no es dónde ni cuándo, es **el orden exacto** de las paradas. Es optimización pura.*
 
-### Diapositiva 28 · ¿Quién es?
-*Datos: 2009 · +70 países · +40 M de viajes y pedidos por día · H3 gratis.*
-> Uber nació en San Francisco en 2009. Es la app para pedir **viajes con chofer**, pero también reparte comida y compras con **Uber Eats** y conecta camiones con cargas con **Uber Freight**. A fines de 2025 hacía **más de 40 millones de viajes y pedidos por día** en más de 70 países.
-
-### Diapositiva 29 · ¿Para qué usa el GIS?
-*Animación: se apilan pedidos, repartidores y hexágonos H3; se juntan y aparece "Faltan repartidores acá".*
-> Usa el GIS para **saber dónde falta gente**. Cruza **dónde están los pedidos**, **dónde están los repartidores y autos libres**, y los cuenta en **hexágonos iguales**. Así decide **a dónde mandar repartidores**.
-
-### Diapositiva 30 · ¿Cómo lo hace? · Todo en hexágonos
-*Animación 3D: la ciudad en hexágonos; la altura es la cantidad de pedidos; donde faltan autos se pone rojo.*
-> Uber cubre la ciudad con **hexágonos iguales**, cada uno con su código; ese sistema se llama **H3**. Cada hexágono **cuenta sus pedidos**: la altura es la demanda. Donde hay muchos pedidos y pocos autos, se pone rojo y **sube el precio**, para que vayan más autos ahí.
->
-> ¿Por qué hexágonos y no barrios? Porque los barrios tienen tamaños distintos y no se pueden comparar; los hexágonos son todos iguales.
-
-### Diapositiva 31 · En su logística
-*Animación: un local y los hexágonos alrededor con su tiempo de entrega.*
-> En el reparto, cada hexágono tiene su **tiempo de entrega** desde el local, y con eso se define **hasta dónde reparte** cada uno.
-
-### Diapositiva 32 · Tecnologías
-> H3 y la ubicación en vivo son GIS; el precio dinámico es la regla de negocio.
-
-*Fuentes (no van en pantalla): Uber Engineering (H3, liberado en 2018); resultados de Uber del cuarto trimestre de 2025 (más de 40 millones de viajes por día; 13.567 millones en el año).*
-
----
-
-## Diapositivas 33 a 39 · Caso 03 · UPS · ORION · Rutas
-
-**Tiempo total:** ~1 minuto 45 segundos
-
-### Diapositiva 33 · Portada
+### Diapositiva 30 · Portada
 > El tercer caso es UPS y su sistema **ORION**, que elige **el mejor orden de paradas** para cada camión.
 
-### Diapositiva 34 · ¿Quién es?
-*Datos: 1907 · 20,8 M de paquetes por día · +200 países · ~460.000 empleados.*
-> UPS es una de las **paqueterías más grandes del mundo**, de Estados Unidos; la de los camiones marrones. Nació en Seattle en 1907 y en 2025 entregó **20,8 millones de paquetes por día** en más de 200 países.
+### Diapositiva 31 · ¿Quién es?
+*Fotos: un camión marrón de UPS, el centro Worldport visto desde el aire y un chofer adentro del camión con los paquetes ordenados.*
+> UPS es una de las paqueterías más grandes del mundo; la de los **camiones marrones**. Nació en Seattle, Estados Unidos, en 1907, y entrega **20,8 millones de paquetes por día**. Su centro Worldport, en Louisville, clasifica **416.000 paquetes por hora**.
 
-### Diapositiva 35 · ¿Para qué usa el GIS?
-*Animación: se apilan calles, paradas del día y camiones con GPS; aparece "El mejor orden".*
-> Usa el GIS para decidir **en qué orden ir**. Cruza el **mapa de calles con sus sentidos**, las **paradas del día** y la **posición de cada camión**.
+### Diapositiva 32 · El GIS detrás de cada entrega
+*El recorrido: Viaja · Se clasifica · Se carga · Se entrega. Se iluminan "Se carga" y "Se entrega" con la función clave: "Optimización de rutas · ¿En qué orden visitar las 120 paradas del día?".*
+> En UPS hay una función GIS que es la clave: la **optimización de rutas**. Cuando se carga el camión, ya se sabe en qué orden va a visitar cada parada; por eso los paquetes van ordenados adentro.
 
-### Diapositiva 36 · ¿Cómo lo hace? · ORION
-*Animación: nuestro video de ORION: "a ojo" contra ORION, el mismo camión y las mismas paradas. Dato: US$ 50 M.*
-> Cada chofer hace **unas 120 paradas por día**, y con 120 paradas hay **más órdenes posibles que átomos en el universo**: nadie puede elegir a ojo. ORION prueba **millones de órdenes sobre el mapa de calles** y se queda con el más corto. Con solo **una milla menos por chofer por día**, UPS ahorra **US$ 50 millones por año**.
+### Diapositiva 33 · La función GIS clave · ¿Cómo funciona ORION?
+*Animación en 4 pasos: aparecen las paradas del día sobre las calles, tres con "antes 10:30" · titilan órdenes al azar: "120 paradas = más órdenes que átomos en el universo" · se dibuja una ruta cualquiera y se va corrigiendo de a pedazos mientras bajan los kilómetros · la ruta final, con las paradas numeradas, va "al aparato del chofer". Abajo: Mapa de calles, Geocodificación y Optimización de rutas (GIS).*
+- **Los datos:** ORION junta los paquetes del día, un mapa de calles muy detallado (UPS usa unos 250 millones de puntos de direcciones) y los horarios: hay entregas que tienen que llegar antes de cierta hora.
+- **No prueba todos:** con 120 paradas hay más órdenes posibles que átomos en el universo. Ninguna computadora puede probarlos todos.
+- **Arma y mejora:** entonces arma una ruta cualquiera y la va corrigiendo de a pedazos: da vuelta un tramo, prueba si queda más corta, y repite. Así revisa unas **200.000 opciones en pocos segundos**. No busca la ruta perfecta, sino una muy buena y rápida.
+- **Al chofer:** la ruta final, respetando los horarios, aparece en el aparato de mano del chofer.
 
-### Diapositiva 37 · Lo probamos en Resistencia
-*Animación: 14 paradas en calles reales; "a ojo" 55,6 km; optimizado 41,1 km.*
-> Lo probamos nosotros con calles reales de Resistencia: el orden "a ojo" suma **55,6 km**; optimizado, **41,1 km**. **Un 26 % menos**, con el mismo camión y las mismas paradas.
+### Diapositiva 34 · El resultado · A ojo vs. ORION
+*Nuestro video: "a ojo" contra ORION, el mismo camión y las mismas paradas.*
+- **Más corto:** ORION recorre menos kilómetros con las mismas paradas.
+- **1 milla menos:** con solo una milla menos por chofer por día, UPS ahorra **US$ 50 millones por año**.
+- **En total:** UPS calcula que ORION le ahorra **entre 300 y 400 millones de dólares por año**.
 
-### Diapositiva 38 · En su logística
-*Animación: entra un pedido nuevo y la ruta se recalcula.*
-> Si a media mañana entra **un pedido nuevo**, ORION **recalcula la ruta en segundos**.
+**Tecnologías (para entenderlas nosotros, no se lee):**
+- **Mapa de calles:** todas las calles con sus sentidos, distancias y giros permitidos. Sin esto no se puede calcular nada.
+- **Geocodificación:** pasar la dirección de cada paquete a un punto en el mapa.
+- **Optimización de rutas:** probar muchísimos órdenes de paradas y quedarse con el más corto. Es el "problema del viajante".
+- **Heurística:** un "atajo" para encontrar una solución muy buena sin probar todas. ORION arma una ruta y la mejora de a pedazos (búsqueda local).
 
-### Diapositiva 39 · Tecnologías
-> Este caso es todo GIS: mapa de calles, direcciones en el mapa, optimización de rutas y GPS.
-
-*Fuentes (no van en pantalla): UPS e INFORMS (premio Franz Edelman 2016): 1 milla menos por chofer por día ≈ US$ 50 M por año. Informe anual y ficha de UPS 2025: 20,8 M de paquetes por día, +200 países, ~460.000 empleados. La prueba de Resistencia es nuestra (OSRM sobre OpenStreetMap; los comercios son de ejemplo).*
+*Fuentes (no van en pantalla): UPS e INFORMS (premio Franz Edelman 2016): 1 milla menos por chofer por día ≈ US$ 50 M por año. Informe anual y ficha de UPS 2025: 20,8 M de paquetes por día. Worldport: 416.000 paquetes por hora (UPS, citado por Engadget y otros). Cómo funciona ORION: Holland et al., "UPS Optimizes Delivery Routes", revista Interfaces de INFORMS (2017): metaheurística con búsqueda local, ventanas horarias, US$ 300–400 M por año; Transport Topics (250 millones de puntos de direcciones); Fortune y Dataconomy (unas 200.000 opciones por ruta en segundos). La animación es ilustrativa. Fotos: Wikimedia Commons.*
 
 ---
 
-## Diapositivas 40 a 46 · Caso 04 · Amazon · Última milla
+## Diapositivas 35 a 39 · Caso 04 · Maersk · Barcos
 
-**Tiempo total:** ~1 minuto 45 segundos
-**Nota:** el barrio de la animación es ilustrativo.
+**Tiempo total:** ~1 minuto 30 segundos
+
+*Lo distinto de este caso: la logística **por mar**. Seguir cada contenedor cuando está en el medio del océano. Se conecta con MarineTraffic, que mostramos en Herramientas.*
+
+### Diapositiva 35 · Portada
+> El cuarto caso es Maersk. La pregunta: **¿dónde está mi contenedor, en el medio del océano?**
+
+### Diapositiva 36 · ¿Quién es?
+*Fotos: un portacontenedores celeste de Maersk, otro cargando en Singapur y una pila de contenedores refrigerados.*
+> Maersk es una de las navieras más grandes del mundo; la de los **barcos celestes**. Nació en Dinamarca en 1904 y tiene **más de 700 barcos** que llevan contenedores por todos los océanos. Sus contenedores refrigerados tienen **GPS y termómetro**.
+
+### Diapositiva 37 · El GIS detrás de cada contenedor
+*El recorrido: Se carga · Cruza el océano · Llega al puerto · Sale en camión. Se iluminan las funciones: "Seguimiento en vivo · ¿Dónde está mi contenedor?" y "Ruteo marítimo · ¿Por dónde conviene ir, y cuándo llega?".*
+> Detrás de cada contenedor hay **dos funciones de GIS**: el **seguimiento en vivo**, para saber dónde está en todo momento, y el **ruteo marítimo**, para elegir por dónde ir y calcular cuándo llega.
+
+### Diapositiva 38 · Función GIS 1 · Seguimiento en vivo
+*Mapa del mundo: los barcos dejan su rastro; aparece un contenedor refrigerado con "GPS · 4 °C"; la ruta se pinta y aparece "Llega a Rotterdam en 12 días". Abajo: AIS y GPS (GIS), Satélites.*
+- **El barco avisa:** por **AIS**, la misma señal que vimos en MarineTraffic.
+- **El contenedor avisa:** los refrigerados llevan **GPS y termómetro**, y mandan los datos por satélite. Se sabe dónde está y si la carga (fruta, remedios) sigue fría.
+- **Cuándo llega:** con la posición y la ruta, el mapa calcula la llegada.
+
+### Diapositiva 39 · Función GIS 2 · Ruteo marítimo
+*Europa, África y Asia: un barco por el Canal de Suez; el Mar Rojo se marca como peligroso y aparece la vuelta por África: "10 a 14 días más". Abajo: Ruteo marítimo y Zonas de riesgo (GIS).*
+- **Camino corto:** entre Asia y Europa, por el **Canal de Suez**.
+- **Si hay peligro:** desde fines de 2023, por los ataques en el Mar Rojo, Maersk mandó muchos barcos por **la vuelta por África**: **10 a 14 días más**. El mapa calcula el desvío y avisa la nueva llegada.
+
+**Tecnologías (para entenderlas nosotros, no se lee):**
+- **AIS:** el equipo de radio de cada barco que avisa su nombre, posición, rumbo y velocidad. Es lo que usa MarineTraffic.
+- **GPS en contenedores:** cada contenedor refrigerado lleva GPS, termómetro y un chip; Maersk lo llama Remote Container Management.
+- **Satélites:** llevan los datos desde el medio del océano, donde no hay señal de celular. No son GIS, pero sin ellos no llegaría el dato.
+- **Ruteo marítimo:** calcular el mejor camino por mar y cuánto tarda, y cambiarlo si hay un problema.
+- **Zonas de riesgo:** una capa del mapa con las zonas peligrosas (guerras, piratas, tormentas) para evitarlas.
+
+*Fuentes (no van en pantalla): Maersk (fundada en 1904; más de 700 barcos a fines de 2025); Remote Container Management (Maersk, lanzado para clientes en 2017: GPS, módem y SIM en cada contenedor refrigerado); gCaptain y Maritime Executive (2024–2026) sobre los desvíos por el Cabo de Buena Esperanza y la vuelta gradual a Suez. "Llega a Rotterdam en 12 días" es un ejemplo. Fotos: Wikimedia Commons.*
+
+---
+
+## Diapositivas 40 a 44 · Caso 05 · Walmart + Wing · Drones
+
+**Tiempo total:** ~1 minuto 30 segundos
+
+*Lo distinto de este caso: la logística **por el aire**. El aire no tiene calles, así que el GIS tiene que dibujar un "mapa del cielo".*
 
 ### Diapositiva 40 · Portada
-> El cuarto caso es Amazon, con **rutas que aprenden de los choferes**.
+> El último caso es Walmart con Wing. La pregunta: **¿cómo se reparte por el aire?**
 
-### Diapositiva 41 · ¿Quién es?
-*Datos: 1994 · +13.000 M de productos en el día o al día siguiente (2025) · red propia · +4.000 pueblos sumados.*
-> Amazon es la **tienda online más grande del mundo**; nació en Seattle en 1994. Reparte con **su propia red**: depósitos, camionetas y hasta aviones. En 2025 entregó **más de 13.000 millones de productos en el día o al día siguiente**.
+### Diapositiva 41 · ¿Quiénes son?
+*Fotos del sitio de Wing: un dron con un pedido de Walmart, una tienda Walmart y una persona retirando el paquete en la puerta.*
+> **Walmart** es el supermercado más grande del mundo. **Wing** es la empresa de drones de **Alphabet**, la dueña de Google. Juntos reparten pedidos con drones en Estados Unidos. El dron **no aterriza**: baja el paquete **con una cuerda**, en un lugar del tamaño de un mantel de picnic. En 2026 ya superaron el **millón de entregas** a casas.
 
-### Diapositiva 42 · ¿Para qué usa el GIS?
-*Animación: se apilan calles, paradas del día y rutas reales de choferes (GPS); aparece "La ruta de un experto".*
-> Usa el GIS para armar **la ruta de cada camioneta**. Cruza las **calles**, las **paradas del día** y algo más: las **rutas reales que hicieron sus choferes**, registradas por GPS.
+### Diapositiva 42 · El GIS detrás de cada vuelo
+*El recorrido: Pedís · Sale de la tienda · Vuela · Baja con cuerda. Se iluminan las funciones: "Área de cobertura · ¿A qué casas llega cada tienda?" y "Mapa del cielo · ¿Por dónde puede volar el dron?".*
+> Detrás de cada vuelo hay **dos funciones de GIS**: el **área de cobertura**, que dice a qué casas llega cada tienda, y el **mapa del cielo**, que dice por dónde puede volar el dron.
 
-### Diapositiva 43 · ¿Cómo lo hace? · Lo que el mapa no sabe
-*Animación: la computadora traza la ruta más corta · aparecen una calle en obra y un lugar sin dónde frenar: la camioneta se demora · el chofer con experiencia toma otra ruta que los esquiva.*
-> La computadora traza **la ruta más corta** sobre el mapa. Pero en la calle hay cosas que el mapa no sabe: **obras, lugares donde no se puede frenar**, horarios. Por eso el chofer con experiencia **cambia la ruta**.
+### Diapositiva 43 · Función GIS 1 · Área de cobertura
+*Animación 3D: varias tiendas, cada una con su círculo y su dron; las casas cubiertas se pintan de verde.*
+- **Un círculo por tienda:** el dron va y vuelve, unos 19 km en total (12 millas), a unos 100 km/h. Eso dibuja un círculo alrededor de cada tienda.
+- **Casas cubiertas:** en verde, las que pueden recibir en minutos. Con el mapa se ve dónde conviene sumar una tienda nueva. **La tienda se vuelve depósito.**
 
-### Diapositiva 44 · ¿Cómo lo hace? · Aprender de los choferes
-*Animación: se suman miles de rutas reales · la IA marca las calles que más eligen · aparece la ruta nueva. Dato: 2.285 participantes.*
-> En 2021 Amazon hizo un desafío con el **MIT**: compartió **más de 4.000 rutas reales** de sus choferes y equipos de todo el mundo entrenaron programas para **predecir la ruta que haría un chofer con experiencia**. Participaron **2.285 personas** y ganó un equipo de la Universidad de Bonn. La ruta nueva es **mapa + experiencia**.
+### Diapositiva 44 · Función GIS 2 · Mapa del cielo
+*Animación 3D: el radio de vuelo; se levantan las zonas prohibidas (hospital, aeropuerto); se dibuja la ruta que las esquiva hasta la casa del cliente.*
+- **Radio de vuelo:** hasta dónde puede ir el dron desde la tienda.
+- **Zonas prohibidas:** encima se cargan las zonas donde no se puede volar, como un hospital o un aeropuerto.
+- **La ruta:** el sistema elige solo el camino que las esquiva, hasta el punto exacto del patio. Un piloto controla varios drones a la vez desde una central.
 
-### Diapositiva 45 · En su logística
-*Animación: un chofer nuevo con la ruta común se demora · con la ruta aprendida llega a horario.*
-> Así, **un chofer nuevo maneja como un experto** desde el primer día.
+**Tecnologías (para entenderlas nosotros, no se lee):**
+- **Área de influencia (buffer):** dibujar todo lo que queda a cierta distancia de un punto; acá, el círculo que cubre cada tienda.
+- **Análisis de cobertura:** cruzar ese círculo con las casas para ver cuáles quedan adentro y cuáles afuera.
+- **Capas del espacio aéreo:** las zonas del cielo donde se puede o no se puede volar, cargadas como capas del mapa.
+- **Ruteo aéreo:** calcular el camino del dron que esquiva esas zonas y otros obstáculos.
+- **GPS de precisión:** ubicar el punto exacto del patio donde baja el paquete.
 
-### Diapositiva 46 · Tecnologías
-> Direcciones en el mapa, ruteo y el GPS de las rutas reales son GIS; el aprendizaje automático es lo que aprende de ellas.
-
-*Fuentes (no van en pantalla): MIT CTL y Amazon Science, Amazon Last Mile Routing Research Challenge (2021): +4.000 rutas, 2.285 participantes, premios de US$ 100.000, 50.000 y 25.000, ganó un equipo con la Universidad de Bonn. Amazon (Business Wire, febrero de 2026): +13.000 M de productos en el día o al día siguiente en 2025; +4.000 ciudades chicas y pueblos sumados en EE. UU.*
-
----
-
-## Diapositivas 47 a 53 · Caso 05 · DHL · Riesgos
-
-**Tiempo total:** ~1 minuto 45 segundos
-**Nota:** el ejemplo de los chips de Taiwán es ilustrativo; las capas y el tipo de alerta son los de la herramienta.
-
-### Diapositiva 47 · Portada
-> Cerramos con DHL: cómo **ver un problema antes de que llegue**.
-
-### Diapositiva 48 · ¿Quién es?
-*Datos: 1969 · +220 países · ~584.000 empleados · € 82.900 M.*
-> DHL es una de las **empresas de logística más grandes del mundo**. Nació en San Francisco en 1969 y hoy es alemana. Lleva **paquetes, carga y depósitos de otras empresas** en más de 220 países, con unos 584.000 empleados.
-
-### Diapositiva 49 · ¿Para qué usa el GIS?
-*Animación: se apilan proveedores, rutas y riesgos en vivo; aparece "Alerta: riesgo cerca".*
-> Usa el GIS para **ver los riesgos en el mapa**. Cruza dónde están los **proveedores y fábricas** de sus clientes, **por dónde van** los barcos y camiones, y una capa de **riesgos en vivo**.
-
-### Diapositiva 50 · ¿Cómo lo hace? · Un problema lejos frena todo
-*Animación: chips de Taiwán viajan en barco hasta una fábrica de autos en Alemania · un tifón cierra el puerto · la fábrica cuenta los días hasta que se entera: "Día 10 · ¡línea parada!".*
-> Imaginen una fábrica de autos en Alemania que compra **chips en Taiwán**. Un **tifón** cierra el puerto. Si nadie lo mira en el mapa, la fábrica **se entera cuando los chips no llegan**, y para la línea.
-
-### Diapositiva 51 · ¿Cómo lo hace? · Resilience360
-*Animación: capa 1, la cadena · capa 2, riesgos en vivo con su radio (tifón, conflicto, inundación, huelga) · el radio del tifón toca al proveedor: "Alerta · día 1" y se dibuja el plan B desde Malasia. Dato: +30 tipos de riesgo.*
-> DHL creó **Resilience360**: un mapa con **la cadena de la empresa** y, encima, **más de 30 tipos de riesgo** en vivo: clima, huelgas, conflictos, accidentes. Cada riesgo tiene un **radio de alcance**. Cuando ese radio toca a un proveedor o una ruta, **avisa en el momento** y se puede activar un **plan B**.
-
-### Diapositiva 52 · En su logística
-*Animación: dos líneas de tiempo: sin mapa, la alerta llega el día 10; con mapa, el día 1.*
-> La diferencia es **cuándo te enterás**: sin el mapa, el día 10; con el mapa, **el día 1**, con tiempo para cambiar de proveedor o de puerto. DHL lo creó en 2014 y hoy sigue como **Everstream Analytics**.
-
-### Diapositiva 53 · Tecnologías
-> Mapa de la cadena, capas de riesgo y radio de alcance son GIS; además, programas que leen noticias y clima todo el día.
-
-**Relación con la materia:** el "radio de alcance" es un **área de influencia** (buffer) y el aviso es un **cruce de capas**, como en el video de la diapositiva 2.
-
-*Fuentes (no van en pantalla): DHL (lanzamiento de Resilience360, 2014; Risk Exposure Index con más de 30 categorías de riesgo); DC Velocity y Everstream (Resilience360 y Riskpulse forman Everstream Analytics); caso DuPont. DHL Group: +220 países y territorios, ~584.000 empleados, € 82.900 M de facturación 2025.*
+*Fuentes (no van en pantalla): wing.com (/technology, /walmart): hasta 60 mph, 12 millas ida y vuelta, hasta 5 libras, "un espacio del tamaño de un mantel de picnic", un piloto supervisa varios vuelos; noticias de Wing (11/1/2026: 150 tiendas nuevas y más de 270 en 2027; 5/10/2026: casi 20 ciudades; 6/11/2026: más de un millón de entregas a casas en 2026). Fotos: wing.com. La ciudad 3D es ilustrativa.*
 
 ---
 
-## Diapositiva 54 · Lo que viene: tecnologías nuevas en GIS y logística
-
-**Tiempo:** ~1 minuto 30 segundos
-**En pantalla:** seis tarjetas, todas a la vista. Son **solo tecnologías nuevas** que no vimos en los casos (GPS, geocercas, H3, satélites, drones, isócronas, ruteo y cámaras ya se contaron).
-
-> Todo lo que vimos ya funciona. Esto es lo que está saliendo ahora (si estamos justos de tiempo, contar solo 3: camiones sin chofer, robots de vereda y gemelos digitales).
-
-- **→ 1 · Gemelos digitales.** > Una copia del depósito o del puerto en la computadora, que se mueve igual que el real. Por ejemplo, DSV armó una de su depósito en Singapur este año. Sirve para probar cambios antes de hacerlos.
-- **→ 2 · Camiones sin chofer.** > Lo mismo que vimos con Tesla, pero con camiones de carga. Aurora ya los usa en rutas de Texas y apunta a más de 200 camiones a fines de 2026. Funcionan sobre mapas muy detallados de cada ruta.
-- **→ 3 · Robots de vereda.** > Robots que llevan el pedido las últimas cuadras, por la vereda. Serve Robotics tiene más de 2.000, trabajando con Uber Eats.
-- **→ 4 · IA agéntica.** > Programas que ven un problema, como un corte de ruta o un puerto cerrado, y **replanifican solos**. Gartner proyecta que la inversión se multiplique por 25 entre 2025 y 2030.
-- **→ 5 · Ruteo conversacional.** > En vez de mirar tablas, se le pregunta al mapa en palabras: "¿por qué llegamos tarde al norte?".
-- **→ 6 · Mapas abiertos.** > Mapas gratis y de calidad, armados entre empresas como Amazon, Meta, Microsoft y TomTom: Overture Maps, que ya suma 50 miembros.
-
-*Fuentes (no van en pantalla): IMDA Singapur, enero de 2026 (gemelo digital 5G de DSV); FreightWaves, Supply Chain 247 y Dallas Innovates (Aurora: rutas Dallas–Houston y Fort Worth–El Paso, meta de más de 200 camiones a fines de 2026; es una meta de la empresa); The Robot Report y QSR Magazine (Serve Robotics, más de 2.000 robots, diciembre de 2025); proyección de Gartner (IA agéntica); Aptean, octubre de 2026 (ruteo conversacional); Linux Foundation, julio de 2026 (Overture Maps).*
-
----
-
-## Diapositiva 55 · Libros para seguir leyendo
+## Diapositiva 45 · Libros para seguir leyendo
 
 **Tiempo:** ~10 segundos (mostrarla, no leerla)
-**En pantalla:** las tapas reales de los cinco libros, en perspectiva (al pasar el cursor se enderezan; con un clic se abre el sitio de cada uno).
+**En pantalla:** las tapas de los cinco libros, en perspectiva (con un clic se abre el sitio de cada uno). Debajo de cada tapa, para qué sirve.
 
-> Si les interesó, estos son los libros que usamos para preparar la charla:
-- *The Geography of Transport Systems*, de Jean-Paul Rodrigue (gratis online).
-- *Geographic Information Science and Systems*, de Longley, Goodchild, Maguire y Rhind.
-- *Vehicle Routing*, de Toth y Vigo: la referencia del problema de ruteo.
-- *PostGIS in Action*, de Obe y Hsu.
-- *Geocomputation with Python*, de Dorman, Graser, Nowosad y Lovelace (gratis online).
+> Si les interesó, estos libros cubren todo lo que vimos:
+- *The Geography of Transport Systems*, de Jean-Paul Rodrigue (6.ª edición, 2024): transporte, puertos y barcos, como Maersk. Su sitio, transportgeography.org, tiene mucho material gratis.
+- *Geographic Information Science and Systems*, de Longley, Goodchild, Maguire y Rhind: la base del GIS.
+- *Location Science*, de Laporte, Nickel y Saldanha da Gama (2.ª edición, 2019): cómo elegir dónde poner un centro, como Mercado Libre y Walmart.
+- *Vehicle Routing*, de Toth y Vigo: la referencia del ruteo, lo que hace ORION.
+- *Geographic Data Science with Python*, de Rey, Arribas-Bel y Wolf (2023, gratis online): analizar datos con ubicación, como Uber o Kepler.gl.
 
----
-
-## Diapositiva 56 · Para hacer: herramientas gratis para practicar
-
-**Tiempo:** ~10 segundos (mostrarla, no leerla)
-**En pantalla:** cinco tarjetas con herramientas gratuitas (con un clic se abre cada una).
-
-> Y si quieren probarlo con las manos, todo esto es gratis:
-- **Workshop de pgRouting:** para aprender a calcular rutas dentro de una base de datos.
-- **OSRM:** el motor de ruteo sobre OpenStreetMap; **con él calculamos las rutas de Resistencia** que mostramos.
-- **VROOM:** un optimizador de rutas, lo mismo que hace ORION.
-- **OR-Tools:** la librería de Google para rutas con capacidades y horarios.
-- **H3:** los hexágonos de Uber, gratis para cualquier proyecto.
+*Por qué estos (no se lee): se sacaron *PostGIS in Action* (es de bases de datos, no de los temas de la charla) y *Geocomputation with Python* (se pisaba con el de Rey y otros). Longley no tiene edición más nueva que la 4.ª (2015) y sigue siendo el texto base.*
 
 ---
 
-## Diapositiva 57 · Los casos en video
+## Diapositiva 46 · Para probar: pruébenlo ustedes
+
+**Tiempo:** ~15 segundos
+**En pantalla:** seis tarjetas con las herramientas de la charla y su dirección a la vista (con un clic se abren).
+
+> Y todo lo que mostramos lo pueden probar hoy, gratis:
+- **what3words** (what3words.com): busquen ///pasen.sueldos.leyes, la puerta del patio de la UTN.
+- **Plus Codes** (maps.google.com/pluscodes): en Google Maps, toquen cualquier punto y aparece su código.
+- **MarineTraffic** (marinetraffic.com): los barcos en vivo, por ejemplo en el puerto de Buenos Aires.
+- **Kepler.gl** (kepler.gl/demo): carguen un mapa de ejemplo, sin programar.
+- **H3 de Uber** (h3geo.org): los hexágonos de Uber, con documentación y ejemplos.
+- **OR-Tools** (developers.google.com/optimization): para los que programan, armar rutas con horarios como ORION.
+
+---
+
+## Diapositiva 47 · Los casos en video
 
 **Tiempo:** ~10 segundos (mostrarla, no reproducir salvo que pregunten)
-**En pantalla:** *los videos de los cinco casos, separados por tema: **Ubicación** (Mercado Libre), **Demanda** (Uber), **Rutas** (UPS), **Última milla** (Amazon) y **Riesgos** (DHL). Con un clic se abren grandes; se cierran con la cruz, con Esc o tocando afuera.*
+**En pantalla:** *los videos de cuatro casos, separados por tema: **Ubicación** (Mercado Libre), **Demanda** (Uber), **Rutas** (UPS) y **Por el aire** (Walmart + Wing). Maersk todavía no tiene video verificado. Con un clic se abren grandes; se cierran con la cruz, con Esc o tocando afuera.*
 
 > Y acá dejamos los videos de cada caso, por si quieren verlos.
 
 ---
 
-## Diapositiva 58 · Muchas gracias
+## Diapositiva 48 · Muchas gracias
 
 **En pantalla:** solo "MUCHAS GRACIAS" sobre el video del planeta de la portada.
 
@@ -508,6 +534,78 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 # Apéndice · Casos ocultos (no se presentan)
 
 Estos casos están armados pero **ocultos** para que la expo entre en 15 minutos. Siguen en el código (`src/cases/`) y se vuelven a mostrar cambiando `show: false` por `show: true` en `src/App.tsx` (y quitando `hidden: true` de su tarjeta en `src/sections/cases.tsx`). Los números de diapositiva de abajo son de versiones anteriores, y estos casos todavía usan el formato viejo (pasos con →, problema → solución).
+
+*DHL se sacó porque el desvío de Maersk ya muestra la idea de "un riesgo lejos → plan B"; en su lugar entró Walmart + Wing (drones).*
+
+## Caso oculto · DHL · Riesgos (formato anterior)
+
+**Tiempo total:** ~1 minuto 45 segundos
+**Nota:** el ejemplo de los chips de Taiwán es ilustrativo; las capas y el tipo de alerta son los de la herramienta.
+
+### · Portada
+> Cerramos con DHL: cómo **ver un problema antes de que llegue**.
+
+### · ¿Quién es?
+*Datos: 1969 · +220 países · ~584.000 empleados · € 82.900 M.*
+> DHL es una de las **empresas de logística más grandes del mundo**. Nació en San Francisco en 1969 y hoy es alemana. Lleva **paquetes, carga y depósitos de otras empresas** en más de 220 países, con unos 584.000 empleados.
+
+### · ¿Para qué usa el GIS?
+*Animación: se apilan proveedores, rutas y riesgos en vivo; aparece "Alerta: riesgo cerca".*
+> Usa el GIS para **ver los riesgos en el mapa**. Cruza dónde están los **proveedores y fábricas** de sus clientes, **por dónde van** los barcos y camiones, y una capa de **riesgos en vivo**.
+
+### · ¿Cómo lo hace? · Un problema lejos frena todo
+*Animación: chips de Taiwán viajan en barco hasta una fábrica de autos en Alemania · un tifón cierra el puerto · la fábrica cuenta los días hasta que se entera: "Día 10 · ¡línea parada!".*
+> Imaginen una fábrica de autos en Alemania que compra **chips en Taiwán**. Un **tifón** cierra el puerto. Si nadie lo mira en el mapa, la fábrica **se entera cuando los chips no llegan**, y para la línea.
+
+### · ¿Cómo lo hace? · Resilience360
+*Animación: capa 1, la cadena · capa 2, riesgos en vivo con su radio (tifón, conflicto, inundación, huelga) · el radio del tifón toca al proveedor: "Alerta · día 1" y se dibuja el plan B desde Malasia. Dato: +30 tipos de riesgo.*
+> DHL creó **Resilience360**: un mapa con **la cadena de la empresa** y, encima, **más de 30 tipos de riesgo** en vivo: clima, huelgas, conflictos, accidentes. Cada riesgo tiene un **radio de alcance**. Cuando ese radio toca a un proveedor o una ruta, **avisa en el momento** y se puede activar un **plan B**.
+
+### · En su logística
+*Animación: dos líneas de tiempo: sin mapa, la alerta llega el día 10; con mapa, el día 1.*
+> La diferencia es **cuándo te enterás**: sin el mapa, el día 10; con el mapa, **el día 1**, con tiempo para cambiar de proveedor o de puerto. DHL lo creó en 2014 y hoy sigue como **Everstream Analytics**.
+
+### · Tecnologías
+> Mapa de la cadena, capas de riesgo y radio de alcance son GIS; además, programas que leen noticias y clima todo el día.
+
+**Relación con la materia:** el "radio de alcance" es un **área de influencia** (buffer) y el aviso es un **cruce de capas**, como en el video de la diapositiva 2.
+
+*Fuentes (no van en pantalla): DHL (lanzamiento de Resilience360, 2014; Risk Exposure Index con más de 30 categorías de riesgo); DC Velocity y Everstream (Resilience360 y Riskpulse forman Everstream Analytics); caso DuPont. DHL Group: +220 países y territorios, ~584.000 empleados, € 82.900 M de facturación 2025.*
+
+---
+
+*Amazon se sacó para no repetir lo de Mercado Libre y UPS (rutas de reparto en la ciudad); en su lugar entró Maersk (barcos).*
+
+## Caso oculto · Amazon · Última milla (formato anterior)
+
+**Tiempo total:** ~1 minuto 45 segundos
+**Nota:** el barrio de la animación es ilustrativo.
+
+### · Portada
+> El cuarto caso es Amazon, con **rutas que aprenden de los choferes**.
+
+### · ¿Para qué usa el GIS?
+*Animación: se apilan calles, paradas del día y rutas reales de choferes (GPS); aparece "La ruta de un experto".*
+> Usa el GIS para armar **la ruta de cada camioneta**. Cruza las **calles**, las **paradas del día** y algo más: las **rutas reales que hicieron sus choferes**, registradas por GPS.
+
+### · ¿Cómo lo hace? · Lo que el mapa no sabe
+*Animación: la computadora traza la ruta más corta · aparecen una calle en obra y un lugar sin dónde frenar: la camioneta se demora · el chofer con experiencia toma otra ruta que los esquiva.*
+> La computadora traza **la ruta más corta** sobre el mapa. Pero en la calle hay cosas que el mapa no sabe: **obras, lugares donde no se puede frenar**, horarios. Por eso el chofer con experiencia **cambia la ruta**.
+
+### · ¿Cómo lo hace? · Aprender de los choferes
+*Animación: se suman miles de rutas reales · la IA marca las calles que más eligen · aparece la ruta nueva. Dato: 2.285 participantes.*
+> En 2021 Amazon hizo un desafío con el **MIT**: compartió **más de 4.000 rutas reales** de sus choferes y equipos de todo el mundo entrenaron programas para **predecir la ruta que haría un chofer con experiencia**. Participaron **2.285 personas** y ganó un equipo de la Universidad de Bonn. La ruta nueva es **mapa + experiencia**.
+
+### · En su logística
+*Animación: un chofer nuevo con la ruta común se demora · con la ruta aprendida llega a horario.*
+> Así, **un chofer nuevo maneja como un experto** desde el primer día.
+
+### · Tecnologías
+> Direcciones en el mapa, ruteo y el GPS de las rutas reales son GIS; el aprendizaje automático es lo que aprende de ellas.
+
+*Fuentes (no van en pantalla): MIT CTL y Amazon Science, Amazon Last Mile Routing Research Challenge (2021): +4.000 rutas, 2.285 participantes, premios de US$ 100.000, 50.000 y 25.000, ganó un equipo con la Universidad de Bonn. Amazon (Business Wire, febrero de 2026): +13.000 M de productos en el día o al día siguiente en 2025; +4.000 ciudades chicas y pueblos sumados en EE. UU.*
+
+---
 
 ---
 
@@ -625,121 +723,6 @@ Estos casos están armados pero **ocultos** para que la expo entre en 15 minutos
 - En logística: **ver toda la flota, siempre**, sin puntos ciegos.
 
 *Fuentes (no van en pantalla): Geotab, comunicado "GO Anywhere" (Geotab Connect, febrero de 2026); TruckNews y Transport Topics (2026); KeepTrack (satélites Starlink en órbita, 2026); Rogers (cobertura celular en Canadá, febrero de 2026).*
-
----
-
-## Diapositivas 18 a 24 · Caso 03 · Walmart + Wing · Drones
-
-**Tiempo total:** ~2 minutos
-**Estilo:** 3D, oscuro. Ciudad ilustrativa. Wing es la empresa de drones de Google (Alphabet) que entrega para Walmart.
-
-### Diapositiva 18 · Portada del caso
-*En pantalla: "DRONES" grande y un dron dando vueltas sobre la ciudad.*
-
-> El tercer caso es Walmart, el supermercado más grande de Estados Unidos, junto con **Wing**, la empresa de drones de Google. Juntos **entregan pedidos con drones**.
-
-### Diapositiva 19 · El problema (2 pasos)
-- **→ 1:** *un camión de reparto atascado en una fila de autos, cartel "Tránsito".*
-  > Mandar un camión por un paquete chico es **caro y lento**: queda atrapado en el tránsito como cualquier auto.
-- **→ 2:** *la cámara se aleja, aparece el dron con un "?" y se levantan las zonas prohibidas (hospital, aeropuerto).*
-  > Un dron va por el aire y esquiva el tránsito… pero **el aire no tiene calles**. Hay lugares donde no se puede volar, como cerca de un hospital o de un aeropuerto. ¿Por dónde va?
-
-### Diapositiva 20 · La solución con GIS: un mapa del cielo (3 pasos)
-- **→ 1:** *aparece el círculo azul del radio de entrega alrededor de la tienda.*
-  > Con un GIS, cada tienda tiene su **radio de entrega** dibujado en el mapa: hasta dónde llega el dron.
-- **→ 2:** *se levantan las zonas prohibidas; una línea roja punteada muestra que el camino recto las atraviesa.*
-  > Encima se cargan las **zonas prohibidas**. El camino recto pasa por arriba del hospital: no se puede.
-- **→ 3:** *se dibuja la ruta que las esquiva y el dron la recorre hasta la casa del cliente.*
-  > Entonces el sistema traza **la ruta que las esquiva** y el dron la sigue solo.
-
-### Diapositiva 21 · La entrega (2 pasos)
-- **→ 1:** *el dron llega volando sobre la casa del cliente (en amarillo).*
-  > El dron llega a la casa del cliente…
-- **→ 2:** *baja el paquete con una cuerda en un punto marcado del patio y vuelve a subir.*
-  > …y **no aterriza**: baja el paquete **con una cuerda** en un punto libre del patio, que también está marcado en el mapa. Suelta el paquete y se va.
-
-### Diapositiva 22 · ¿Y en logística? (2 pasos)
-- **→ 1:** *varias tiendas, cada una con su círculo y su dron.*
-  > En logística, esto cambia el rol de la tienda: **cada tienda pasa a ser un depósito** que cubre un círculo de casas a pocos minutos.
-- **→ 2:** *las casas cubiertas se pintan de verde; las que quedan afuera, en gris.*
-  > Y con el mapa se ve enseguida **qué casas quedan cubiertas** y dónde conviene sumar una tienda nueva.
-
-### Diapositiva 23 · Tecnologías (pasos = una tarjeta por tecnología)
-*En pantalla: Mapa del cielo (GIS) · Ruteo aéreo (GIS) · GPS de precisión (GIS) · Drones de Wing. Las que tienen la marca azul "GIS" son tecnologías del mundo de los mapas.*
-
-> Casi todo este caso es GIS: el **mapa del cielo** con las zonas prohibidas, el **ruteo** que las esquiva y el **GPS de precisión** que marca dónde baja el paquete. El dron es el vehículo.
-
-### Diapositiva 24 · Resultados (3 pasos)
-- **→ 1:** *+1 M.* > Walmart ya superó **un millón de entregas con drones** (mayo de 2026), y cerca del 40 % fueron en los últimos tres meses: crece muy rápido.
-- **→ 2:** *23 min.* > En promedio, el pedido llega en **23 minutos**.
-- **→ 3:** *270+.* > Y el plan es llegar a **más de 270 tiendas** con drones.
-
-**Para recordar:**
-- El aire no tiene calles: el GIS dibuja **el mapa del cielo** (radio de entrega + zonas prohibidas + ruta).
-- El paquete **baja con una cuerda** en un punto marcado del patio.
-- En logística: **la tienda se vuelve depósito**.
-
-**Fuentes (para nosotros, no van en pantalla):**
-- DroneXL, "Walmart Hits 1M Drone Deliveries, 40% This Quarter" (31/05/2026): 1 millón de entregas, 23 min promedio, 66 tiendas en 4 estados.
-- eWeek / Axios (enero 2026): Wing y Walmart suman 150 tiendas; más de 270 ubicaciones con drones al terminar la expansión.
-
----
-
-## Diapositivas 38 a 44 · Caso 06 · Maersk · Barcos
-
-**Tiempo total:** ~2 minutos
-**Estilo:** mapa del mundo en neón con las rutas marítimas y barcos navegando. Maersk es una de las navieras más grandes del mundo: mueve contenedores entre continentes.
-**Video:** todavía no tiene (pendiente).
-
-### Diapositiva 38 · Portada del caso
-*En pantalla: "BARCOS" sobre el mapa del mundo con barcos en sus rutas.*
-
-> El sexto caso es Maersk, una de las navieras más grandes del mundo. Lleva contenedores en barcos enormes entre Asia, Europa y América. Acá el GIS sirve para algo muy concreto: **seguir cada barco y cada contenedor en el medio del océano**.
-
-### Diapositiva 39 · El problema (2 pasos)
-- **→ 1:** *un barco en el Océano Índico: "¿Dónde está mi contenedor?".*
-  > Un contenedor puede viajar **semanas en el medio del océano**. Y el cliente pregunta: ¿dónde está mi carga?
-- **→ 2:** *aparece una zona roja: "Peligro: Mar Rojo".*
-  > Y en el camino puede aparecer un **peligro**. En 2026, por los ataques en la zona, el Mar Rojo no era seguro para pasar.
-
-### Diapositiva 40 · La solución con GIS: todo sobre el mapa (3 pasos)
-- **→ 1:** *todos los barcos dejan su rastro y emiten "pings" de posición.*
-  > Cada barco **avisa su posición todo el tiempo** (con un sistema que se llama AIS) y deja su rastro en el mapa.
-- **→ 2:** *aparece un contenedor refrigerado con "GPS" y "4 °C".*
-  > Los contenedores refrigerados llevan **GPS y termómetro**: se sabe dónde están y si la carga, por ejemplo fruta o remedios, sigue fría.
-- **→ 3:** *la ruta se pinta de verde y aparece "Llega a Rotterdam en 12 días".*
-  > Con la posición y la ruta, el mapa calcula **cuándo llega**.
-
-### Diapositiva 41 · La clave: cambiar de ruta (2 pasos)
-*En pantalla: Europa, África y Asia.*
-- **→ 1:** *un barco va por la ruta corta, por el Canal de Suez.*
-  > El camino corto entre Asia y Europa pasa por el **Canal de Suez**.
-- **→ 2:** *el Mar Rojo se pone rojo con una cruz; aparece en verde la vuelta por África: "Vuelta por África · +14 días".*
-  > Si el Mar Rojo no es seguro, el mapa calcula **la vuelta por África**, por el Cabo de Buena Esperanza, y avisa **cuánto más tarda**. Eso pasó de verdad en 2026: algunos viajes de Maersk tardaron hasta 14 días más.
-
-### Diapositiva 42 · ¿Y en logística? (2 pasos)
-*En pantalla: el puerto de Rotterdam.*
-- **→ 1:** *un panel de "Llegadas" con los barcos y sus horarios.*
-  > Como se sabe dónde está cada barco, el puerto ve **cuándo llega cada uno**, días antes.
-- **→ 2:** *camiones esperando en el puerto: "Camiones listos cuando llega el barco".*
-  > Así **los camiones esperan listos** para llevarse los contenedores, sin perder tiempo.
-
-### Diapositiva 43 · Tecnologías (4 pasos)
-*En pantalla: AIS (GIS) · GPS en contenedores (GIS) · Satélites · Ruteo marítimo (GIS).*
-
-> Las tecnologías GIS son el **AIS**, que transmite la posición de cada barco, el **GPS de los contenedores** y el **ruteo marítimo**, que calcula el mejor camino y lo cambia si hay peligro. Los **satélites** llevan esos datos desde el medio del océano.
-
-### Diapositiva 44 · Resultados (3 pasos)
-- **→ 1:** *~4,3 M.* > La flota de Maersk tiene capacidad para **unos 4,3 millones de contenedores** (medidos en TEU, contenedores de 20 pies).
-- **→ 2:** *270.000.* > **270.000 contenedores refrigerados** llevan GPS y termómetro.
-- **→ 3:** *+14 días.* > Y cuando hubo que dar la vuelta por África, el viaje se alargó **hasta 14 días**: el mapa lo calcula y avisa a todos.
-
-**Para recordar:**
-- En el mar también hay GIS: **posición de cada barco y de cada contenedor**.
-- El mapa permite **cambiar de ruta** si hay peligro y avisar cuánto se demora.
-- En logística: el puerto **se prepara** porque sabe cuándo llega cada barco.
-
-*Fuentes (no van en pantalla): Maersk Remote Container Management (270.000 contenedores refrigerados con GPS; Container Mag, Food Logistics); gCaptain y Maritime Professional (desvíos por el Cabo, 2026: hasta 14 días más); reportes de flota 2026 (~4,3 millones de TEU, Datamar News / India Seatrade News).*
 
 ---
 

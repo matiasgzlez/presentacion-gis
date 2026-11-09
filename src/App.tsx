@@ -13,22 +13,21 @@ import { UPS_SLIDES } from "@/cases/ups";
 import { ESPANA_SLIDES } from "@/cases/espana";
 import { AMAZON_SLIDES } from "@/cases/amazon";
 import { DHL_SLIDES } from "@/cases/dhl";
-import { Tech } from "@/sections/tech";
 import { End, Resources, Tools } from "@/sections/closing";
 import { Videos } from "@/sections/videos";
 
-/* El hilo: qué es un GIS → herramientas poco conocidas → 5 casos (estilo oscuro; las animaciones corren solas en bucle) → lo que viene → libros → para hacer → videos → gracias.
+/* El hilo: qué es un GIS → herramientas poco conocidas → 5 casos (estilo oscuro; las animaciones corren solas en bucle) → libros → para probar → videos → gracias.
    La expo dura 15 minutos: los casos se prenden y se apagan acá. Los ocultos siguen en src/cases/ por si hacen falta. */
 const CASES: { slides: DeckSlide[]; show: boolean }[] = [
   { slides: MELI_SLIDES, show: true },
   { slides: UBER_SLIDES, show: true },
   { slides: UPS_SLIDES, show: true },
-  { slides: AMAZON_SLIDES, show: true },
-  { slides: DHL_SLIDES, show: true },
+  { slides: MAERSK_SLIDES, show: true },
+  { slides: WALMART_SLIDES, show: true },
+  { slides: DHL_SLIDES, show: false },
+  { slides: AMAZON_SLIDES, show: false },
   { slides: TESLA_SLIDES, show: false },
   { slides: STARLINK_SLIDES, show: false },
-  { slides: WALMART_SLIDES, show: false },
-  { slides: MAERSK_SLIDES, show: false },
   { slides: ESPANA_SLIDES, show: false },
 ];
 
@@ -39,9 +38,8 @@ const SLIDES: DeckSlide[] = [
   ...TOOL_SLIDES,
   { id: "casos", label: "Los casos", C: Cases },
   ...CASES.filter((c) => c.show).flatMap((c) => c.slides),
-  { id: "tecnologias", label: "Lo que viene", C: Tech },
   { id: "recursos", label: "Libros", C: Resources },
-  { id: "para-hacer", label: "Para hacer", C: Tools },
+  { id: "para-hacer", label: "Para probar", C: Tools },
   { id: "videos", label: "Videos", C: Videos },
   { id: "gracias", label: "Gracias", C: End },
 ];

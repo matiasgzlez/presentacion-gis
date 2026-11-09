@@ -1,133 +1,115 @@
-import { motion } from "motion/react";
-import { MapPinned, Route, Locate, Drone } from "lucide-react";
+import { Smartphone, Store, Drone, ArrowDownToLine } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { useStep } from "@/components/deck";
-import { FullScene, NEON, StepCard, NeonFrame, Pill, TechSlide, type Dato, WhoIs } from "@/components/neon";
+import { CaseIntro, NEON } from "@/components/neon";
+import { Photo, PhotoPage } from "@/components/photo-page";
+import { ExplainSlide } from "@/components/explain";
+import { GisSlide, type Station } from "@/components/journey";
 import { DroneScene } from "@/scenes/drone";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 03 · Walmart + Wing · entregas con drones. Cinco diapositivas cortas, en 3D.
-   Lo que se dice en voz alta está en exposicion.md. */
+/* Caso 05 · Walmart + Wing · drones. Lo distinto de este caso: la logística POR EL AIRE (el aire no tiene calles).
+   Portada → ¿Quiénes son? (fotos del sitio de Wing) → el GIS detrás de cada vuelo → área de cobertura → mapa del cielo.
+   Animaciones 3D en bucle. Lo que se dice está en exposicion.md. Fotos: wing.com y Wikimedia Commons (ver README). */
 
 const LOGO = "/logos/walmart.png";
 export const WALMART_VIDEO: CaseVideo = { title: "Walmart + Wing: entregas con drones", youtube: "8B1NGqM1zYk" };
-const ease = [0.16, 1, 0.3, 1] as const;
+const L = { logo: LOGO };
+const AZUL = "#0071dc";
 
-function Intro() {
-  return (
-    <NeonFrame id="walmart" logo={LOGO}>
-      <div className="absolute inset-0 opacity-70">
-        <DroneScene mode="intro" />
+const Intro = () => <CaseIntro id="walmart" {...L} n="05" company="Walmart + Wing" title="Drones" pill="¿Cómo se reparte por el aire?" bg={<DroneScene mode="intro" />} />;
+
+const Quien = () => (
+  <PhotoPage
+    id="walmart-quien"
+    {...L}
+    pill="¿Quiénes son?"
+    name="Walmart + Wing"
+    color={AZUL}
+    part="El súper que reparte con drones"
+    points={[
+      { b: "Walmart", t: <>el supermercado más grande del mundo.</> },
+      { b: "Wing", t: <>los drones de <b>Alphabet</b>, la dueña de Google.</> },
+      { b: "Sin aterrizar", t: <>baja el paquete <b>con una cuerda</b>.</> },
+      { b: "+1 millón", t: <>de entregas a casas en 2026.</> },
+    ]}
+    right={
+      <div className="grid size-full grid-cols-2 grid-rows-[1.3fr_1fr] gap-[clamp(0.8rem,1.4vw,1.4rem)]">
+        <Photo src="/photos/walmart/dron.jpg" className="col-span-2 min-h-0" caption="Un dron de Wing con un pedido de Walmart" />
+        <Photo src="/photos/walmart/tienda.jpg" className="min-h-0" caption="La tienda es el depósito" />
+        <Photo src="/photos/walmart/retiro.jpg" className="min-h-0" caption="El pedido, en la puerta" />
       </div>
-      <div className="pointer-events-none absolute inset-0 grid place-items-center">
-        <div className="text-center">
-          <motion.p className="font-mono text-[clamp(0.9rem,1.2vw,1.4rem)] font-bold uppercase tracking-[0.2em] text-white/70" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-            Caso 03 · Walmart + Wing
-          </motion.p>
-          <motion.h2
-            className="display mt-2 text-[clamp(4rem,11vw,12rem)] uppercase leading-none [text-shadow:0_6px_40px_rgba(0,0,0,0.9)]"
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1, ease }}
-          >
-            Drones
-          </motion.h2>
-          <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
-            <Pill color={NEON.amber}>Entregas por el aire</Pill>
-          </motion.div>
-          <WhoIs who={[{ name: "Walmart", d: "la cadena de supermercados más grande del mundo, de Estados Unidos." }, { name: "Wing", d: "la empresa de drones de reparto de Alphabet, la dueña de Google." }]} />
-        </div>
-      </div>
-    </NeonFrame>
-  );
-}
+    }
+  />
+);
 
-function Slide({ id, mode, label, title, color, items, dato }: { id: string; mode: "problema" | "solucion" | "entrega" | "logistica"; label: string; title: string; color: string; items: React.ReactNode[]; dato?: Dato }) {
-  const step = useStep();
-  return (
-    <NeonFrame id={id} logo={LOGO}>
-      <FullScene map={<DroneScene mode={mode} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} dato={dato} />} />
-    </NeonFrame>
-  );
-}
+const VUELO: Station[] = [
+  { icon: Smartphone, b: "Pedís" },
+  { icon: Store, b: "Sale de la tienda" },
+  { icon: Drone, b: "Vuela" },
+  { icon: ArrowDownToLine, b: "Baja con cuerda" },
+];
 
-const Problema = () => (
-  <Slide
-    id="walmart-problema"
-    mode="problema"
-    label="El problema"
-    title="Un camión para una caja chica"
-    color={NEON.amber}
-    items={[
-      <>Mandar un camión por un paquete chico es <b>caro y lento</b>: queda atrapado en el tránsito.</>,
-      <>Un dron va por el aire… pero <b>el aire no tiene calles</b>: hay lugares donde no se puede volar.</>,
+const DondeGis = () => (
+  <GisSlide
+    id="walmart-donde-gis"
+    {...L}
+    name="Walmart + Wing"
+    color={AZUL}
+    title="El GIS detrás de cada vuelo"
+    stations={VUELO}
+    questions={[
+      { at: [2], fn: "Área de cobertura", q: "¿A qué casas llega cada tienda?", c: NEON.green },
+      { at: [3, 4], fn: "Mapa del cielo", q: "¿Por dónde puede volar el dron?", c: NEON.blue },
     ]}
   />
 );
-const Solucion = () => (
-  <Slide
-    id="walmart-mapa"
-    mode="solucion"
-    label="La solución con GIS"
-    title="Un mapa del cielo"
-    color={NEON.blue}
-    items={[
-      <>Cada tienda tiene su <b>radio de entrega</b> dibujado en el mapa.</>,
-      <>Encima van las <b>zonas prohibidas</b>: aeropuertos, hospitales.</>,
-      <>El sistema traza la <b>ruta que las esquiva</b> hasta la casa.</>,
-    ]}
-  />
-);
-const Entrega = () => (
-  <Slide
-    id="walmart-entrega"
-    mode="entrega"
-    label="La entrega"
-    title="Justo en el patio"
-    dato={{ n: "23 min", d: "en promedio, desde el pedido hasta la puerta." }}
-    color={NEON.green}
-    items={[
-      <>El dron llega volando a la <b>casa del cliente</b>.</>,
-      <>Baja el paquete <b>con una cuerda</b> en un punto libre del patio, marcado en el mapa.</>,
-    ]}
-  />
-);
-const Logistica = () => (
-  <Slide
+
+const Cobertura = () => (
+  <ExplainSlide
     id="walmart-logistica"
-    mode="logistica"
-    label="GIS en logística"
-    title="La tienda es el depósito"
+    {...L}
+    pill="Función GIS 1"
+    title="Área de cobertura"
+    question={<><b>¿A qué casas llega cada tienda?</b> El dron va y vuelve: unos 19 km en total.</>}
     color={NEON.green}
-    items={[
-      <>Cada tienda <b>cubre un círculo de casas</b> a pocos minutos.</>,
-      <>Con el mapa se ve <b>qué casas quedan cubiertas</b> y dónde conviene sumar tiendas.</>,
+    points={[
+      { b: "Un círculo por tienda", t: <>hasta dónde llega el dron.</> },
+      { b: "Casas cubiertas", t: <>en verde, las que reciben en minutos.</> },
     ]}
-  />
-);
-
-const Tecnologias = () => (
-  <TechSlide
-    id="walmart-tecnologias"
-    logo={LOGO}
-   
-    label="Tecnologías · Walmart + Wing"
-    bg={<DroneScene mode="intro" />}
     techs={[
-      { icon: MapPinned, name: "Mapa del cielo", d: "Zonas donde se puede y no se puede volar, cargadas en el mapa.", gis: true, c: NEON.blue },
-      { icon: Route, name: "Ruteo aéreo", d: "Calcula el camino del dron que esquiva las zonas prohibidas.", gis: true, c: NEON.green },
-      { icon: Locate, name: "GPS de precisión", d: "Ubica el punto exacto del patio donde baja el paquete.", gis: true, c: NEON.amber },
-      { icon: Drone, name: "Drones de Wing", d: "Vuelan solos y bajan el paquete con una cuerda.", c: NEON.red },
+      { name: "Área de influencia", gis: true },
+      { name: "Análisis de cobertura", gis: true },
     ]}
+    scene={(s) => <DroneScene mode="logistica" step={s} />}
   />
 );
 
+const Cielo = () => (
+  <ExplainSlide
+    id="walmart-mapa"
+    {...L}
+    pill="Función GIS 2"
+    title="Mapa del cielo"
+    question={<><b>El aire no tiene calles.</b> ¿Por dónde puede volar?</>}
+    color={NEON.blue}
+    points={[
+      { b: "Radio de vuelo", t: <>desde la tienda.</> },
+      { b: "Zonas prohibidas", t: <>hospital, aeropuerto.</> },
+      { b: "La ruta", t: <>la que las esquiva, hasta el patio.</> },
+    ]}
+    techs={[
+      { name: "Capas del espacio aéreo", gis: true },
+      { name: "Ruteo aéreo", gis: true },
+      { name: "GPS de precisión", gis: true },
+    ]}
+    scene={(s) => <DroneScene mode="solucion" step={s} />}
+  />
+);
 
 export const WALMART_SLIDES: DeckSlide[] = [
-  { id: "walmart", label: "Walmart · Drones", C: Intro },
-  { id: "walmart-problema", label: "Walmart · El problema", steps: 2, C: Problema },
-  { id: "walmart-mapa", label: "Walmart · Mapa del cielo", steps: 3, C: Solucion },
-  { id: "walmart-entrega", label: "Walmart · La entrega", steps: 2, C: Entrega },
-  { id: "walmart-logistica", label: "Walmart · En logística", steps: 2, C: Logistica },
-  { id: "walmart-tecnologias", label: "Walmart + Wing · Tecnologías", steps: 4, C: Tecnologias },
+  { id: "walmart", label: "Walmart + Wing · Drones", C: Intro },
+  { id: "walmart-quien", label: "Walmart + Wing · ¿Quiénes son?", C: Quien },
+  { id: "walmart-donde-gis", label: "Walmart + Wing · El GIS detrás de cada vuelo", steps: 2, phase: 4500, C: DondeGis },
+  { id: "walmart-logistica", label: "Walmart + Wing · Área de cobertura", steps: 2, phase: 5000, C: Cobertura },
+  { id: "walmart-mapa", label: "Walmart + Wing · Mapa del cielo", steps: 3, phase: 5000, C: Cielo },
 ];

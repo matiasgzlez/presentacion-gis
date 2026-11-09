@@ -141,7 +141,7 @@ export function SeaMap({ scene, step }: { scene: SeaScene; step: number }) {
         const route = closed > 0 ? CAPE : SUEZ, f = (t * (closed > 0 ? 0.035 : 0.05)) % 1, [p, a] = along(route, f);
         if (s >= 1) ship(p, a, "#ffffff", 1.9, 0.6);
         const [px, py] = P(32.4, 31.3); if (s >= 1 && closed === 0) tagPill(g, px - 40 * k, py - 26 * k, "CANAL DE SUEZ", mono(10 * k + 3), k, GREEN);
-        if (alt >= 0.95) { const [cx, cy] = P(-12, -12); badge(g, cx, cy, "VUELTA POR ÁFRICA · +14 DÍAS", AMBER, sans(15 * k + 5), k, W); }
+        if (alt >= 0.95) { const [cx, cy] = P(-12, -12); badge(g, cx, cy, "VUELTA POR ÁFRICA · 10 A 14 DÍAS MÁS", AMBER, sans(15 * k + 5), k, W); }
       }
 
       // ── logística: el puerto sabe cuándo llega cada barco; camiones listos

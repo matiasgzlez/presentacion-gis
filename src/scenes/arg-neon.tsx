@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 import { ARG_CITIES, ARG_RINGS } from "@/scenes/arg-data";
 import { badge, tagPill } from "@/scenes/neon-map";
+import { label } from "@/scenes/kit";
 
 /* Caso Mercado Libre: el mapa real de Argentina en estilo neón. Las ciudades son los compradores (tamaño = población).
    intro     · el país con sus compradores
    problema  · 1 un solo depósito en Buenos Aires manda a todo el país · 2 a los de cerca llega rápido; a los lejanos, tarda días
    solucion  · 1 dónde están los compradores · 2 hasta dónde se llega en un día desde cada lugar posible · 3 se elige Córdoba
    tiempo    · 1 un círculo: misma distancia · 2 la forma real: mismo tiempo (se estira por las rutas)
-   logistica · 1 el centro grande abastece a los regionales · 2 de cada regional salen los repartos */
+   logistica · 1 el centro grande abastece a los regionales · 2 de cada regional salen los repartos
+   ubicacion · 1 dónde están los compradores · 2 las rutas · 3 hasta dónde llega un camión en un día (isócrona) · 4 gana la que suma más compradores nuevos */
 
-export type ArgScene = "intro" | "problema" | "solucion" | "tiempo" | "logistica";
+export type ArgScene = "intro" | "problema" | "solucion" | "tiempo" | "logistica" | "ubicacion";
 
 const BLUE = "#3b82f6", BLUE_L = "#93c5fd", AMBER = "#f5b31b", GREEN = "#22c55e", RED = "#ef4444", MINT = "#3cf2b5";
 const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -52,7 +54,8 @@ export function ArgMap({ scene, step }: { scene: ArgScene; step: number }) {
       if (scene === "tiempo") { tiempo(g, W, H, k, s, ts, t, since, sans, mono); raf = requestAnimationFrame(frame); return; }
 
       // proyección: el país entra entero en el alto disponible
-      const U = Math.min(W / (21 * KX * 1.25), H / 33), CX = W / 2, CY = H / 2;
+      const ub = scene === "ubicacion";
+      const U = Math.min(W / (21 * KX * 1.25), H / (ub ? 36.5 : 33)), CX = W / 2, CY = H / 2 + (ub ? H * 0.045 : 0);
       const P = (lon: number, lat: number): [number, number] => [CX + (lon + 63.6) * KX * U, CY - (lat + 38.4) * U];
 
       // ── el país
@@ -60,6 +63,8 @@ export function ArgMap({ scene, step }: { scene: ArgScene; step: number }) {
       for (const r of ARG_RINGS) { g.beginPath(); r.forEach(([lo, la], i) => (i ? g.lineTo(...P(lo, la)) : g.moveTo(...P(lo, la)))); g.closePath(); g.fillStyle = "rgba(37,99,235,0.12)"; g.fill(); g.strokeStyle = BLUE; g.lineWidth = 3.2 * k; g.stroke(); }
       g.restore();
       for (const r of ARG_RINGS) { g.beginPath(); r.forEach(([lo, la], i) => (i ? g.lineTo(...P(lo, la)) : g.moveTo(...P(lo, la)))); g.closePath(); g.strokeStyle = BLUE_L; g.lineWidth = 1 * k; g.stroke(); }
+
+      if (scene === "ubicacion") { ubicacion(g, P, U, k, W, H, s, t, since, sans, mono); raf = requestAnimationFrame(frame); return; }
 
       // ── qué mostrar
       const heat = scene === "solucion" ? since(1, 1.2) : 0;
@@ -209,4 +214,104 @@ function tiempo(g: CanvasRenderingContext2D, W: number, H: number, k: number, s:
     for (const a of ROADS) { const r = (s >= 2 ? reachAt(a) : R) * k2; g.fillStyle = AMBER; g.beginPath(); g.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 5.5 * k, 0, Math.PI * 2); g.fill(); }
   }
   depot(g, cx, cy, 16 * k, AMBER);
+}
+
+/* ── "ubicacion": dónde conviene el próximo centro ──
+   Rutas nacionales simplificadas (de ciudad a ciudad). La isócrona de un día se estira en la dirección de cada ruta.
+   Se cuentan los habitantes de las ciudades que quedan adentro y que hoy no cubre Buenos Aires (datos: Natural Earth). */
+type LL = [number, number];
+const NODES: Record<string, LL> = {
+  BA: [-58.43, -34.61], Rosario: [-60.67, -32.95], Córdoba: [-64.18, -31.4], SdE: [-64.26, -27.79], Tucumán: [-65.22, -26.81], Salta: [-65.42, -24.78],
+  Junín: [-60.95, -34.59], RíoCuarto: [-64.35, -33.12], SanLuis: [-66.34, -33.3], Mendoza: [-68.82, -32.88], SanJuan: [-68.53, -31.54],
+  SantaRosa: [-64.29, -36.62], Neuquén: [-68.06, -38.95], Bahía: [-62.27, -38.72], Viedma: [-63.0, -40.81], Trelew: [-65.3, -43.25], Comodoro: [-67.5, -45.86],
+  Concordia: [-58.02, -31.39], Posadas: [-55.9, -27.37], SantaFe: [-60.7, -31.63], Resistencia: [-58.99, -27.46],
+};
+const ROADS: string[][] = [
+  ["BA", "Rosario", "Córdoba", "SdE", "Tucumán", "Salta"], ["BA", "Junín", "RíoCuarto", "SanLuis", "Mendoza", "SanJuan"], ["BA", "SantaRosa", "Neuquén"],
+  ["BA", "Bahía", "Viedma", "Trelew", "Comodoro"], ["BA", "Concordia", "Posadas"], ["Rosario", "SantaFe", "Resistencia"], ["Córdoba", "SanJuan"],
+  ["Córdoba", "RíoCuarto"], ["Neuquén", "Bahía"], ["Mendoza", "Neuquén"],
+];
+const SITES = [
+  { key: "Córdoba", n: "CÓRDOBA" }, { key: "Mendoza", n: "MENDOZA" }, { key: "Tucumán", n: "TUCUMÁN" }, { key: "Neuquén", n: "NEUQUÉN" },
+];
+const roadDirs = (key: string) => {
+  const out: number[] = [];
+  for (const r of ROADS) r.forEach((n, i) => { if (n !== key) return; [i - 1, i + 1].forEach((j) => { if (j < 0 || j >= r.length) return; const a = NODES[key], b = NODES[r[j]]; out.push(Math.atan2(b[1] - a[1], (b[0] - a[0]) * KX)); }); });
+  return out;
+};
+const DIRS: Record<string, number[]> = Object.fromEntries(["BA", ...SITES.map((x) => x.key)].map((k) => [k, roadDirs(k)]));
+/** Hasta dónde llega un camión en un día desde `key`, en la dirección `ang` (grados de latitud). */
+const reach = (key: string, ang: number) => {
+  let m = 0;
+  for (const d of DIRS[key]) { const x = Math.atan2(Math.sin(ang - d), Math.cos(ang - d)); m = Math.max(m, Math.pow(Math.max(0, Math.cos(x)), 10)); }
+  return REACH * (0.62 + 0.68 * m);
+};
+const inIso = (key: string, lon: number, lat: number) => {
+  const a = NODES[key], dx = (lon - a[0]) * KX, dy = lat - a[1];
+  return Math.hypot(dx, dy) < reach(key, Math.atan2(dy, dx));
+};
+const NEW_BUYERS: Record<string, number> = Object.fromEntries(SITES.map(({ key }) => [key, ARG_CITIES.filter((c) => inIso(key, c.lon, c.lat) && !inIso("BA", c.lon, c.lat)).reduce((a, c) => a + c.pop, 0)]));
+const BEST = SITES.reduce((a, b) => (NEW_BUYERS[b.key] > NEW_BUYERS[a.key] ? b : a)).key;
+const millones = (n: number) => `+${(n / 1e6).toLocaleString("es-AR", { maximumFractionDigits: 1 })} M`;
+
+function ubicacion(g: CanvasRenderingContext2D, P: (lon: number, lat: number) => [number, number], U: number, k: number, W: number, H: number, s: number, t: number, since: (n: number, d: number) => number, sans: (px: number, w?: number) => string, mono: (px: number) => string) {
+  const c1 = since(1, 1.2), c2 = since(2, 1.6), c3 = since(3, 1.4), c4 = since(4, 1.0);
+
+  // 2 · rutas
+  if (c2 > 0) {
+    g.save(); g.shadowColor = AMBER; g.shadowBlur = 8 * k; g.strokeStyle = s >= 3 ? "rgba(245,179,27,0.55)" : AMBER; g.lineWidth = 2.6 * k; g.lineCap = "round";
+    for (const r of ROADS) {
+      const pts = r.map((n) => P(...NODES[n])); const total = pts.length - 1, upto = c2 * total;
+      g.beginPath(); g.moveTo(...pts[0]);
+      for (let i = 1; i <= total; i++) { const f = clamp(upto - (i - 1)); if (f <= 0) break; g.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)); }
+      g.stroke();
+    }
+    g.restore();
+  }
+
+  // 3 · isócronas de un día: Buenos Aires (ya existe) y las ciudades posibles
+  const iso = (key: string, grow: number, col: string, fill: string, dashed: boolean, width: number) => {
+    const [cx, cy] = P(...NODES[key]);
+    g.beginPath();
+    for (let i = 0; i <= 180; i++) { const a = (i / 180) * Math.PI * 2, r = reach(key, a) * U * grow; const x = cx + Math.cos(a) * r, y = cy - Math.sin(a) * r; i ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.closePath(); g.fillStyle = fill; g.fill();
+    g.save(); if (dashed) g.setLineDash([8 * k, 6 * k]); g.shadowColor = col; g.shadowBlur = dashed ? 0 : 16 * k; g.strokeStyle = col; g.lineWidth = width * k; g.stroke(); g.restore();
+  };
+  if (c3 > 0) {
+    iso("BA", c3, AMBER, "rgba(245,179,27,0.07)", false, 2.4);
+    SITES.forEach(({ key }) => {
+      const win = c4 > 0 && key === BEST, lose = c4 > 0 && key !== BEST;
+      g.globalAlpha = lose ? 1 - 0.6 * c4 : 1;
+      iso(key, c3, win ? GREEN : "#cbd5e1", win ? `rgba(34,197,94,${0.1 + 0.1 * c4})` : "rgba(148,163,184,0.06)", !win, win ? 3.4 : 1.8);
+      g.globalAlpha = 1;
+    });
+  }
+
+  // 1 · compradores (tamaño = habitantes); en el paso 4, en verde los nuevos que suma la ganadora
+  for (const c of ARG_CITIES) {
+    const [x, y] = P(c.lon, c.lat);
+    const r = (Math.sqrt(c.pop) / 160 * k + 2.2 * k) * (0.5 + 0.6 * (s >= 1 ? c1 : 0)) * (1 + 0.08 * Math.sin(t * 2 + c.lon));
+    const nuevo = c4 > 0 && inIso(BEST, c.lon, c.lat) && !inIso("BA", c.lon, c.lat);
+    const col = nuevo ? "rgba(34,197,94,0.95)" : s >= 1 ? "rgba(147,197,253,0.95)" : "rgba(147,197,253,0.35)";
+    const hal = g.createRadialGradient(x, y, 0, x, y, r * 2.6); hal.addColorStop(0, col.replace(/[\d.]+\)$/, "0.35)")); hal.addColorStop(1, col.replace(/[\d.]+\)$/, "0)"));
+    g.fillStyle = hal; g.beginPath(); g.arc(x, y, r * 2.6, 0, Math.PI * 2); g.fill();
+    g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+
+  // centros: Buenos Aires (ya está) y los lugares posibles
+  if (s >= 3) {
+    const [bx, by] = P(...NODES.BA); depot(g, bx, by, 12 * k, AMBER);
+    tagPill(g, bx + 78 * k, by + 28 * k, "YA ESTÁ: BUENOS AIRES", mono(10 * k + 3), k, AMBER);
+    SITES.forEach(({ key, n }) => {
+      const [x, y] = P(...NODES[key]), win = c4 > 0 && key === BEST;
+      depot(g, x, y, (win ? 13 : 9) * k, win ? GREEN : "#cbd5e1");
+      if (c4 > 0 && !win) { g.globalAlpha = c4; tagPill(g, x - 10 * k, y + 24 * k, `${n} ${millones(NEW_BUYERS[key])}`, mono(10 * k + 3), k, "#94a3b8"); g.globalAlpha = 1; }
+      if (s === 3) tagPill(g, x, y + 22 * k, n, mono(10 * k + 3), k, "#cbd5e1");
+    });
+    if (c4 > 0) { const [x, y] = P(...NODES[BEST]); g.globalAlpha = c4; badge(g, x, y - 6 * k, `ELEGIDA: CÓRDOBA · ${millones(NEW_BUYERS[BEST])} PERSONAS`, GREEN, sans(13 * k + 5), k, W); g.globalAlpha = 1; }
+  }
+
+  const titles = ["DÓNDE ESTÁN LOS COMPRADORES", "DÓNDE ESTÁN LOS COMPRADORES", "LAS RUTAS DEL PAÍS", "HASTA DÓNDE LLEGA UN CAMIÓN EN UN DÍA", "GANA LA QUE SUMA MÁS COMPRADORES NUEVOS"];
+  const cols = [BLUE, BLUE, AMBER, MINT, GREEN];
+  label(g, W / 2, H * 0.05, titles[Math.min(s, 4)], cols[Math.min(s, 4)], sans(14 * k + 5), k, { W });
 }

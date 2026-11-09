@@ -1,120 +1,113 @@
-import { Map, Route, Locate, MapPinned, CalendarDays, Globe2, Package, Users } from "lucide-react";
+import { Plane, Warehouse, Package, MapPin } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
+import { CaseIntro, NEON } from "@/components/neon";
 import { BackgroundVideo } from "@/components/bg-video";
+import { Photo, PhotoPage } from "@/components/photo-page";
+import { ExplainSlide } from "@/components/explain";
+import { GisSlide, type Station } from "@/components/journey";
 import { RouteMap } from "@/scenes/route-neon";
-import { LayerStack } from "@/scenes/layers-neon";
+import { OrionHow } from "@/scenes/orion-how";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 03 · UPS · ORION: cómo usa el GIS para elegir el orden de las paradas. Usa nuestro video de ORION
-   y la prueba con calles reales de Resistencia. Lo que se dice está en exposicion.md. */
+/* Caso 03 · UPS · ORION. Lo distinto de este caso: EL ORDEN EXACTO de las paradas (optimización pura).
+   Portada → ¿Quién es? (fotos: acá se conoce poco) → el GIS detrás de cada entrega → ¿cómo funciona ORION? → el resultado (nuestro video).
+   Lo que se dice está en exposicion.md. Fotos: Wikimedia Commons (ver README). */
 
 const LOGO = "/logos/ups.png";
 export const UPS_VIDEO: CaseVideo = { title: "UPS ORION (On-Road Integrated Optimization and Navigation)", youtube: "0jLAdTC7_TY" };
 const L = { logo: LOGO };
+const AMBER = NEON.amber;
 
 const Intro = () => <CaseIntro id="ups" {...L} n="03" company="UPS · ORION" title="Rutas" pill="El mejor orden de paradas para cada camión" bg={<RouteMap scene="intro" step={0} />} />;
 
 const Quien = () => (
-  <CompanySlide
+  <PhotoPage
     id="ups-quien"
     {...L}
+    pill="¿Quién es?"
     name="UPS"
-    color={NEON.amber}
-    items={[
-      <>Lleva <b>paquetes</b> de empresas y personas.</>,
-      <>Es de <b>Estados Unidos</b>; sus camiones son marrones.</>,
-      <>Una de las <b>paqueterías más grandes</b> del mundo.</>,
+    color={AMBER}
+    part="La de los camiones marrones"
+    points={[
+      { b: "Qué hace", t: <>lleva paquetes por todo el mundo.</> },
+      { b: "Desde 1907", t: <>nació en Seattle, Estados Unidos.</> },
+      { b: "20,8 millones", t: <>de paquetes por día.</> },
+      { b: "Worldport", t: <>su centro clasifica <b>416.000 paquetes por hora</b>.</> },
     ]}
-    facts={[
-      { icon: CalendarDays, n: "1907", d: "nace en Seattle" },
-      { icon: Package, n: "20,8 M", d: "de paquetes por día (2025)" },
-      { icon: Globe2, n: "+200", d: "países y territorios" },
-      { icon: Users, n: "~460.000", d: "empleados" },
-    ]}
+    right={
+      <div className="grid size-full grid-cols-2 grid-rows-[1.25fr_1fr] gap-[clamp(0.8rem,1.4vw,1.4rem)]">
+        <Photo src="/photos/ups/camion.jpg" className="col-span-2 min-h-0" caption="Un camión de reparto de UPS" />
+        <Photo src="/photos/ups/worldport.jpg" className="min-h-0" caption="Worldport, Louisville (EE. UU.)" />
+        <Photo src="/photos/ups/interior.jpg" className="min-h-0" caption="Los paquetes, en el orden de las paradas" />
+      </div>
+    }
   />
 );
 
-const ParaQue = () => (
-  <CaseSlide
-    id="ups-gis"
+const ENTREGA: Station[] = [
+  { icon: Plane, b: "Viaja" },
+  { icon: Warehouse, b: "Se clasifica" },
+  { icon: Package, b: "Se carga" },
+  { icon: MapPin, b: "Se entrega" },
+];
+
+const DondeGis = () => (
+  <GisSlide
+    id="ups-donde-gis"
     {...L}
-    label="¿Para qué usa el GIS?"
-    title="El orden de las paradas"
-    color={NEON.blue}
-    items={[<>Capa: <b>calles</b> (con sentidos)</>, <>Capa: <b>paradas del día</b></>, <>Capa: <b>camiones con GPS</b></>, <>Decide: <b>en qué orden ir</b></>]}
-    scene={(s) => (
-      <LayerStack
-        step={s}
-        layers={[
-          { name: "Calles", kind: "calles", color: NEON.blue },
-          { name: "Paradas del día", kind: "puntos", color: NEON.amber },
-          { name: "Camiones con GPS", kind: "camiones", color: NEON.green },
-        ]}
-        decision={{ text: "El mejor orden", at: [-0.2, 0.3] }}
-      />
-    )}
+    name="UPS"
+    color={AMBER}
+    title="El GIS detrás de cada entrega"
+    stations={ENTREGA}
+    questions={[{ at: [3, 4], fn: "Optimización de rutas", q: "¿En qué orden visitar las 120 paradas del día?", c: NEON.blue }]}
   />
 );
 
 const Como = () => (
-  <CaseSlide
+  <ExplainSlide
+    id="ups-orion-como"
+    {...L}
+    pill="La función GIS clave"
+    title="¿Cómo funciona ORION?"
+    question={<>Elige <b>el orden de las paradas</b> de cada camión.</>}
+    color={NEON.blue}
+    points={[
+      { b: "Los datos", t: <>paquetes, calles y horarios.</> },
+      { b: "No prueba todos", t: <>son más que <b>átomos en el universo</b>.</> },
+      { b: "Arma y mejora", t: <>una ruta, y la corrige de a pedazos.</> },
+      { b: "Al chofer", t: <>la ruta, en su aparato.</> },
+    ]}
+    techs={[
+      { name: "Mapa de calles", gis: true },
+      { name: "Geocodificación", gis: true },
+      { name: "Optimización de rutas", gis: true },
+    ]}
+    scene={(s) => <OrionHow step={s} />}
+  />
+);
+
+const Resultado = () => (
+  <ExplainSlide
     id="ups-orion"
     {...L}
-    label="¿Cómo lo hace?"
-    title="ORION"
-    color={NEON.blue}
-    items={[<>~<b>120 paradas</b> por chofer por día</>, <>Más órdenes posibles que <b>átomos del universo</b></>, <>ORION prueba millones y <b>elige el más corto</b></>]}
-    dato={{ n: "US$ 50 M", d: "por año ahorra UPS con solo 1 milla menos por chofer por día." }}
-    scene={() => <BackgroundVideo src="/videos/ups-orion.mp4" className="object-contain" />}
-  />
-);
-
-const Resistencia = () => (
-  <CaseSlide
-    id="ups-resistencia"
-    {...L}
-    label="Lo probamos"
-    title="En Resistencia"
+    pill="El resultado"
+    title="A ojo vs. ORION"
+    question={<>El mismo camión y las mismas paradas.</>}
     color={NEON.green}
-    items={[<>"A ojo": <b>55,6 km</b></>, <>Optimizado: <b>41,1 km (−26 %)</b></>]}
-    scene={(s) => <RouteMap scene="resistencia" step={s} />}
-  />
-);
-
-const Logistica = () => (
-  <CaseSlide
-    id="ups-logistica"
-    {...L}
-    label="En su logística"
-    title="La ruta cambia en vivo"
-    color={NEON.green}
-    items={[<>Entra un <b>pedido nuevo</b></>, <>Recalcula la ruta <b>en segundos</b></>]}
-    scene={(s) => <RouteMap scene="logistica" step={s} />}
-  />
-);
-
-const Tecnologias = () => (
-  <TechSlide
-    id="ups-tecnologias"
-    logo={LOGO}
-    label="Tecnologías · UPS ORION"
-    bg={<RouteMap scene="intro" step={0} />}
-    techs={[
-      { icon: Map, name: "Mapa de calles", d: "Todas las calles, con sus sentidos y distancias.", gis: true, c: NEON.blue },
-      { icon: MapPinned, name: "Direcciones en el mapa", d: "Cada paquete convertido en un punto exacto.", gis: true, c: NEON.green },
-      { icon: Route, name: "Optimización de rutas", d: "Prueba millones de órdenes y elige el más corto.", gis: true, c: NEON.amber },
-      { icon: Locate, name: "GPS de los camiones", d: "Dónde está cada camión, para recalcular en vivo.", gis: true, c: NEON.red },
+    points={[
+      { b: "Más corto", t: <>ORION recorre menos.</> },
+      { b: "1 milla menos", t: <>por chofer = <b>US$ 50 M</b> al año.</> },
+      { b: "En total", t: <><b>US$ 300 a 400 M</b> por año.</> },
     ]}
+    techs={[{ name: "ORION", gis: true }]}
+    scene={() => <BackgroundVideo src="/videos/ups-orion.mp4" className="object-contain" />}
   />
 );
 
 export const UPS_SLIDES: DeckSlide[] = [
   { id: "ups", label: "UPS · Rutas", C: Intro },
-  { id: "ups-quien", label: "UPS · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
-  { id: "ups-gis", label: "UPS · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
-  { id: "ups-orion", label: "UPS · ORION", C: Como },
-  { id: "ups-resistencia", label: "UPS · Lo probamos en Resistencia", steps: 2, phase: 5000, C: Resistencia },
-  { id: "ups-logistica", label: "UPS · En su logística", steps: 2, phase: 4500, C: Logistica },
-  { id: "ups-tecnologias", label: "UPS · Tecnologías", C: Tecnologias },
+  { id: "ups-quien", label: "UPS · ¿Quién es?", C: Quien },
+  { id: "ups-donde-gis", label: "UPS · El GIS detrás de cada entrega", steps: 1, C: DondeGis },
+  { id: "ups-orion-como", label: "UPS · ¿Cómo funciona ORION?", steps: 4, phase: 6000, C: Como },
+  { id: "ups-orion", label: "UPS · El resultado", steps: 3, phase: 3500, C: Resultado },
 ];

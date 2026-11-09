@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import type { DeckSlide } from "@/components/deck";
 import { NeonFrame, Pill } from "@/components/neon";
+import { Photo, PhotoPage, type Point } from "@/components/photo-page";
 
 /* Herramientas de GIS en logística poco conocidas. Cada una se cuenta igual:
    ¿Qué es? · ¿Cómo funciona? · ¿Para qué sirve? (y un ejemplo cercano).
@@ -12,62 +13,9 @@ import { NeonFrame, Pill } from "@/components/neon";
 const ease = [0.16, 1, 0.3, 1] as const;
 const W3W = "#e11f26", PLUS = "#4285f4", MARINE = "#22d3ee", KEPLER = "#3cf2b5";
 
-/** Una imagen grande con un zoom lento en bucle, para que la diapositiva no quede quieta. */
-function Photo({ src, caption, className, contain }: { src: string; caption?: ReactNode; className?: string; contain?: boolean }) {
-  return (
-    <figure className={`relative overflow-hidden rounded-3xl border-2 border-white/15 ${contain ? "bg-white" : "bg-black"} ${className ?? ""}`}>
-      <motion.img
-        src={src}
-        alt=""
-        className={`size-full ${contain ? "object-contain p-[6%] pb-[14%]" : "object-cover"}`}
-        initial={{ scale: 1 }}
-        animate={{ scale: 1.08 }}
-        transition={{ duration: 14, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
-      />
-      {caption && (
-        <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-[clamp(0.8rem,1.4vw,1.4rem)] pb-[clamp(0.6rem,1.2vh,1rem)] pt-10 text-[clamp(0.95rem,1.2vw,1.4rem)] font-semibold leading-snug text-white">
-          {caption}
-        </figcaption>
-      )}
-    </figure>
-  );
-}
-
-type Point = { b: string; t: ReactNode };
-
-/** Diapositiva de herramienta: texto a la izquierda (la parte + los puntos), imágenes a la derecha. */
-function ToolPage({ id, tool, color, n, part, lead, points, right }: { id: string; tool: string; color: string; n: number; part: string; lead?: ReactNode; points?: Point[]; right: ReactNode }) {
-  return (
-    <NeonFrame id={id}>
-      <div className="absolute inset-y-[clamp(3.5rem,8vh,5.5rem)] left-[clamp(1.5rem,3.5vw,4rem)] flex w-[36vw] flex-col justify-center">
-        <div className="flex items-center gap-3">
-          <Pill>Herramienta {n}</Pill>
-          <span className="display text-[clamp(1.2rem,1.7vw,2rem)]" style={{ color }}>{tool}</span>
-        </div>
-        <h2 className="display mt-[clamp(0.6rem,1.6vh,1.1rem)] text-[clamp(2.4rem,4vw,4.6rem)] uppercase leading-none">{part}</h2>
-        {lead && <div className="mt-[clamp(0.9rem,2.4vh,1.6rem)] text-[clamp(1.15rem,1.6vw,1.9rem)] font-medium leading-snug text-white/90">{lead}</div>}
-        {points && (
-          <ul className="mt-[clamp(0.9rem,2.4vh,1.6rem)] flex flex-col gap-[clamp(0.6rem,1.6vh,1.1rem)]">
-            {points.map((p, i) => (
-              <motion.li
-                key={p.b}
-                className="flex gap-3 text-[clamp(1.05rem,1.4vw,1.65rem)] leading-snug text-white/90"
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 + i * 0.12, ease }}
-              >
-                <span className="mt-[0.45em] size-[0.55em] shrink-0 rounded-full" style={{ background: color }} />
-                <span>
-                  <b className="text-white">{p.b}:</b> {p.t}
-                </span>
-              </motion.li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div className="absolute inset-y-[clamp(3.5rem,8vh,5.5rem)] left-[40vw] right-[clamp(1.5rem,3vw,3.5rem)]">{right}</div>
-    </NeonFrame>
-  );
+/** Diapositiva de herramienta: la etiqueta dice "Herramienta n". */
+function ToolPage({ tool, n, ...rest }: { id: string; tool: string; color: string; n: number; part: string; lead?: ReactNode; points?: Point[]; right: ReactNode }) {
+  return <PhotoPage pill={`Herramienta ${n}`} name={tool} {...rest} />;
 }
 
 /* ── Portada de la sección ── */

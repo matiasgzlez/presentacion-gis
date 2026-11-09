@@ -6,19 +6,17 @@ import { VideoModal, videoThumb, type CaseVideo } from "@/components/video-peek"
 import { MELI_VIDEO } from "@/cases/meli";
 import { UBER_VIDEO } from "@/cases/uber";
 import { UPS_VIDEO } from "@/cases/ups";
-import { AMAZON_VIDEO } from "@/cases/amazon";
-import { DHL_VIDEO } from "@/cases/dhl";
+import { WALMART_VIDEO } from "@/cases/walmart";
 
 /* Al final: todos los videos de los casos juntos, separados por tema. Al hacer clic se abren grandes
-   (se cierran con la cruz, con Esc o tocando afuera). Los casos ocultos también tienen video (TESLA_VIDEO, STARLINK_VIDEO, WALMART_VIDEO)
+   (se cierran con la cruz, con Esc o tocando afuera). Los casos ocultos también tienen video (AMAZON_VIDEO, DHL_VIDEO, TESLA_VIDEO, STARLINK_VIDEO)
    por si se vuelven a mostrar. */
 
 const GROUPS: { tema: string; caso: string; v: CaseVideo; c: string }[] = [
   { tema: "Ubicación", caso: "Mercado Libre", v: MELI_VIDEO, c: NEON.amber },
   { tema: "Demanda", caso: "Uber · H3", v: UBER_VIDEO, c: NEON.blue },
   { tema: "Rutas", caso: "UPS · ORION", v: UPS_VIDEO, c: NEON.green },
-  { tema: "Última milla", caso: "Amazon", v: AMAZON_VIDEO, c: "#ff9900" },
-  { tema: "Riesgos", caso: "DHL · Resilience360", v: DHL_VIDEO, c: NEON.red },
+  { tema: "Por el aire", caso: "Walmart + Wing", v: WALMART_VIDEO, c: NEON.blue },
 ];
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -31,7 +29,7 @@ export function Videos() {
           <Pill>Videos</Pill>
         </div>
         <h2 className="display mt-3 text-[clamp(2.4rem,4.4vw,4.8rem)] uppercase leading-none">Los casos en video</h2>
-        <div className="mt-[clamp(1.5rem,5vh,3.5rem)] grid grid-cols-2 gap-[clamp(1rem,1.8vw,2rem)] lg:grid-cols-5">
+        <div className="mt-[clamp(1.5rem,5vh,3.5rem)] grid grid-cols-2 gap-[clamp(1rem,1.8vw,2rem)] lg:grid-cols-4">
           {GROUPS.map((g, i) => (
             <motion.div key={g.tema} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 + i * 0.08, ease }}>
               <div className="flex items-center gap-3">

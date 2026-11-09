@@ -1,106 +1,118 @@
-import { Hexagon, Locate, TrendingUp, CalendarDays, Globe2, Car, Gift } from "lucide-react";
+import { Smartphone, UserCheck, Navigation, MapPin } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
+import { CaseIntro, NEON } from "@/components/neon";
+import { ExplainSlide } from "@/components/explain";
+import { GisSlide, type Station } from "@/components/journey";
 import { H3Scene } from "@/scenes/h3";
-import { H3Map } from "@/scenes/h3-neon";
-import { LayerStack } from "@/scenes/layers-neon";
+import { UberMatch } from "@/scenes/uber-match";
+import { H3Explain } from "@/scenes/h3-explain";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 02 · Uber · cómo usa el GIS para medir la ciudad en hexágonos (H3) y repartir.
-   Las animaciones corren solas en bucle; a la izquierda, solo la guía. Lo que se dice está en exposicion.md. */
+/* Caso 02 · Uber · cómo funciona por dentro y dónde usa el GIS.
+   Sin fotos ni "quién es" (todos la conocen): portada → dónde entra el GIS en un pedido → decisión 1 (hexágonos H3)
+   → decisión 2 (quién lleva el pedido). Las animaciones corren solas en bucle. Lo que se dice está en exposicion.md. */
 
 const LOGO = "/logos/uber.png";
 export const UBER_VIDEO: CaseVideo = { title: "H3: Tiling the Earth with Hexagons (Uber Engineering)", youtube: "ay2uwtRO3QE" };
 const L = { logo: LOGO };
+const WHITE = "#e5e7eb";
 
-const Intro = () => <CaseIntro id="uber" {...L} n="02" company="Uber" title="Hexágonos" pill="La ciudad partida en hexágonos iguales" bg={<H3Scene priceLabel={false} />} />;
+const Intro = () => <CaseIntro id="uber" {...L} n="02" company="Uber" title="Hexágonos" pill="¿Qué pasa por dentro cuando pedís un Uber?" bg={<H3Scene priceLabel={false} />} />;
 
-const Quien = () => (
-  <CompanySlide
-    id="uber-quien"
+/** El recorrido de un pedido (viaje o comida), solo con íconos. */
+const PEDIDO: Station[] = [
+  { icon: Smartphone, b: "Pedís" },
+  { icon: UserCheck, b: "Elige quién va" },
+  { icon: Navigation, b: "Va en camino" },
+  { icon: MapPin, b: "Llega" },
+];
+
+const DondeGis = () => (
+  <GisSlide
+    id="uber-donde-gis"
     {...L}
     name="Uber"
-    color={NEON.blue}
-    items={[
-      <>App para pedir <b>viajes con chofer</b>.</>,
-      <><b>Uber Eats</b>: comida y compras a domicilio.</>,
-      <><b>Uber Freight</b>: une camiones con cargas.</>,
-    ]}
-    facts={[
-      { icon: CalendarDays, n: "2009", d: "nace en San Francisco" },
-      { icon: Globe2, n: "+70 países", d: "con viajes o reparto" },
-      { icon: Car, n: "+40 M", d: "de viajes y pedidos por día (fines de 2025)" },
-      { icon: Gift, n: "H3 gratis", d: "sus hexágonos los usa cualquiera desde 2018" },
+    color={WHITE}
+    title="El GIS detrás de cada viaje"
+    stations={PEDIDO}
+    questions={[
+      { at: [1], fn: "Análisis por hexágonos", q: "¿Dónde faltan autos?", c: NEON.amber },
+      { at: [2, 3], fn: "Ruteo y tiempo de llegada", q: "¿Qué auto lleva el pedido?", c: NEON.green },
     ]}
   />
 );
 
-const ParaQue = () => (
-  <CaseSlide
-    id="uber-gis"
+const QueEsH3 = () => (
+  <ExplainSlide
+    id="uber-que-es-h3"
     {...L}
-    label="¿Para qué usa el GIS?"
-    title="Saber dónde falta gente"
+    pill="La base de todo"
+    title="¿Qué es H3?"
+    question={<>El sistema de Uber para <b>partir el planeta en hexágonos</b>. Lo liberó gratis en 2018.</>}
     color={NEON.blue}
-    items={[<>Capa: <b>pedidos</b></>, <>Capa: <b>repartidores y autos libres</b></>, <>Capa: <b>hexágonos H3</b></>, <>Decide: <b>a dónde mandar repartidores</b></>]}
-    scene={(s) => (
-      <LayerStack
-        step={s}
-        layers={[
-          { name: "Pedidos", kind: "puntos", color: NEON.amber },
-          { name: "Repartidores", kind: "camiones", color: NEON.green },
-          { name: "Hexágonos H3", kind: "hex", color: NEON.blue },
-        ]}
-        decision={{ text: "Faltan repartidores acá", at: [0.3, 0.15], color: NEON.red }}
-      />
-    )}
+    points={[
+      { b: "Hexágonos", t: <>el mapa, en celdas iguales.</> },
+      { b: "Un código", t: <>cada hexágono tiene su número.</> },
+      { b: "Vecinos iguales", t: <>los 6 vecinos, a la misma distancia.</> },
+      { b: "16 tamaños", t: <>cada uno tiene <b>7 más chicos</b> adentro.</> },
+    ]}
+    techs={[
+      { name: "H3", gis: true },
+      { name: "Índice espacial", gis: true },
+    ]}
+    scene={(s) => <H3Explain step={s} />}
   />
 );
 
-const Como = () => (
-  <CaseSlide
+const Hexagonos = () => (
+  <ExplainSlide
     id="uber-h3"
     {...L}
-    label="¿Cómo lo hace?"
-    title="Todo en hexágonos"
-    color={NEON.blue}
-    items={[<>Ciudad en <b>hexágonos iguales</b>, cada uno con su código</>, <>Cada hexágono <b>cuenta sus pedidos</b> (altura)</>, <>Faltan autos (rojo) → <b>sube el precio</b></>]}
-    dato={{ n: "16 tamaños", d: "de hexágono, desde un continente hasta una cuadra." }}
+    pill="Función GIS 1"
+    title="Análisis por hexágonos"
+    question={<><b>¿Dónde faltan autos?</b> Compara pedidos y autos libres en cada hexágono.</>}
+    color={NEON.amber}
+    points={[
+      { b: "Hexágonos", t: <>la ciudad se parte en <b>hexágonos iguales</b>.</> },
+      { b: "Pedidos", t: <>la <b>altura</b> es cuántos pedidos hay.</> },
+      { b: "Color", t: <><b>verde</b> alcanza; <b>naranja o rojo</b>, faltan autos y sube el precio.</> },
+    ]}
+    techs={[
+      { name: "H3", gis: true },
+      { name: "GPS", gis: true },
+      { name: "Precio dinámico" },
+    ]}
     scene={(s) => <H3Scene step={s} />}
   />
 );
 
-const Logistica = () => (
-  <CaseSlide
-    id="uber-logistica"
+const Asignar = () => (
+  <ExplainSlide
+    id="uber-asignar"
     {...L}
-    label="En su logística"
-    title="Reparto por hexágono"
+    pill="Función GIS 2"
+    title="Ruteo y tiempo de llegada"
+    question={<><b>¿Qué auto lleva el pedido?</b> No el más cercano: el que llega antes.</>}
     color={NEON.green}
-    items={[<>Cada hexágono: <b>tiempo de entrega</b> desde el local</>, <>Define <b>hasta dónde reparte</b> cada local</>]}
-    scene={(s) => <H3Map scene="logistica" step={s} />}
-  />
-);
-
-const Tecnologias = () => (
-  <TechSlide
-    id="uber-tecnologias"
-    logo={LOGO}
-    label="Tecnologías · Uber H3"
-    bg={<H3Scene priceLabel={false} />}
-    techs={[
-      { icon: Hexagon, name: "H3", d: "Divide el planeta en hexágonos iguales, cada uno con su código.", gis: true, c: NEON.blue },
-      { icon: Locate, name: "Ubicación en vivo", d: "Dónde está cada pedido y cada auto libre, al segundo.", gis: true, c: NEON.green },
-      { icon: TrendingUp, name: "Precio dinámico", d: "Sube la tarifa en los hexágonos donde faltan autos.", c: NEON.amber },
+    points={[
+      { b: "Llega un pedido", t: <>con su ubicación.</> },
+      { b: "Busca cerca", t: <>autos libres en los <b>hexágonos de al lado</b>.</> },
+      { b: "Mide por las calles", t: <>A está más cerca, pero hay <b>un río</b>.</> },
+      { b: "Elige", t: <>va B y la app muestra <b>cuánto tarda</b>.</> },
     ]}
+    techs={[
+      { name: "H3", gis: true },
+      { name: "Ruteo", gis: true },
+      { name: "Asignación" },
+    ]}
+    scene={(s) => <UberMatch step={s} />}
   />
 );
 
 export const UBER_SLIDES: DeckSlide[] = [
   { id: "uber", label: "Uber · Hexágonos", C: Intro },
-  { id: "uber-quien", label: "Uber · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
-  { id: "uber-gis", label: "Uber · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
-  { id: "uber-h3", label: "Uber · Todo en hexágonos", steps: 3, phase: 4500, C: Como },
-  { id: "uber-logistica", label: "Uber · En su logística", steps: 2, C: Logistica },
-  { id: "uber-tecnologias", label: "Uber · Tecnologías", C: Tecnologias },
+  { id: "uber-donde-gis", label: "Uber · El GIS detrás de cada viaje", steps: 2, phase: 4500, C: DondeGis },
+  { id: "uber-que-es-h3", label: "Uber · ¿Qué es H3?", steps: 4, phase: 4500, C: QueEsH3 },
+  { id: "uber-h3", label: "Uber · Análisis por hexágonos", steps: 3, phase: 4500, C: Hexagonos },
+  { id: "uber-asignar", label: "Uber · Ruteo y tiempo de llegada", steps: 4, phase: 4500, C: Asignar },
 ];
