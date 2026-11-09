@@ -33,7 +33,7 @@ const CASES: { slides: DeckSlide[]; show: boolean }[] = [
 
 const SLIDES: DeckSlide[] = [
   { id: "inicio", label: "Inicio", C: Hero },
-  { id: "capas", label: "Qué es un GIS", C: Layers },
+  { id: "capas", label: "Qué es un GIS", steps: 6, phase: 3000, C: Layers },
   { id: "herramientas", label: "Herramientas", C: Herramientas },
   ...TOOL_SLIDES,
   { id: "casos", label: "Los casos", C: Cases },

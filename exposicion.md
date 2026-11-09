@@ -53,18 +53,20 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ## Diapositiva 2 · ¿Qué es un GIS aplicado a la logística?
 
-**Tiempo:** ~1 minuto 15 segundos (el video dura 16 s y se repite; se puede hablar sobre dos vueltas)
-**En pantalla:** *Fondo blanco. Aparecen cuatro capas del mismo barrio, una arriba de la otra: **Calles** (negro), **Clientes** (pines azules), **Tránsito** (rojo), **Camiones** (naranja). Las capas se juntan en un solo mapa y aparece en verde **la mejor ruta**, que pasa por todos los clientes y esquiva el tránsito. El camión la recorre y cada cliente queda tildado.*
+**Tiempo:** ~1 minuto 15 segundos
+**En pantalla:** *A la izquierda, una suma que aparece de a una: **Logística** (mover y guardar productos y su información, de ida y de vuelta) **+ GIS** (cada dato tiene su ubicación) **= GIS en logística: usar el dónde para decidir** (dónde guardar · por dónde ir · dónde está cada cosa, con los casos de cada una). A la derecha, una animación en bucle: aparecen cuatro capas del mismo barrio, una arriba de la otra (**Calles**, **Clientes**, **Tránsito**, **Camiones**); se juntan en un solo mapa y aparece en verde **la mejor ruta**, que pasa por todos los clientes y esquiva el tránsito; el camión la recorre y cada cliente queda tildado.*
 
 **Qué decimos:**
 
 > Antes de empezar, dos definiciones.
 >
-> Cuando decimos **logística** hablamos de todo lo que hace falta para que **una cosa llegue al lugar correcto, en el momento justo y al menor costo**: guardar la mercadería, armar los pedidos, elegir los caminos, seguir los camiones y entregar. Desde un paquete de Mercado Libre hasta un contenedor que cruza el océano.
+> **Logística** no es solo llevar un paquete del punto A al punto B. Es **planificar y controlar el movimiento y el almacenamiento de los productos, y de la información que los acompaña**, desde donde se producen hasta donde se consumen, **y también la vuelta**, como las devoluciones.
+>
+> El objetivo es que llegue **el producto correcto, en la cantidad y el estado correctos, al lugar correcto, en el momento justo y al menor costo**. Por eso incluye guardar la mercadería, armar los pedidos, elegir los caminos, seguir la carga, entregar y recibir las devoluciones. Desde un paquete de Mercado Libre hasta un contenedor que cruza el océano.
 >
 > Y un **GIS** es un **Sistema de Información Geográfica**. Es un sistema que guarda datos, pero con algo especial: **cada dato tiene su ubicación en el mapa**, sus coordenadas.
 >
-> Miren el video. Primero tenemos las **calles**: por dónde se puede circular.
+> Miren la animación. Primero tenemos las **calles**: por dónde se puede circular.
 > Arriba ponemos los **clientes**: cada pin azul es una dirección donde hay que entregar.
 > Después el **tránsito**: en rojo, las calles que hoy están complicadas.
 > Y por último los **camiones**, que sabemos dónde están gracias al GPS.
@@ -72,17 +74,22 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 > Cada una de estas cosas es una **capa**. Por separado, cada capa dice poco. Pero como todas comparten **el mismo dónde**, las podemos **apilar** en un solo mapa.
 >
 > Y ahí está la gracia del GIS: **cruzar las capas para tomar una decisión**. En este caso, la decisión es la ruta: el sistema calcula el camino que **pasa por todos los clientes y esquiva el tránsito**. Eso es lo que hace un GIS en logística: transforma datos con ubicación en decisiones.
+>
+> Y esas decisiones son las que vamos a ver en los casos: **dónde guardar**, como Mercado Libre y Walmart; **por dónde ir**, como Uber y UPS; y **dónde está cada cosa**, como Maersk.
 
 **Para recordar:**
-- **Logística** = que cada cosa llegue al lugar correcto, en el momento justo y al menor costo (guardar, preparar, transportar, seguir, entregar).
+- **Logística** = planificar y controlar el movimiento y el almacenamiento de productos **y de su información**, de ida y de vuelta, para que llegue lo correcto, al lugar y en el momento justos, al menor costo. No es solo ir de A a B.
 - **GIS = datos + ubicación.** Cada dato tiene coordenadas.
 - Los datos se organizan en **capas** (calles, clientes, tránsito, camiones).
 - Como comparten el mismo dónde, se pueden **superponer y cruzar**.
 - El objetivo no es el mapa: es la **decisión** (qué ruta, dónde poner un depósito, qué zona atender primero).
 
 **Si nos preguntan:**
+- *¿Logística y cadena de suministro son lo mismo?* No. La cadena de suministro es todo: comprar, producir, vender. La logística es la parte que mueve y guarda los productos y su información.
 - *¿Un GIS es lo mismo que Google Maps?* No. Google Maps es una aplicación que **usa** un GIS por detrás. Un GIS es la herramienta con la que una empresa carga **sus propios datos** (sus clientes, sus camiones, sus depósitos) y los analiza.
 - *¿Qué tipos de datos hay?* Puntos (un cliente), líneas (una calle) y polígonos (una zona, un barrio). También imágenes, como una foto satelital.
+
+*Fuentes (no van en pantalla): definición de logística del CSCMP (Council of Supply Chain Management Professionals), glosario oficial: "la parte de la cadena de suministro que planifica, implementa y controla el flujo directo e inverso y el almacenamiento de bienes, servicios e información relacionada, entre el punto de origen y el de consumo, para cumplir con los requisitos del cliente".*
 
 ---
 
