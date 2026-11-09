@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { Boxes, Truck, Bot, Sparkles, MessageSquareText, Globe2, type LucideIcon } from "lucide-react";
-import { useStep } from "@/components/deck";
 import { NEON, NeonFrame, Pill } from "@/components/neon";
 import { SeaMap } from "@/scenes/sea-neon";
 
@@ -21,7 +20,6 @@ const ITEMS: Item[] = [
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export function Tech() {
-  const step = useStep();
   return (
     <NeonFrame id="tecnologias">
       <div className="absolute inset-0 opacity-20">
@@ -34,15 +32,15 @@ export function Tech() {
         </h2>
         <div className="mt-[clamp(1.25rem,3.5vh,2.5rem)] grid grid-cols-3 gap-[clamp(0.8rem,1.4vw,1.4rem)]">
           {ITEMS.map((it, i) => {
-            const shown = step > i, current = step === i + 1, Icon = it.icon;
+            const Icon = it.icon;
             return (
               <motion.div
                 key={it.t}
                 className="rounded-3xl border-[3px] bg-[#151b26]/92 p-[clamp(1rem,1.7vw,1.8rem)]"
-                style={{ borderColor: it.c, boxShadow: current ? `0 0 50px ${it.c}44` : "none" }}
-                initial={false}
-                animate={{ opacity: shown ? 1 : 0, y: shown ? 0 : 26, scale: shown ? 1 : 0.96 }}
-                transition={{ duration: 0.6, ease }}
+                style={{ borderColor: it.c, boxShadow: `0 0 36px ${it.c}2e` }}
+                initial={{ opacity: 0, y: 26 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 + i * 0.08, ease }}
               >
                 <div className="flex items-center gap-3">
                   <span className="grid size-[clamp(2.6rem,3.4vw,3.8rem)] shrink-0 place-items-center rounded-2xl" style={{ background: `${it.c}22`, color: it.c }}>

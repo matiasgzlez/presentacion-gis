@@ -1,146 +1,91 @@
-import { motion } from "motion/react";
-import { Hexagon, Locate, TrendingUp } from "lucide-react";
+import { Hexagon, Locate, TrendingUp, CalendarDays, Globe2, Car, Gift } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { useStep } from "@/components/deck";
-import { FullScene, NEON, StepCard, NeonFrame, Pill, ResultsSlide, TechSlide } from "@/components/neon";
+import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
 import { H3Scene } from "@/scenes/h3";
 import { H3Map } from "@/scenes/h3-neon";
+import { LayerStack } from "@/scenes/layers-neon";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 02 · Uber · H3 (hexágonos). Cinco diapositivas cortas, mismo estilo que Tesla.
-   Contado con reparto (pedidos y repartidores), para que quede claro el vínculo con logística.
-   Lo que se dice en voz alta está en exposicion.md. */
+/* Caso 02 · Uber · cómo usa el GIS para medir la ciudad en hexágonos (H3) y repartir.
+   Las animaciones corren solas en bucle; a la izquierda, solo la guía. Lo que se dice está en exposicion.md. */
 
 const LOGO = "/logos/uber.png";
-const VIDEO: CaseVideo = { title: "H3: Tiling the Earth with Hexagons (Uber Engineering)", youtube: "ay2uwtRO3QE" };
-const ease = [0.16, 1, 0.3, 1] as const;
+export const UBER_VIDEO: CaseVideo = { title: "H3: Tiling the Earth with Hexagons (Uber Engineering)", youtube: "ay2uwtRO3QE" };
+const L = { logo: LOGO };
 
-function Intro() {
-  return (
-    <NeonFrame id="uber" logo={LOGO} video={VIDEO}>
-      <div className="absolute inset-0 opacity-55">
-        <H3Scene priceLabel={false} />
-      </div>
-      <div className="pointer-events-none absolute inset-0 grid place-items-center">
-        <div className="text-center">
-          <motion.p className="font-mono text-[clamp(0.9rem,1.2vw,1.4rem)] font-bold uppercase tracking-[0.2em] text-white/70" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-            Caso 02 · Uber
-          </motion.p>
-          <motion.h2
-            className="display mt-2 text-[clamp(4rem,11vw,12rem)] uppercase leading-none [text-shadow:0_6px_40px_rgba(0,0,0,0.9)]"
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1, ease }}
-          >
-            Hexágonos
-          </motion.h2>
-          <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
-            <Pill color={NEON.amber}>H3 · la ciudad partida en hexágonos iguales</Pill>
-          </motion.div>
-        </div>
-      </div>
-    </NeonFrame>
-  );
-}
+const Intro = () => <CaseIntro id="uber" {...L} n="02" company="Uber" title="Hexágonos" pill="La ciudad partida en hexágonos iguales" bg={<H3Scene priceLabel={false} />} />;
 
-function Problema() {
-  const step = useStep();
-  return (
-    <NeonFrame id="uber-problema" logo={LOGO} video={VIDEO}>
-      <FullScene
-        map={<H3Map scene="problema" step={step} />}
-        card={
-          <StepCard
-            label="El problema"
-            title="Los barrios no se comparan"
-            color={NEON.amber}
-            step={step}
-            items={[
-              <>Para saber dónde faltan repartidores hay que <b>contar pedidos por zona</b>.</>,
-              <>Pero los barrios tienen <b>formas y tamaños distintos</b>: 120 pedidos en uno grande no es lo mismo que 40 en uno chico.</>,
-            ]}
-          />
-        }
+const Quien = () => (
+  <CompanySlide
+    id="uber-quien"
+    {...L}
+    name="Uber"
+    color={NEON.blue}
+    items={[
+      <>App para pedir <b>viajes con chofer</b>.</>,
+      <><b>Uber Eats</b>: comida y compras a domicilio.</>,
+      <><b>Uber Freight</b>: une camiones con cargas.</>,
+    ]}
+    facts={[
+      { icon: CalendarDays, n: "2009", d: "nace en San Francisco" },
+      { icon: Globe2, n: "+70 países", d: "con viajes o reparto" },
+      { icon: Car, n: "+40 M", d: "de viajes y pedidos por día (fines de 2025)" },
+      { icon: Gift, n: "H3 gratis", d: "sus hexágonos los usa cualquiera desde 2018" },
+    ]}
+  />
+);
+
+const ParaQue = () => (
+  <CaseSlide
+    id="uber-gis"
+    {...L}
+    label="¿Para qué usa el GIS?"
+    title="Saber dónde falta gente"
+    color={NEON.blue}
+    items={[<>Capa: <b>pedidos</b></>, <>Capa: <b>repartidores y autos libres</b></>, <>Capa: <b>hexágonos H3</b></>, <>Decide: <b>a dónde mandar repartidores</b></>]}
+    scene={(s) => (
+      <LayerStack
+        step={s}
+        layers={[
+          { name: "Pedidos", kind: "puntos", color: NEON.amber },
+          { name: "Repartidores", kind: "camiones", color: NEON.green },
+          { name: "Hexágonos H3", kind: "hex", color: NEON.blue },
+        ]}
+        decision={{ text: "Faltan repartidores acá", at: [0.3, 0.15], color: NEON.red }}
       />
-    </NeonFrame>
-  );
-}
+    )}
+  />
+);
 
-function Solucion() {
-  const step = useStep();
-  return (
-    <NeonFrame id="uber-h3" logo={LOGO} video={VIDEO}>
-      <FullScene
-        map={<H3Scene step={step} />}
-        card={
-          <StepCard
-            label="La solución con GIS"
-            title="H3: todo en hexágonos"
-            color={NEON.blue}
-            step={step}
-            items={[
-              <>Uber cubre la ciudad con <b>hexágonos iguales</b>, cada uno con su código.</>,
-              <>Cada hexágono <b>cuenta sus pedidos</b>: la altura es la demanda.</>,
-              <>Y los compara con los <b>autos libres</b>. Donde faltan (rojo), <b>sube el precio</b> y los autos van hacia ahí.</>,
-            ]}
-          />
-        }
-      />
-    </NeonFrame>
-  );
-}
+const Como = () => (
+  <CaseSlide
+    id="uber-h3"
+    {...L}
+    label="¿Cómo lo hace?"
+    title="Todo en hexágonos"
+    color={NEON.blue}
+    items={[<>Ciudad en <b>hexágonos iguales</b>, cada uno con su código</>, <>Cada hexágono <b>cuenta sus pedidos</b> (altura)</>, <>Faltan autos (rojo) → <b>sube el precio</b></>]}
+    dato={{ n: "16 tamaños", d: "de hexágono, desde un continente hasta una cuadra." }}
+    scene={(s) => <H3Scene step={s} />}
+  />
+);
 
-function Hexagonos() {
-  const step = useStep();
-  return (
-    <NeonFrame id="uber-hexagonos" logo={LOGO} video={VIDEO}>
-      <FullScene
-        map={<H3Map scene="hexagonos" step={step} />}
-        card={
-          <StepCard
-            label="¿Por qué hexágonos?"
-            title="Todos igual de cerca"
-            color={NEON.green}
-            step={step}
-            items={[
-              <>Con <b>cuadrados</b>, el camión llega rápido a 4 vecinos y <b>tarde a los de las esquinas</b>.</>,
-              <>Con <b>hexágonos</b>, llega a los 6 vecinos <b>al mismo tiempo</b>: todos están igual de cerca.</>,
-            ]}
-          />
-        }
-      />
-    </NeonFrame>
-  );
-}
-
-function Logistica() {
-  const step = useStep();
-  return (
-    <NeonFrame id="uber-logistica" logo={LOGO} video={VIDEO}>
-      <FullScene
-        map={<H3Map scene="logistica" step={step} />}
-        card={
-          <StepCard
-            label="GIS en logística"
-            title="Reparto por hexágono"
-            color={NEON.green}
-            step={step}
-            items={[
-              <>Cada hexágono tiene su <b>tiempo de entrega estimado</b> desde el local.</>,
-              <>Con eso se define <b>hasta dónde reparte</b> cada local y dónde conviene esperar a los repartidores.</>,
-            ]}
-          />
-        }
-      />
-    </NeonFrame>
-  );
-}
+const Logistica = () => (
+  <CaseSlide
+    id="uber-logistica"
+    {...L}
+    label="En su logística"
+    title="Reparto por hexágono"
+    color={NEON.green}
+    items={[<>Cada hexágono: <b>tiempo de entrega</b> desde el local</>, <>Define <b>hasta dónde reparte</b> cada local</>]}
+    scene={(s) => <H3Map scene="logistica" step={s} />}
+  />
+);
 
 const Tecnologias = () => (
   <TechSlide
     id="uber-tecnologias"
     logo={LOGO}
-    video={VIDEO}
     label="Tecnologías · Uber H3"
     bg={<H3Scene priceLabel={false} />}
     techs={[
@@ -151,27 +96,11 @@ const Tecnologias = () => (
   />
 );
 
-const Resultados = () => (
-  <ResultsSlide
-    id="uber-resultados"
-    logo={LOGO}
-    video={VIDEO}
-    label="Resultados · Uber H3"
-    bg={<H3Scene priceLabel={false} />}
-    stats={[
-      { to: 2018, raw: true, d: "Uber lo liberó gratis: hoy lo usan empresas de reparto y de mapas de todo el mundo", c: NEON.blue },
-      { to: 16, suf: " tamaños", d: "de hexágono, desde un continente hasta una cuadra", c: NEON.green },
-      { pre: "×", to: 7, d: "cada tamaño es 7 veces más chico que el anterior", c: NEON.amber },
-    ]}
-  />
-);
-
 export const UBER_SLIDES: DeckSlide[] = [
   { id: "uber", label: "Uber · Hexágonos", C: Intro },
-  { id: "uber-problema", label: "Uber · El problema", steps: 2, C: Problema },
-  { id: "uber-h3", label: "Uber · H3", steps: 3, C: Solucion },
-  { id: "uber-hexagonos", label: "Uber · Por qué hexágonos", steps: 2, C: Hexagonos },
-  { id: "uber-logistica", label: "Uber · En logística", steps: 2, C: Logistica },
-  { id: "uber-tecnologias", label: "Uber H3 · Tecnologías", steps: 3, C: Tecnologias },
-  { id: "uber-resultados", label: "Uber · Resultados", steps: 3, C: Resultados },
+  { id: "uber-quien", label: "Uber · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
+  { id: "uber-gis", label: "Uber · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
+  { id: "uber-h3", label: "Uber · Todo en hexágonos", steps: 3, phase: 4500, C: Como },
+  { id: "uber-logistica", label: "Uber · En su logística", steps: 2, C: Logistica },
+  { id: "uber-tecnologias", label: "Uber · Tecnologías", C: Tecnologias },
 ];

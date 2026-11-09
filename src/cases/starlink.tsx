@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { MapPinned, Satellite, Cpu, Locate } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
 import { useStep } from "@/components/deck";
-import { FullScene, NEON, NeonFrame, Pill, ResultsSlide, StepCard, TechSlide } from "@/components/neon";
+import { FullScene, NEON, NeonFrame, Pill, StepCard, TechSlide, type Dato, WhoIs } from "@/components/neon";
 import { SignalMap, type SignalScene } from "@/scenes/signal-neon";
 import { StarlinkScene } from "@/scenes/starlink";
 import type { CaseVideo } from "@/components/video-peek";
@@ -11,12 +11,12 @@ import type { CaseVideo } from "@/components/video-peek";
    Lo que se dice en voz alta está en exposicion.md. */
 
 const LOGO = "/logos/starlink-wordmark.svg";
-const VIDEO: CaseVideo = { title: "How Starlink works, explained by an aerospace engineer", youtube: "zYgHbgGygJM" };
+export const STARLINK_VIDEO: CaseVideo = { title: "How Starlink works, explained by an aerospace engineer", youtube: "zYgHbgGygJM" };
 const ease = [0.16, 1, 0.3, 1] as const;
 
 function Frame({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <NeonFrame id={id} video={VIDEO}>
+    <NeonFrame id={id}>
       <div className="absolute left-[clamp(1.5rem,3vw,3.5rem)] top-[clamp(2.75rem,6vh,4.5rem)] z-10 flex items-center gap-4">
         <img src={LOGO} alt="Starlink" className="h-[clamp(2.4rem,6.5vh,4.5rem)] w-auto invert" />
         <span className="display text-[clamp(1.4rem,2.2vw,2.4rem)] text-white">+ Geotab</span>
@@ -48,17 +48,18 @@ function Intro() {
           <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
             <Pill color={NEON.amber}>Rastrear camiones donde no hay celular</Pill>
           </motion.div>
+          <WhoIs who={[{ name: "Starlink", d: "la red de internet por satélite de SpaceX, la empresa de Elon Musk." }, { name: "Geotab", d: "empresa canadiense que rastrea flotas: un equipo en cada camión avisa dónde está y cómo va." }]} />
         </div>
       </div>
     </Frame>
   );
 }
 
-function Slide({ id, scene, label, title, color, items }: { id: string; scene: SignalScene; label: string; title: string; color: string; items: React.ReactNode[] }) {
+function Slide({ id, scene, label, title, color, items, dato }: { id: string; scene: SignalScene; label: string; title: string; color: string; items: React.ReactNode[]; dato?: Dato }) {
   const step = useStep();
   return (
     <Frame id={id}>
-      <FullScene map={<SignalMap scene={scene} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} />} />
+      <FullScene map={<SignalMap scene={scene} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} dato={dato} />} />
     </Frame>
   );
 }
@@ -69,6 +70,7 @@ const Problema = () => (
     scene="problema"
     label="El problema"
     title="El camión desaparece"
+    dato={{ n: "18 %", d: "del territorio de Canadá tiene señal de celular. El resto necesita satélite." }}
     color={NEON.amber}
     items={[
       <>El GPS sabe dónde está el camión, pero <b>para avisarlo necesita señal de celular</b>.</>,
@@ -106,7 +108,7 @@ const Logistica = () => (
 const Tecnologias = () => (
   <TechSlide
     id="starlink-tecnologias"
-    video={VIDEO}
+   
     label="Tecnologías · Starlink + Geotab"
     bg={<StarlinkScene />}
     techs={[
@@ -117,19 +119,6 @@ const Tecnologias = () => (
     ]}
   />
 );
-const Resultados = () => (
-  <ResultsSlide
-    id="starlink-resultados"
-    video={VIDEO}
-    label="Resultados · Starlink + Geotab"
-    bg={<StarlinkScene />}
-    stats={[
-      { pre: "~", to: 6, suf: " M", d: "de vehículos y equipos conectados a Geotab", c: NEON.amber },
-      { pre: "+", to: 10000, d: "satélites Starlink funcionando (2026)", c: NEON.blue },
-      { to: 18, suf: " %", d: "del territorio de Canadá tiene señal de celular: el resto necesita satélite", c: NEON.red },
-    ]}
-  />
-);
 
 export const STARLINK_SLIDES: DeckSlide[] = [
   { id: "starlink", label: "Starlink + Geotab · Sin señal", C: Intro },
@@ -137,5 +126,4 @@ export const STARLINK_SLIDES: DeckSlide[] = [
   { id: "starlink-satelite", label: "Starlink · Por satélite", steps: 3, C: Solucion },
   { id: "starlink-logistica", label: "Starlink · En logística", steps: 2, C: Logistica },
   { id: "starlink-tecnologias", label: "Starlink · Tecnologías", steps: 4, C: Tecnologias },
-  { id: "starlink-resultados", label: "Starlink · Resultados", steps: 3, C: Resultados },
 ];

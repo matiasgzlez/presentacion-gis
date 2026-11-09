@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { MapPinned, Route, Locate, Drone } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
 import { useStep } from "@/components/deck";
-import { FullScene, NEON, StepCard, NeonFrame, Pill, ResultsSlide, TechSlide } from "@/components/neon";
+import { FullScene, NEON, StepCard, NeonFrame, Pill, TechSlide, type Dato, WhoIs } from "@/components/neon";
 import { DroneScene } from "@/scenes/drone";
 import type { CaseVideo } from "@/components/video-peek";
 
@@ -10,12 +10,12 @@ import type { CaseVideo } from "@/components/video-peek";
    Lo que se dice en voz alta está en exposicion.md. */
 
 const LOGO = "/logos/walmart.png";
-const VIDEO: CaseVideo = { title: "Walmart + Wing: entregas con drones", youtube: "8B1NGqM1zYk" };
+export const WALMART_VIDEO: CaseVideo = { title: "Walmart + Wing: entregas con drones", youtube: "8B1NGqM1zYk" };
 const ease = [0.16, 1, 0.3, 1] as const;
 
 function Intro() {
   return (
-    <NeonFrame id="walmart" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="walmart" logo={LOGO}>
       <div className="absolute inset-0 opacity-70">
         <DroneScene mode="intro" />
       </div>
@@ -35,17 +35,18 @@ function Intro() {
           <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
             <Pill color={NEON.amber}>Entregas por el aire</Pill>
           </motion.div>
+          <WhoIs who={[{ name: "Walmart", d: "la cadena de supermercados más grande del mundo, de Estados Unidos." }, { name: "Wing", d: "la empresa de drones de reparto de Alphabet, la dueña de Google." }]} />
         </div>
       </div>
     </NeonFrame>
   );
 }
 
-function Slide({ id, mode, label, title, color, items }: { id: string; mode: "problema" | "solucion" | "entrega" | "logistica"; label: string; title: string; color: string; items: React.ReactNode[] }) {
+function Slide({ id, mode, label, title, color, items, dato }: { id: string; mode: "problema" | "solucion" | "entrega" | "logistica"; label: string; title: string; color: string; items: React.ReactNode[]; dato?: Dato }) {
   const step = useStep();
   return (
-    <NeonFrame id={id} logo={LOGO} video={VIDEO}>
-      <FullScene map={<DroneScene mode={mode} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} />} />
+    <NeonFrame id={id} logo={LOGO}>
+      <FullScene map={<DroneScene mode={mode} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} dato={dato} />} />
     </NeonFrame>
   );
 }
@@ -83,6 +84,7 @@ const Entrega = () => (
     mode="entrega"
     label="La entrega"
     title="Justo en el patio"
+    dato={{ n: "23 min", d: "en promedio, desde el pedido hasta la puerta." }}
     color={NEON.green}
     items={[
       <>El dron llega volando a la <b>casa del cliente</b>.</>,
@@ -108,7 +110,7 @@ const Tecnologias = () => (
   <TechSlide
     id="walmart-tecnologias"
     logo={LOGO}
-    video={VIDEO}
+   
     label="Tecnologías · Walmart + Wing"
     bg={<DroneScene mode="intro" />}
     techs={[
@@ -120,20 +122,6 @@ const Tecnologias = () => (
   />
 );
 
-const Resultados = () => (
-  <ResultsSlide
-    id="walmart-resultados"
-    logo={LOGO}
-    video={VIDEO}
-    label="Resultados · Walmart + Wing"
-    bg={<DroneScene mode="intro" />}
-    stats={[
-      { pre: "+", to: 1, suf: " M", d: "millón de entregas con drones (mayo de 2026)", c: NEON.blue },
-      { to: 23, suf: " min", d: "en promedio, desde el pedido hasta la puerta", c: NEON.green },
-      { to: 270, suf: "+", d: "tiendas con drones cuando termine la expansión", c: NEON.amber },
-    ]}
-  />
-);
 
 export const WALMART_SLIDES: DeckSlide[] = [
   { id: "walmart", label: "Walmart · Drones", C: Intro },
@@ -142,5 +130,4 @@ export const WALMART_SLIDES: DeckSlide[] = [
   { id: "walmart-entrega", label: "Walmart · La entrega", steps: 2, C: Entrega },
   { id: "walmart-logistica", label: "Walmart · En logística", steps: 2, C: Logistica },
   { id: "walmart-tecnologias", label: "Walmart + Wing · Tecnologías", steps: 4, C: Tecnologias },
-  { id: "walmart-resultados", label: "Walmart · Resultados", steps: 3, C: Resultados },
 ];

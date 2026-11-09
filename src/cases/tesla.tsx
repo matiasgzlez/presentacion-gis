@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Fence, Locate, Camera, BrainCircuit } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
 import { useStep } from "@/components/deck";
-import { FullScene, NEON, StepCard, NeonFrame, Pill, ResultsSlide, TechSlide } from "@/components/neon";
+import { FullScene, NEON, StepCard, NeonFrame, Pill, TechSlide, WhoIs } from "@/components/neon";
 import { NeonMap } from "@/scenes/neon-map";
 import type { CaseVideo } from "@/components/video-peek";
 
@@ -10,12 +10,12 @@ import type { CaseVideo } from "@/components/video-peek";
    Lo que se dice en voz alta está en exposicion.md. */
 
 const LOGO = "/logos/tesla.png";
-const VIDEO: CaseVideo = { title: "Driverless Tesla Robotaxi Ride in Austin, Texas", youtube: "vic83wLY_Tw" };
+export const TESLA_VIDEO: CaseVideo = { title: "Driverless Tesla Robotaxi Ride in Austin, Texas", youtube: "vic83wLY_Tw" };
 const ease = [0.16, 1, 0.3, 1] as const;
 
 function Intro() {
   return (
-    <NeonFrame id="tesla" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="tesla" logo={LOGO}>
       <div className="absolute inset-x-0 bottom-[6vh] top-[12vh] opacity-60">
         <NeonMap scene="intro" step={0} />
       </div>
@@ -35,6 +35,7 @@ function Intro() {
           <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
             <Pill color={NEON.red}>● Sin nadie al volante · Austin, Texas</Pill>
           </motion.div>
+          <WhoIs who={[{ name: "Tesla", d: "fabrica autos eléctricos en Estados Unidos. Sus autos manejan solos con cámaras e inteligencia artificial, y en Austin los usa como taxis sin chofer." }]} />
         </div>
       </div>
     </NeonFrame>
@@ -62,7 +63,7 @@ function CarSide() {
 function Problema() {
   const step = useStep();
   return (
-    <NeonFrame id="tesla-problema" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="tesla-problema" logo={LOGO}>
       <FullScene
         map={
           <div className="absolute inset-0 grid place-items-center">
@@ -103,7 +104,7 @@ function Problema() {
 function Geocerca() {
   const step = useStep();
   return (
-    <NeonFrame id="tesla-geocerca" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="tesla-geocerca" logo={LOGO}>
       <FullScene
         map={<NeonMap scene="geocerca" step={step} />}
         card={
@@ -127,13 +128,14 @@ function Geocerca() {
 function Borde() {
   const step = useStep();
   return (
-    <NeonFrame id="tesla-borde" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="tesla-borde" logo={LOGO}>
       <FullScene
         map={<NeonMap scene="borde" step={step} />}
         card={
           <StepCard
             label="En la calle"
             title="El borde manda"
+            dato={{ n: "~290 mi²", d: "mide hoy la zona de Austin. Un año antes eran ~170: el polígono creció." }}
             color={NEON.red}
             step={step}
             items={[
@@ -150,7 +152,7 @@ function Borde() {
 function Logistica() {
   const step = useStep();
   return (
-    <NeonFrame id="tesla-logistica" logo={LOGO} video={VIDEO}>
+    <NeonFrame id="tesla-logistica" logo={LOGO}>
       <FullScene
         map={<NeonMap scene="logistica" step={step} />}
         card={
@@ -174,7 +176,7 @@ const Tecnologias = () => (
   <TechSlide
     id="tesla-tecnologias"
     logo={LOGO}
-    video={VIDEO}
+   
     label="Tecnologías · Tesla Robotaxi"
     bg={<NeonMap scene="intro" step={0} />}
     techs={[
@@ -186,20 +188,6 @@ const Tecnologias = () => (
   />
 );
 
-const Resultados = () => (
-  <ResultsSlide
-    id="tesla-resultados"
-    logo={LOGO}
-    video={VIDEO}
-    label="Resultados · Tesla Robotaxi"
-    bg={<NeonMap scene="intro" step={0} />}
-    stats={[
-      { pre: "+", to: 3, suf: " M", d: "de millas recorridas sin nadie al volante (octubre de 2026)", c: NEON.blue },
-      { pre: "~", to: 290, suf: " mi²", d: "mide la zona de Austin: un año antes eran ~170", c: NEON.green },
-      { to: 4, suf: " ciudades", d: "sin chofer en 2026: Austin, Dallas, Houston y Miami", c: NEON.amber },
-    ]}
-  />
-);
 
 export const TESLA_SLIDES: DeckSlide[] = [
   { id: "tesla", label: "Tesla · Robotaxis", C: Intro },
@@ -208,5 +196,4 @@ export const TESLA_SLIDES: DeckSlide[] = [
   { id: "tesla-borde", label: "Tesla · En la calle", steps: 2, C: Borde },
   { id: "tesla-logistica", label: "Tesla · En logística", steps: 2, C: Logistica },
   { id: "tesla-tecnologias", label: "Tesla Robotaxi · Tecnologías", steps: 4, C: Tecnologias },
-  { id: "tesla-resultados", label: "Tesla · Resultados", steps: 3, C: Resultados },
 ];

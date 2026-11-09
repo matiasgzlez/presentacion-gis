@@ -1,113 +1,102 @@
-import { motion } from "motion/react";
-import { Warehouse, Timer, Route, BrainCircuit } from "lucide-react";
+import { Warehouse, Timer, Route, BrainCircuit, CalendarDays, Globe2, Truck } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
-import { useStep } from "@/components/deck";
-import { FullScene, NEON, NeonFrame, Pill, ResultsSlide, StepCard, TechSlide } from "@/components/neon";
-import { ArgMap, type ArgScene } from "@/scenes/arg-neon";
+import { CaseIntro, CaseSlide, CompanySlide, NEON, TechSlide } from "@/components/neon";
+import { ArgMap } from "@/scenes/arg-neon";
+import { LayerStack } from "@/scenes/layers-neon";
 import type { CaseVideo } from "@/components/video-peek";
 
-/* Caso 02 · Mercado Libre · dónde poner los depósitos. Mapa real de Argentina en neón.
-   Lo que se dice en voz alta está en exposicion.md. */
+/* Caso 01 · Mercado Libre · cómo usa el GIS para decidir dónde poner sus depósitos.
+   Las animaciones corren solas en bucle; a la izquierda, solo la guía. Lo que se dice está en exposicion.md. */
 
 const LOGO = "/logos/mercadolibre.png";
-const VIDEO: CaseVideo = { title: "Así funciona el centro logístico de Mercado Libre en Cyber Monday (A24)", youtube: "kpDNNx3uju0" };
-const ease = [0.16, 1, 0.3, 1] as const;
+export const MELI_VIDEO: CaseVideo = { title: "Así funciona el centro logístico de Mercado Libre en Cyber Monday (A24)", youtube: "kpDNNx3uju0" };
+const L = { logo: LOGO };
 
-function Intro() {
-  return (
-    <NeonFrame id="mercadolibre" logo={LOGO} video={VIDEO}>
-      <div className="absolute inset-0 opacity-60">
-        <ArgMap scene="intro" step={0} />
-      </div>
-      <div className="pointer-events-none absolute inset-0 grid place-items-center">
-        <div className="text-center">
-          <motion.p className="font-mono text-[clamp(0.9rem,1.2vw,1.4rem)] font-bold uppercase tracking-[0.2em] text-white/70" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-            Caso 02 · Mercado Libre
-          </motion.p>
-          <motion.h2
-            className="display mt-2 text-[clamp(4rem,11vw,12rem)] uppercase leading-none [text-shadow:0_6px_40px_rgba(0,0,0,0.9)]"
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1, ease }}
-          >
-            Depósitos
-          </motion.h2>
-          <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
-            <Pill color={NEON.amber}>¿Dónde conviene guardar los productos?</Pill>
-          </motion.div>
-        </div>
-      </div>
-    </NeonFrame>
-  );
-}
+const Intro = () => <CaseIntro id="mercadolibre" {...L} n="01" company="Mercado Libre" title="Depósitos" pill="¿Dónde conviene guardar los productos?" bg={<ArgMap scene="intro" step={0} />} />;
 
-function Slide({ id, scene, label, title, color, items }: { id: string; scene: ArgScene; label: string; title: string; color: string; items: React.ReactNode[] }) {
-  const step = useStep();
-  return (
-    <NeonFrame id={id} logo={LOGO} video={VIDEO}>
-      <FullScene map={<ArgMap scene={scene} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} />} />
-    </NeonFrame>
-  );
-}
-
-const Problema = () => (
-  <Slide
-    id="mercadolibre-problema"
-    scene="problema"
-    label="El problema"
-    title="Un depósito lejos de todos"
+const Quien = () => (
+  <CompanySlide
+    id="mercadolibre-quien"
+    {...L}
+    name="Mercado Libre"
     color={NEON.amber}
     items={[
-      <>Casi todo lo que se vende sale por la <b>red propia</b> de Mercado Libre.</>,
-      <>Si el producto está lejos de quien lo compra, <b>la entrega tarda días</b>.</>,
+      <>La <b>tienda online</b> más grande de Latinoamérica.</>,
+      <>También <b>Mercado Pago</b> (pagos) y <b>Mercado Envíos</b>.</>,
+      <>Casi todo lo que vende viaja por <b>su propia red</b> de envíos.</>,
+    ]}
+    facts={[
+      { icon: CalendarDays, n: "1999", d: "nace en Buenos Aires" },
+      { icon: Globe2, n: "18 países", d: "de Latinoamérica" },
+      { icon: Warehouse, n: "+100.000 m²", d: "su centro de Escobar, el más grande del país" },
+      { icon: Truck, n: "Red propia", d: "depósitos, camiones, aviones y repartidores" },
     ]}
   />
 );
-const Solucion = () => (
-  <Slide
-    id="mercadolibre-ubicacion"
-    scene="solucion"
-    label="La solución con GIS"
-    title="Elegir el mejor lugar"
+
+const ParaQue = () => (
+  <CaseSlide
+    id="mercadolibre-gis"
+    {...L}
+    label="¿Para qué usa el GIS?"
+    title="Elegir dónde guardar"
     color={NEON.blue}
-    items={[
-      <>Primero, el mapa de <b>dónde están los compradores</b>.</>,
-      <>Después, <b>hasta dónde llega un camión en un día</b> desde cada lugar posible.</>,
-      <>Se elige el lugar que deja <b>más compradores cerca</b>: Córdoba.</>,
-    ]}
+    items={[<>Capa: <b>compradores</b></>, <>Capa: <b>rutas</b></>, <>Capa: <b>tiempo de viaje</b></>, <>Decide: <b>dónde va el depósito</b></>]}
+    scene={(s) => (
+      <LayerStack
+        step={s}
+        layers={[
+          { name: "Compradores", kind: "puntos", color: NEON.blue },
+          { name: "Rutas", kind: "rutas", color: NEON.amber },
+          { name: "Tiempo de viaje", kind: "tiempo", color: NEON.green },
+        ]}
+        decision={{ text: "Acá va el depósito", at: [0.05, -0.1] }}
+      />
+    )}
   />
 );
-const Tiempo = () => (
-  <Slide
+
+const Como1 = () => (
+  <CaseSlide
+    id="mercadolibre-ubicacion"
+    {...L}
+    label="¿Cómo lo hace?"
+    title="El mejor lugar"
+    color={NEON.blue}
+    items={[<>Dónde están los <b>compradores</b></>, <>Hasta dónde llega un camión <b>en un día</b></>, <>Gana el lugar con <b>más compradores cerca</b>: Córdoba</>]}
+    scene={(s) => <ArgMap scene="solucion" step={s} />}
+  />
+);
+
+const Como2 = () => (
+  <CaseSlide
     id="mercadolibre-tiempo"
-    scene="tiempo"
-    label="La clave"
+    {...L}
+    label="¿Cómo lo hace?"
     title="Tiempo, no distancia"
     color={NEON.green}
-    items={[
-      <>Un círculo marca lo que está <b>a la misma distancia</b>.</>,
-      <>Pero por la ruta el camión va más rápido: lo que llega en un día <b>se estira por las rutas</b>.</>,
-    ]}
+    items={[<>Círculo = <b>misma distancia</b></>, <>Por ruta se llega más lejos: <b>isócrona</b></>]}
+    scene={(s) => <ArgMap scene="tiempo" step={s} />}
   />
 );
+
 const Logistica = () => (
-  <Slide
+  <CaseSlide
     id="mercadolibre-logistica"
-    scene="logistica"
-    label="GIS en logística"
+    {...L}
+    label="En su logística"
     title="Una red de depósitos"
     color={NEON.green}
-    items={[
-      <>Un <b>centro grande</b> abastece a los centros regionales.</>,
-      <>Y de cada uno salen <b>los repartos del día</b>, armados sobre el mapa.</>,
-    ]}
+    items={[<>Centro grande → <b>centros regionales</b></>, <>De cada uno, <b>los repartos del día</b></>]}
+    dato={{ n: "US$ 3.400 M", d: "invierte Mercado Libre en Argentina en 2026, sobre todo en logística." }}
+    scene={(s) => <ArgMap scene="logistica" step={s} />}
   />
 );
+
 const Tecnologias = () => (
   <TechSlide
     id="mercadolibre-tecnologias"
     logo={LOGO}
-    video={VIDEO}
     label="Tecnologías · Mercado Libre"
     bg={<ArgMap scene="intro" step={0} />}
     techs={[
@@ -119,27 +108,12 @@ const Tecnologias = () => (
   />
 );
 
-const Resultados = () => (
-  <ResultsSlide
-    id="mercadolibre-resultados"
-    logo={LOGO}
-    video={VIDEO}
-    label="Resultados · Mercado Libre"
-    bg={<ArgMap scene="intro" step={0} />}
-    stats={[
-      { pre: "US$ ", to: 3400, suf: " M", d: "invierte en Argentina en 2026, sobre todo en logística", c: NEON.amber },
-      { pre: "+", to: 100000, suf: " m²", d: "tiene Escobar, su mayor centro del país (octubre de 2026)", c: NEON.blue },
-      { to: 130000, d: "productos por día puede procesar Escobar", c: NEON.green },
-    ]}
-  />
-);
-
 export const MELI_SLIDES: DeckSlide[] = [
   { id: "mercadolibre", label: "Mercado Libre · Depósitos", C: Intro },
-  { id: "mercadolibre-problema", label: "Mercado Libre · El problema", steps: 2, C: Problema },
-  { id: "mercadolibre-ubicacion", label: "Mercado Libre · Dónde ubicar", steps: 3, C: Solucion },
-  { id: "mercadolibre-tiempo", label: "Mercado Libre · Tiempo, no distancia", steps: 2, C: Tiempo },
-  { id: "mercadolibre-logistica", label: "Mercado Libre · En logística", steps: 2, C: Logistica },
-  { id: "mercadolibre-tecnologias", label: "Mercado Libre · Tecnologías", steps: 4, C: Tecnologias },
-  { id: "mercadolibre-resultados", label: "Mercado Libre · Resultados", steps: 3, C: Resultados },
+  { id: "mercadolibre-quien", label: "Mercado Libre · ¿Quién es?", steps: 4, phase: 2600, C: Quien },
+  { id: "mercadolibre-gis", label: "Mercado Libre · ¿Para qué usa el GIS?", steps: 4, C: ParaQue },
+  { id: "mercadolibre-ubicacion", label: "Mercado Libre · El mejor lugar", steps: 3, C: Como1 },
+  { id: "mercadolibre-tiempo", label: "Mercado Libre · Tiempo, no distancia", steps: 2, C: Como2 },
+  { id: "mercadolibre-logistica", label: "Mercado Libre · En su logística", steps: 2, C: Logistica },
+  { id: "mercadolibre-tecnologias", label: "Mercado Libre · Tecnologías", C: Tecnologias },
 ];

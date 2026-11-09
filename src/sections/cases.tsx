@@ -1,20 +1,22 @@
 import { motion } from "motion/react";
 import { Slide } from "@/components/ui";
 
-/* Diapositiva 3: los casos que vamos a ver. Cada tarjeta tiene el color de la marca, el logo en grande
+/* Los casos que vamos a ver. Cada tarjeta tiene el color de la marca, el logo en grande
    y para qué usa el GIS. Cada tarjeta lleva a su caso. Los casos ocultos (hidden) no se presentan: la expo dura 15 minutos. */
 
 type Logo = { src: string; h: string; white?: boolean };
 type Card = { id: string; name: string; use: string; bg: string; logos: Logo[]; extra?: string; badge?: string; hidden?: boolean };
 
 const CASES: Card[] = [
-  { id: "tesla", name: "Tesla", use: "Manejar dentro de una geocerca", bg: "#f2f2f2", logos: [{ src: "/logos/tesla.png", h: "78%" }] },
-  { hidden: true, id: "uber", name: "Uber", use: "Medir la ciudad en hexágonos", bg: "#000000", logos: [{ src: "/logos/uber.png", h: "34%" }] },
-  { hidden: true, id: "walmart", name: "Walmart + Wing", use: "Entregar por el aire con drones", bg: "#0153e3", logos: [{ src: "/logos/walmart.png", h: "24%" }], extra: "+ Wing" },
   { id: "mercadolibre", name: "Mercado Libre", use: "Decidir dónde guardar", bg: "#ffe700", logos: [{ src: "/logos/mercadolibre.png", h: "38%" }] },
-  { id: "starlink", name: "Starlink + Geotab", use: "Rastrear sin señal de celular", bg: "#0e0e10", logos: [{ src: "/logos/starlink-wordmark.svg", h: "30%", white: true }], extra: "+ Geotab" },
+  { id: "uber", name: "Uber", use: "Medir la ciudad en hexágonos", bg: "#000000", logos: [{ src: "/logos/uber.png", h: "34%" }] },
+  { id: "ups", name: "UPS", use: "Elegir el orden de las paradas", bg: "#330000", logos: [{ src: "/logos/ups.png", h: "80%" }] },
+  { id: "amazon", name: "Amazon", use: "Rutas que aprenden de los choferes", bg: "#232f3e", logos: [{ src: "/logos/amazon-white.svg", h: "26%" }] },
+  { id: "dhl", name: "DHL", use: "Ver los riesgos antes de que lleguen", bg: "#ffcc00", logos: [{ src: "/logos/dhl.svg", h: "30%" }] },
+  { hidden: true, id: "tesla", name: "Tesla", use: "Manejar dentro de una geocerca", bg: "#f2f2f2", logos: [{ src: "/logos/tesla.png", h: "78%" }] },
+  { hidden: true, id: "walmart", name: "Walmart + Wing", use: "Entregar por el aire con drones", bg: "#0153e3", logos: [{ src: "/logos/walmart.png", h: "24%" }], extra: "+ Wing" },
+  { hidden: true, id: "starlink", name: "Starlink + Geotab", use: "Rastrear sin señal de celular", bg: "#0e0e10", logos: [{ src: "/logos/starlink-wordmark.svg", h: "30%", white: true }], extra: "+ Geotab" },
   { hidden: true, id: "maersk", name: "Maersk", use: "Seguir barcos en todo el mundo", bg: "#ffffff", logos: [{ src: "/logos/maersk.svg", h: "30%" }] },
-  { id: "ups", name: "UPS", use: "Elegir el mejor camino", bg: "#330000", logos: [{ src: "/logos/ups.png", h: "80%" }] },
   { hidden: true, id: "espana", name: "Trenes en España", use: "Saber dónde está no alcanza", bg: "#ffffff", logos: [{ src: "/logos/renfe.svg", h: "30%" }, { src: "/logos/iryo.svg", h: "34%" }], badge: "Caso reciente · 28 oct 2026" },
 ];
 
@@ -65,7 +67,7 @@ export function Cases() {
         >
           Los casos que vamos a ver
         </motion.h2>
-        <div className="mt-[clamp(1rem,3vh,2.5rem)] grid gap-[clamp(0.9rem,1.4vw,1.6rem)] sm:grid-cols-2 lg:h-[62vh] lg:grid-cols-4">
+        <div className="mt-[clamp(1rem,3vh,2.5rem)] grid gap-[clamp(0.9rem,1.4vw,1.6rem)] sm:grid-cols-2 lg:h-[62vh] lg:grid-cols-5">
           {SHOWN.map((c, i) => (
             <Tile key={c.id} c={c} i={i} />
           ))}

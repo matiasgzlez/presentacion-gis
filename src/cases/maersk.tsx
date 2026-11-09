@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Radar, Container, Satellite, Route } from "lucide-react";
 import type { DeckSlide } from "@/components/deck";
 import { useStep } from "@/components/deck";
-import { FullScene, NEON, NeonFrame, Pill, ResultsSlide, StepCard, TechSlide } from "@/components/neon";
+import { FullScene, NEON, NeonFrame, Pill, StepCard, TechSlide, type Dato, WhoIs } from "@/components/neon";
 import { SeaMap, type SeaScene } from "@/scenes/sea-neon";
 
 /* Caso 06 · Maersk · seguir barcos y contenedores en todo el mundo. Mapa del mundo en neón.
@@ -43,17 +43,18 @@ function Intro() {
           <motion.div className="mt-5" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.7, ease }}>
             <Pill color={NEON.amber}>Seguir cada contenedor por el mundo</Pill>
           </motion.div>
+          <WhoIs who={[{ name: "Maersk", d: "naviera de Dinamarca, una de las más grandes del mundo: lleva contenedores en barcos por todos los océanos." }]} />
         </div>
       </div>
     </Frame>
   );
 }
 
-function Slide({ id, scene, label, title, color, items }: { id: string; scene: SeaScene; label: string; title: string; color: string; items: React.ReactNode[] }) {
+function Slide({ id, scene, label, title, color, items, dato }: { id: string; scene: SeaScene; label: string; title: string; color: string; items: React.ReactNode[]; dato?: Dato }) {
   const step = useStep();
   return (
     <Frame id={id}>
-      <FullScene map={<SeaMap scene={scene} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} />} />
+      <FullScene map={<SeaMap scene={scene} step={step} />} card={<StepCard label={label} title={title} color={color} step={step} items={items} dato={dato} />} />
     </Frame>
   );
 }
@@ -91,6 +92,7 @@ const Desvio = () => (
     scene="desvio"
     label="La clave"
     title="Cambiar de ruta"
+    dato={{ n: "+14 días", d: "de viaje al dar la vuelta por África: el mapa lo calcula y avisa." }}
     color={NEON.green}
     items={[
       <>El camino corto entre Asia y Europa pasa por el <b>Canal de Suez</b>.</>,
@@ -124,18 +126,6 @@ const Tecnologias = () => (
     ]}
   />
 );
-const Resultados = () => (
-  <ResultsSlide
-    id="maersk-resultados"
-    label="Resultados · Maersk"
-    bg={<SeaMap scene="intro" step={0} />}
-    stats={[
-      { pre: "~", to: 4.3, dec: 1, suf: " M", d: "de contenedores (TEU) de capacidad en su flota (2026)", c: NEON.blue },
-      { to: 270000, d: "contenedores refrigerados con GPS y termómetro", c: NEON.green },
-      { pre: "+", to: 14, suf: " días", d: "de viaje al dar la vuelta por África: el mapa lo calcula y avisa", c: NEON.amber },
-    ]}
-  />
-);
 
 export const MAERSK_SLIDES: DeckSlide[] = [
   { id: "maersk", label: "Maersk · Barcos", C: Intro },
@@ -144,5 +134,4 @@ export const MAERSK_SLIDES: DeckSlide[] = [
   { id: "maersk-desvio", label: "Maersk · Cambiar de ruta", steps: 2, C: Desvio },
   { id: "maersk-logistica", label: "Maersk · En logística", steps: 2, C: Logistica },
   { id: "maersk-tecnologias", label: "Maersk · Tecnologías", steps: 4, C: Tecnologias },
-  { id: "maersk-resultados", label: "Maersk · Resultados", steps: 3, C: Resultados },
 ];
