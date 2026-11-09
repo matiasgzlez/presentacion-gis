@@ -24,9 +24,11 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 **Ojo con el tiempo:** con las cuatro herramientas la expo pasa los 15 minutos. Para entrar: cada diapositiva de herramienta en ~15 s.
 
-**Cómo funciona ahora la presentación:** las animaciones **corren solas, en bucle**; no hay que apretar nada para que avancen. Con → se pasa directo a la diapositiva siguiente. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 47.
+**Cómo funciona ahora la presentación:** los subpasos **avanzan solos hasta la idea final y quedan ahí, sin reiniciar**. Con → avanzamos un subpaso y, desde el último, pasamos a la diapositiva siguiente, que inicia su propia secuencia automática. Con ← retrocedemos un subpaso y, desde el primero, volvemos a la diapositiva anterior en su estado final. Recorrer los subpasos con el teclado deja esa diapositiva en modo manual para poder repasar sin que se adelante sola. Elegir una diapositiva desde la barra superior o un enlace interno reinicia su secuencia automática. Los videos y movimientos continuos de las escenas siguen reproduciéndose. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 47.
 
 **Para llegar con margen:** las diapositivas **¿Quién es?** se pasan en ~10 segundos, y Libros, Para probar y Videos se muestran sin leerlas. Ensayar con cronómetro: está justo.
+
+**Para elegir un subpaso:** acercar el mouse a los puntos superiores y elegir Inicio o un número. Ese subpaso queda en modo manual para explicarlo con tiempo; las flechas permiten seguir repasando y la diapositiva siguiente vuelve a avanzar automáticamente.
 
 **Para revisar una animación quieta:** agregar `?paso=2` (o el paso que sea) a la dirección, antes del `#`.
 

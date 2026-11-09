@@ -8,7 +8,7 @@ Presentación para la materia **Sistemas de Información Geográfica**: qué es 
 
 ## Qué es
 
-Es una presentación web que se recorre como un PowerPoint, con animaciones 2D y 3D que corren solas, en bucle. Primero muestra herramientas de GIS en logística poco conocidas (qué son, cómo funcionan y para qué sirven, con imágenes de sus sitios) y después cinco casos reales de empresas:
+Es una presentación web que se recorre como un PowerPoint, con animaciones 2D y 3D cuyos pasos avanzan solos hasta dejar visible la idea final. El teclado permite repasar cada paso. Primero muestra herramientas de GIS en logística poco conocidas (qué son, cómo funcionan y para qué sirven, con imágenes de sus sitios) y después cinco casos reales de empresas:
 
 | Herramienta | Qué hace |
 |---|---|
@@ -44,11 +44,15 @@ Después abrir la dirección que aparece en la terminal (por defecto http://127.
 
 | Tecla | Acción |
 |---|---|
-| → · espacio | Siguiente diapositiva (las animaciones avanzan solas) |
-| ← | Diapositiva anterior |
+| → · espacio · Av Pág | Siguiente subpaso; desde el último, siguiente diapositiva |
+| ← · Re Pág | Subpaso anterior; desde el primero, diapositiva anterior en su estado final |
 | Inicio · Fin | Primera · última diapositiva |
 
-También se puede saltar a cualquier diapositiva haciendo clic en la barra de arriba. En la diapositiva de videos, cada video se abre grande con un clic (se cierra con la cruz o con Esc).
+Los subpasos avanzan automáticamente al entrar en cada diapositiva y se detienen en el último, sin reiniciar. Al recorrer sus subpasos con el teclado, esa diapositiva queda en modo manual para poder repasar. Al avanzar a la siguiente diapositiva, su secuencia vuelve a ser automática. Al retroceder a la anterior, se muestra su estado final y se mantiene el control manual. Elegir una diapositiva desde la barra de arriba o un enlace interno vuelve a iniciar su secuencia automática desde el primer estado.
+
+Para saltar a una subdiapositiva, acercá el mouse a los puntos superiores o hacé clic en ellos. Se despliega un selector con **Inicio** y los subpasos numerados. Al elegir uno, la diapositiva queda pausada ahí y las flechas permiten seguir repasándola. El selector también se abre con el teclado y se cierra con Escape.
+
+Los videos y movimientos continuos de las escenas mantienen su reproducción; lo que queda fijo es el subpaso y su idea final. En la diapositiva de videos, cada video se abre grande con un clic (se cierra con la cruz o con Esc).
 
 Para ver una animación quieta en un paso, agregar `?paso=2` a la dirección (antes del `#`).
 
