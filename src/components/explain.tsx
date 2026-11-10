@@ -12,7 +12,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 export type ExplainPoint = { b: string; t: ReactNode };
 export type ExplainTech = { name: string; d?: string; gis?: boolean };
 
-export function ExplainSlide({ id, logo, logoClass, pill, title, question, color, points, techs, scene }: { id: string; logo?: string; logoClass?: string; pill: string; title: string; question: ReactNode; color: string; points: ExplainPoint[]; techs: ExplainTech[]; scene: (step: number) => ReactNode }) {
+export function ExplainSlide({ id, logo, logoClass, pill, title, subtitle, question, color, points, techs, scene }: { id: string; logo?: string; logoClass?: string; pill: string; title: string; subtitle?: ReactNode; question: ReactNode; color: string; points: ExplainPoint[]; techs: ExplainTech[]; scene: (step: number) => ReactNode }) {
   const step = useStep();
   return (
     <NeonFrame id={id} logo={logo} logoClass={logoClass}>
@@ -21,6 +21,7 @@ export function ExplainSlide({ id, logo, logoClass, pill, title, question, color
           <Pill>{pill}</Pill>
         </div>
         <h2 className="display mt-[clamp(0.5rem,1.2vh,0.9rem)] text-[clamp(1.7rem,2.6vw,3.1rem)] uppercase leading-[1.02]" style={{ color }}>{title}</h2>
+        {subtitle && <p className="mt-[clamp(0.3rem,0.8vh,0.6rem)] text-[clamp(0.95rem,1.2vw,1.45rem)] leading-snug text-white/80">{subtitle}</p>}
         <p className="mt-[clamp(0.4rem,1vh,0.7rem)] text-[clamp(1.1rem,1.4vw,1.7rem)] font-medium leading-snug text-white/90">{question}</p>
         <ol className="mt-[clamp(0.8rem,2vh,1.4rem)] flex flex-col gap-[clamp(0.45rem,1.1vh,0.8rem)]">
           {points.map((p, i) => {

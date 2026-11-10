@@ -70,6 +70,17 @@ const Como = () => (
     {...L}
     pill="La función GIS clave"
     title="¿Cómo funciona ORION?"
+    subtitle={
+      <>
+        {["On-", "Road ", "Integrated ", "Optimization and ", "Navigation"].map((w, i) => (
+          <span key={i}>
+            <b style={{ color: NEON.blue }}>{w === "On-" ? "O" : w[0]}</b>
+            {w === "On-" ? "n-" : w.slice(1)}
+          </span>
+        ))}
+        <span className="block text-[0.85em] text-white/60">Optimización y navegación integradas en la ruta</span>
+      </>
+    }
     question={<>Elige <b>el orden de las paradas</b> de cada camión.</>}
     color={NEON.blue}
     points={[

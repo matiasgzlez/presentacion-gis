@@ -352,6 +352,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ### Diapositiva 29 · La función GIS clave · ¿Cómo funciona ORION?
 *Animación en 4 pasos: aparecen las paradas del día sobre las calles, tres con "antes 10:30" · titilan órdenes al azar: "120 paradas = más órdenes que átomos en el universo" · se dibuja una ruta cualquiera y se va corrigiendo de a pedazos mientras bajan los kilómetros · la ruta final, con las paradas numeradas, va "al aparato del chofer". Abajo: Mapa de calles, Geocodificación y Optimización de rutas (GIS).*
+> ORION son las siglas de **On-Road Integrated Optimization and Navigation**: optimización y navegación integradas en la ruta.
 - **Los datos:** ORION junta los paquetes del día, un mapa de calles muy detallado (UPS usa unos 250 millones de puntos de direcciones) y los horarios: hay entregas que tienen que llegar antes de cierta hora.
 - **No prueba todos:** con 120 paradas hay más órdenes posibles que átomos en el universo. Ninguna computadora puede probarlos todos.
 - **Arma y mejora:** entonces arma una ruta cualquiera y la va corrigiendo de a pedazos: da vuelta un tramo, prueba si queda más corta, y repite. Así revisa unas **200.000 opciones en pocos segundos**. No busca la ruta perfecta, sino una muy buena y rápida.
