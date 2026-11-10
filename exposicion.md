@@ -24,7 +24,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 **Ojo con el tiempo:** está justo. Cada diapositiva de herramienta, en ~15 s.
 
-**Cómo funciona ahora la presentación:** los subpasos **avanzan solos hasta la idea final y quedan ahí, sin reiniciar**. Con → avanzamos un subpaso y, desde el último, pasamos a la diapositiva siguiente, que inicia su propia secuencia automática. Con ← retrocedemos un subpaso y, desde el primero, volvemos a la diapositiva anterior en su estado final. Recorrer los subpasos con el teclado deja esa diapositiva en modo manual para poder repasar sin que se adelante sola. Elegir una diapositiva desde la barra superior o un enlace interno reinicia su secuencia automática. Los videos y movimientos continuos de las escenas siguen reproduciéndose. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 43.
+**Cómo funciona ahora la presentación:** todo se avanza **a mano**, nada pasa solo. Con → (o espacio) se pasa al paso siguiente de la animación; en el último paso, → pasa a la diapositiva siguiente. Con ← se vuelve un paso, o a la diapositiva anterior. Al entrar a una diapositiva ya se ve el primer paso. A la izquierda se resalta el punto que corresponde al paso que se ve. Los videos están todos juntos en la diapositiva 43.
 
 **Para llegar con margen:** las diapositivas **¿Quién es?** se pasan en ~10 segundos, y Para probar y Videos se muestran sin leerlas. Ensayar con cronómetro: está justo.
 

@@ -47,7 +47,7 @@ Después abrir la dirección que aparece en la terminal (por defecto http://127.
 | ← · Re Pág | Subpaso anterior; desde el primero, diapositiva anterior en su estado final |
 | Inicio · Fin | Primera · última diapositiva |
 
-Los subpasos avanzan automáticamente al entrar en cada diapositiva y se detienen en el último, sin reiniciar. Al recorrer sus subpasos con el teclado, esa diapositiva queda en modo manual para poder repasar. Al avanzar a la siguiente diapositiva, su secuencia vuelve a ser automática. Al retroceder a la anterior, se muestra su estado final y se mantiene el control manual. Elegir una diapositiva desde la barra de arriba o un enlace interno vuelve a iniciar su secuencia automática desde el primer estado.
+Todo se avanza a mano: nada cambia de paso solo. Al entrar en una diapositiva se ve su primer subpaso; con → se pasa al siguiente y, desde el último, a la diapositiva siguiente. Con ← se vuelve un subpaso o, desde el primero, a la diapositiva anterior en su último subpaso.
 
 Para saltar a una subdiapositiva, acercá el mouse a los puntos superiores o hacé clic en ellos. Se despliega un selector con **Inicio** y los subpasos numerados. Al elegir uno, la diapositiva queda pausada ahí y las flechas permiten seguir repasándola. El selector también se abre con el teclado y se cierra con Escape.
 
