@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useState, type JSX } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Nav } from "@/components/nav";
 
 /* Modo presentación: una diapositiva por pantalla, sin scroll. Todo se avanza a mano (nada pasa solo).
    →, espacio, PgDn: siguiente paso; desde el último, siguiente diapositiva.
    ←, PgUp: paso anterior; desde el primero, diapositiva anterior en su último paso.
    Al entrar a una diapositiva con pasos se arranca en el paso 1 (así nunca se ve vacía).
+   Abajo a la derecha hay dos botones (‹ ›) que hacen lo mismo con el mouse.
    Home / End: primera / última diapositiva. `phase` y `manual` quedan por compatibilidad y no se usan. */
 
 export type DeckSlide = { id: string; label: string; steps?: number; manual?: boolean; phase?: number; C: () => JSX.Element };
@@ -83,6 +85,25 @@ export function Deck({ slides }: { slides: DeckSlide[] }) {
           </motion.div>
         </AnimatePresence>
       </main>
+      {/* botones para avanzar con el mouse: hacen lo mismo que ← y → */}
+      <div className="fixed bottom-[clamp(0.75rem,2vh,1.5rem)] right-[clamp(0.75rem,1.5vw,1.5rem)] z-50 flex gap-2">
+        {[
+          { label: "Anterior", Icon: ChevronLeft, on: prev, off: pos.i === 0 && pos.step <= first(S) },
+          { label: "Siguiente", Icon: ChevronRight, on: next, off: pos.i === last && pos.step >= (S.steps ?? 0) },
+        ].map(({ label, Icon, on, off }) => (
+          <button
+            key={label}
+            type="button"
+            title={label}
+            aria-label={label}
+            disabled={off}
+            onClick={(e) => { e.currentTarget.blur(); on(); }}
+            className="grid size-[clamp(2.6rem,3.4vw,3.4rem)] place-items-center rounded-full border border-white/25 bg-black/55 text-white shadow-lg backdrop-blur transition hover:bg-black/75 active:scale-95 disabled:opacity-25"
+          >
+            <Icon className="size-[55%]" strokeWidth={2.5} />
+          </button>
+        ))}
+      </div>
     </>
   );
 }

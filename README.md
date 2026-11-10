@@ -46,6 +46,7 @@ Después abrir la dirección que aparece en la terminal (por defecto http://127.
 | → · espacio · Av Pág | Siguiente subpaso; desde el último, siguiente diapositiva |
 | ← · Re Pág | Subpaso anterior; desde el primero, diapositiva anterior en su estado final |
 | Inicio · Fin | Primera · última diapositiva |
+| Botones ‹ › (abajo a la derecha) | Lo mismo que ← y →, con el mouse |
 
 Todo se avanza a mano: nada cambia de paso solo. Al entrar en una diapositiva se ve su primer subpaso; con → se pasa al siguiente y, desde el último, a la diapositiva siguiente. Con ← se vuelve un subpaso o, desde el primero, a la diapositiva anterior en su último subpaso.
 

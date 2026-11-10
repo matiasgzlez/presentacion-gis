@@ -24,7 +24,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 **Ojo con el tiempo:** está justo. Cada diapositiva de herramienta, en ~15 s.
 
-**Cómo funciona ahora la presentación:** todo se avanza **a mano**, nada pasa solo. Con → (o espacio) se pasa al paso siguiente de la animación; en el último paso, → pasa a la diapositiva siguiente. Con ← se vuelve un paso, o a la diapositiva anterior. Al entrar a una diapositiva ya se ve el primer paso. A la izquierda se resalta el punto que corresponde al paso que se ve. Los videos están todos juntos en la diapositiva 43.
+**Cómo funciona ahora la presentación:** todo se avanza **a mano**, nada pasa solo. Con → (o espacio) se pasa al paso siguiente de la animación; en el último paso, → pasa a la diapositiva siguiente. Con ← se vuelve un paso, o a la diapositiva anterior. También se puede con el mouse: abajo a la derecha hay dos botones, ‹ y ›, que hacen lo mismo. Al entrar a una diapositiva ya se ve el primer paso. A la izquierda se resalta el punto que corresponde al paso que se ve. Los videos están todos juntos en la diapositiva 43.
 
 **Para llegar con margen:** las diapositivas **¿Quién es?** se pasan en ~10 segundos, y Para probar y Videos se muestran sin leerlas. Ensayar con cronómetro: está justo.
 
