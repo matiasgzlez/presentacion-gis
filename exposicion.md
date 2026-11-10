@@ -16,15 +16,15 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 | Los casos | 19 | ~20 s |
 | Caso 01 · Mercado Libre | 20 a 24 | ~2 min |
 | Caso 02 · Uber | 25 a 29 | ~1 min 45 s |
-| Caso 03 · UPS | 30 a 34 | ~1 min 30 s |
-| Caso 04 · Maersk | 35 a 39 | ~1 min 30 s |
-| Caso 05 · Walmart + Wing | 40 a 44 | ~1 min 30 s |
-| Libros · Para probar · Videos · Gracias | 45 a 48 | ~35 s |
-| **Total** | **48** | **~15 min 40 s** |
+| Caso 03 · UPS | 30 a 35 | ~1 min 50 s |
+| Caso 04 · Maersk | 36 a 40 | ~1 min 30 s |
+| Caso 05 · Walmart + Wing | 41 a 45 | ~1 min 30 s |
+| Libros · Para probar · Videos · Gracias | 46 a 49 | ~35 s |
+| **Total** | **49** | **~16 min** |
 
 **Ojo con el tiempo:** con las cuatro herramientas la expo pasa los 15 minutos. Para entrar: cada diapositiva de herramienta en ~15 s.
 
-**Cómo funciona ahora la presentación:** los subpasos **avanzan solos hasta la idea final y quedan ahí, sin reiniciar**. Con → avanzamos un subpaso y, desde el último, pasamos a la diapositiva siguiente, que inicia su propia secuencia automática. Con ← retrocedemos un subpaso y, desde el primero, volvemos a la diapositiva anterior en su estado final. Recorrer los subpasos con el teclado deja esa diapositiva en modo manual para poder repasar sin que se adelante sola. Elegir una diapositiva desde la barra superior o un enlace interno reinicia su secuencia automática. Los videos y movimientos continuos de las escenas siguen reproduciéndose. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 47.
+**Cómo funciona ahora la presentación:** los subpasos **avanzan solos hasta la idea final y quedan ahí, sin reiniciar**. Con → avanzamos un subpaso y, desde el último, pasamos a la diapositiva siguiente, que inicia su propia secuencia automática. Con ← retrocedemos un subpaso y, desde el primero, volvemos a la diapositiva anterior en su estado final. Recorrer los subpasos con el teclado deja esa diapositiva en modo manual para poder repasar sin que se adelante sola. Elegir una diapositiva desde la barra superior o un enlace interno reinicia su secuencia automática. Los videos y movimientos continuos de las escenas siguen reproduciéndose. A la izquierda está lo necesario para guiarnos (no todo lo que se dice) y se resalta el punto que corresponde a lo que se ve. Los videos están todos juntos en la diapositiva 48.
 
 **Para llegar con margen:** las diapositivas **¿Quién es?** se pasan en ~10 segundos, y Libros, Para probar y Videos se muestran sin leerlas. Ensayar con cronómetro: está justo.
 
@@ -231,29 +231,31 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 ## Diapositiva 16 · Kepler.gl · ¿Qué es?
 
 **Tiempo:** ~20 segundos
-**En pantalla:** *la pantalla de Kepler.gl: a la izquierda, datos y capas; a la derecha, el mapa de la bahía de San Francisco.*
+**En pantalla:** *la frase "Convierte una planilla en un mapa" y la pantalla de Kepler.gl: a la izquierda, la planilla y las capas; a la derecha, el mapa.*
 
-> **Kepler.gl** es una herramienta **gratis y de código abierto** que **creó Uber** y liberó en **2018**. Se abre en el navegador y sirve para ver **millones de datos con ubicación** —viajes, pedidos, camiones— en un mapa, **sin programar**.
+> **Kepler.gl** convierte **una planilla en un mapa**. Imaginen un Excel con **100.000 envíos**, cada uno con su latitud y longitud. Leído como tabla, no se entiende nada. Kepler.gl lo dibuja en un mapa en segundos, y ahí se ve enseguida dónde se concentran.
+>
+> Es **gratis**, funciona **en el navegador** y **no hace falta programar**. Lo creó **Uber** en 2018 para mirar sus propios viajes, y lo liberó para que lo use cualquiera.
 
 ## Diapositiva 17 · Kepler.gl · ¿Cómo funciona?
 
 **Tiempo:** ~25 segundos
-**En pantalla:** *una capa de hexágonos en 3D y columnas sobre la bahía de San Francisco.*
+**En pantalla:** *animación en 4 pasos: una planilla de envíos de Resistencia (envío, latitud, longitud, hora) · el archivo "envios.csv" se arrastra al mapa · cada fila se vuelve un punto · los puntos se juntan en hexágonos que crecen donde hay más envíos.*
 
-- **Cargás los datos:** se arrastra un archivo **CSV o GeoJSON** con latitud y longitud.
-- **Elegís una capa:** puntos, arcos, hexágonos, mapa de calor, H3 o viajes animados.
-- **Filtrás y reproducís:** por hora, por día o por tipo, y se ve cómo cambia en el tiempo.
-- **Exportás:** una imagen, un video o el mapa para compartir.
+- **Una planilla:** cada fila es un envío, con su ubicación.
+- **La arrastrás:** el archivo se suelta en el navegador. No hay que programar.
+- **Cada fila, un punto:** Kepler.gl pone cada envío en el mapa.
+- **Elegís cómo verlo:** como puntos, como hexágonos (la altura es cuántos envíos hay en cada zona), como arcos o como viajes animados.
 
 ## Diapositiva 18 · Kepler.gl · ¿Para qué sirve?
 
-**Tiempo:** ~25 segundos
-**En pantalla:** *arcos de viajes de Manhattan a los aeropuertos de Nueva York, viajes animados por las calles y hexágonos en 3D.*
+**Tiempo:** ~20 segundos
+**En pantalla:** *arcos de viajes en Nueva York, viajes animados por las calles y hexágonos en 3D.*
 
-- **Dónde hay más pedidos:** los hexágonos muestran las zonas calientes de la ciudad.
-- **De dónde a dónde:** los arcos unen el origen y el destino de cada envío o viaje.
-- **Cómo se mueve la flota:** los viajes animados muestran el recorrido de cada vehículo a lo largo del día.
-- **Quién lo usa:** Uber lo usa en sus propios tableros, y cualquiera lo puede usar gratis.
+> En logística, cada forma de verlo responde una pregunta:
+- **¿Dónde se piden más envíos?** Los hexágonos muestran las zonas calientes de la ciudad.
+- **¿De dónde a dónde van?** Los arcos unen el origen y el destino de cada envío.
+- **¿Cómo se movió la flota hoy?** Los viajes animados repiten el recorrido de cada vehículo a lo largo del día.
 
 *Fuentes (no van en pantalla): blog de Uber Engineering (lanzamiento, mayo de 2018), docs.kepler.gl y el repositorio en GitHub (licencia MIT, tipos de capa, imágenes).*
 
@@ -374,7 +376,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositivas 30 a 34 · Caso 03 · UPS · ORION · Rutas
+## Diapositivas 30 a 35 · Caso 03 · UPS · ORION · Rutas
 
 **Tiempo total:** ~1 minuto 30 segundos
 
@@ -389,7 +391,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ### Diapositiva 32 · El GIS detrás de cada entrega
 *El recorrido: Viaja · Se clasifica · Se carga · Se entrega. Se iluminan "Se carga" y "Se entrega" con la función clave: "Optimización de rutas · ¿En qué orden visitar las 120 paradas del día?".*
-> En UPS hay una función GIS que es la clave: la **optimización de rutas**. Cuando se carga el camión, ya se sabe en qué orden va a visitar cada parada; por eso los paquetes van ordenados adentro.
+> En UPS hay una función GIS que es la clave: la **optimización de rutas**, con un sistema que se llama **ORION**. UPS empezó a desarrollarlo a principios de los 2000 y en 2016 ya armaba las rutas de unos **55.000 recorridos** en Estados Unidos. Cuando se carga el camión, ya se sabe en qué orden va a visitar cada parada; por eso los paquetes van ordenados adentro.
 
 ### Diapositiva 33 · La función GIS clave · ¿Cómo funciona ORION?
 *Animación en 4 pasos: aparecen las paradas del día sobre las calles, tres con "antes 10:30" · titilan órdenes al azar: "120 paradas = más órdenes que átomos en el universo" · se dibuja una ruta cualquiera y se va corrigiendo de a pedazos mientras bajan los kilómetros · la ruta final, con las paradas numeradas, va "al aparato del chofer". Abajo: Mapa de calles, Geocodificación y Optimización de rutas (GIS).*
@@ -398,46 +400,54 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 - **Arma y mejora:** entonces arma una ruta cualquiera y la va corrigiendo de a pedazos: da vuelta un tramo, prueba si queda más corta, y repite. Así revisa unas **200.000 opciones en pocos segundos**. No busca la ruta perfecta, sino una muy buena y rápida.
 - **Al chofer:** la ruta final, respetando los horarios, aparece en el aparato de mano del chofer.
 
-### Diapositiva 34 · El resultado · A ojo vs. ORION
+### Diapositiva 34 · Lo más famoso de UPS · Doblar a la izquierda cuesta
+*Animación en una esquina vista desde arriba: el camión quiere doblar a la izquierda, vienen autos de frente y espera con el reloj corriendo · después la otra opción: tres veces a la derecha alrededor de la manzana, y llega sin frenar.*
+> Lo más famoso de las rutas de UPS es que **casi no doblan a la izquierda**. Es una regla de UPS de antes de ORION, y ORION la aplica.
+- **A la izquierda:** hay que esperar a que pasen los autos de frente y cruzar el tránsito. Se pierde tiempo, se gasta combustible con el motor en marcha y hay más riesgo de choque.
+- **Tres a la derecha:** muchas veces conviene dar la vuelta a la manzana doblando a la derecha, sin frenar.
+> No es que esté prohibido: ORION le suma una **penalidad de tiempo** a cada giro a la izquierda, y si igual conviene, lo hace.
+
+### Diapositiva 35 · El resultado · A ojo vs. ORION
 *Nuestro video: "a ojo" contra ORION, el mismo camión y las mismas paradas.*
-- **Más corto:** ORION recorre menos kilómetros con las mismas paradas.
 - **1 milla menos:** con solo una milla menos por chofer por día, UPS ahorra **US$ 50 millones por año**.
+- **100 millones de millas:** ORION les ahorra unas 100 millones de millas por año, unos 160 millones de kilómetros, y unos 10 millones de galones de combustible.
 - **En total:** UPS calcula que ORION le ahorra **entre 300 y 400 millones de dólares por año**.
 
 **Tecnologías (para entenderlas nosotros, no se lee):**
 - **Mapa de calles:** todas las calles con sus sentidos, distancias y giros permitidos. Sin esto no se puede calcular nada.
 - **Geocodificación:** pasar la dirección de cada paquete a un punto en el mapa.
 - **Optimización de rutas:** probar muchísimos órdenes de paradas y quedarse con el más corto. Es el "problema del viajante".
+- **Penalidad de giro:** en el mapa de calles, cada giro tiene un "costo" en tiempo. A los giros a la izquierda se les suma más (por ejemplo, 20 segundos), así el sistema los evita cuando puede.
 - **Heurística:** un "atajo" para encontrar una solución muy buena sin probar todas. ORION arma una ruta y la mejora de a pedazos (búsqueda local).
 
-*Fuentes (no van en pantalla): UPS e INFORMS (premio Franz Edelman 2016): 1 milla menos por chofer por día ≈ US$ 50 M por año. Informe anual y ficha de UPS 2025: 20,8 M de paquetes por día. Worldport: 416.000 paquetes por hora (UPS, citado por Engadget y otros). Cómo funciona ORION: Holland et al., "UPS Optimizes Delivery Routes", revista Interfaces de INFORMS (2017): metaheurística con búsqueda local, ventanas horarias, US$ 300–400 M por año; Transport Topics (250 millones de puntos de direcciones); Fortune y Dataconomy (unas 200.000 opciones por ruta en segundos). La animación es ilustrativa. Fotos: Wikimedia Commons.*
+*Fuentes (no van en pantalla): UPS e INFORMS (premio Franz Edelman 2016): 1 milla menos por chofer por día ≈ US$ 50 M por año. Informe anual y ficha de UPS 2025: 20,8 M de paquetes por día. Worldport: 416.000 paquetes por hora (UPS, citado por Engadget y otros). Cómo funciona ORION: Holland et al., "UPS Optimizes Delivery Routes", revista Interfaces de INFORMS (2017): metaheurística con búsqueda local, ventanas horarias, US$ 300–400 M por año; Transport Topics (250 millones de puntos de direcciones); Fortune y Dataconomy (unas 200.000 opciones por ruta en segundos). Giros a la izquierda: UPS citado por Mental Floss y CBS (no es una prohibición; el software suma una penalidad, por ejemplo 20 segundos); la regla es anterior a ORION. Desarrollo desde principios de los 2000, 55.000 recorridos en 2016, 100 millones de millas y 10 millones de galones por año: UPS, INFORMS, Fortune e InformationWeek. Las animaciones son ilustrativas. Fotos: Wikimedia Commons.*
 
 ---
 
-## Diapositivas 35 a 39 · Caso 04 · Maersk · Barcos
+## Diapositivas 36 a 40 · Caso 04 · Maersk · Barcos
 
 **Tiempo total:** ~1 minuto 30 segundos
 
 *Lo distinto de este caso: la logística **por mar**. Seguir cada contenedor cuando está en el medio del océano. Se conecta con MarineTraffic, que mostramos en Herramientas.*
 
-### Diapositiva 35 · Portada
+### Diapositiva 36 · Portada
 > El cuarto caso es Maersk. La pregunta: **¿dónde está mi contenedor, en el medio del océano?**
 
-### Diapositiva 36 · ¿Quién es?
+### Diapositiva 37 · ¿Quién es?
 *Fotos: un portacontenedores celeste de Maersk, otro cargando en Singapur y una pila de contenedores refrigerados.*
 > Maersk es una de las navieras más grandes del mundo; la de los **barcos celestes**. Nació en Dinamarca en 1904 y tiene **más de 700 barcos** que llevan contenedores por todos los océanos. Sus contenedores refrigerados tienen **GPS y termómetro**.
 
-### Diapositiva 37 · El GIS detrás de cada contenedor
+### Diapositiva 38 · El GIS detrás de cada contenedor
 *El recorrido: Se carga · Cruza el océano · Llega al puerto · Sale en camión. Se iluminan las funciones: "Seguimiento en vivo · ¿Dónde está mi contenedor?" y "Ruteo marítimo · ¿Por dónde conviene ir, y cuándo llega?".*
 > Detrás de cada contenedor hay **dos funciones de GIS**: el **seguimiento en vivo**, para saber dónde está en todo momento, y el **ruteo marítimo**, para elegir por dónde ir y calcular cuándo llega.
 
-### Diapositiva 38 · Función GIS 1 · Seguimiento en vivo
+### Diapositiva 39 · Función GIS 1 · Seguimiento en vivo
 *Mapa del mundo: los barcos dejan su rastro; aparece un contenedor refrigerado con "GPS · 4 °C"; la ruta se pinta y aparece "Llega a Rotterdam en 12 días". Abajo: AIS y GPS (GIS), Satélites.*
 - **El barco avisa:** por **AIS**, la misma señal que vimos en MarineTraffic.
 - **El contenedor avisa:** los refrigerados llevan **GPS y termómetro**, y mandan los datos por satélite. Se sabe dónde está y si la carga (fruta, remedios) sigue fría.
 - **Cuándo llega:** con la posición y la ruta, el mapa calcula la llegada.
 
-### Diapositiva 39 · Función GIS 2 · Ruteo marítimo
+### Diapositiva 40 · Función GIS 2 · Ruteo marítimo
 *Europa, África y Asia: un barco por el Canal de Suez; el Mar Rojo se marca como peligroso y aparece la vuelta por África: "10 a 14 días más". Abajo: Ruteo marítimo y Zonas de riesgo (GIS).*
 - **Camino corto:** entre Asia y Europa, por el **Canal de Suez**.
 - **Si hay peligro:** desde fines de 2023, por los ataques en el Mar Rojo, Maersk mandó muchos barcos por **la vuelta por África**: **10 a 14 días más**. El mapa calcula el desvío y avisa la nueva llegada.
@@ -453,29 +463,29 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositivas 40 a 44 · Caso 05 · Walmart + Wing · Drones
+## Diapositivas 41 a 45 · Caso 05 · Walmart + Wing · Drones
 
 **Tiempo total:** ~1 minuto 30 segundos
 
 *Lo distinto de este caso: la logística **por el aire**. El aire no tiene calles, así que el GIS tiene que dibujar un "mapa del cielo".*
 
-### Diapositiva 40 · Portada
+### Diapositiva 41 · Portada
 > El último caso es Walmart con Wing. La pregunta: **¿cómo se reparte por el aire?**
 
-### Diapositiva 41 · ¿Quiénes son?
+### Diapositiva 42 · ¿Quiénes son?
 *Fotos del sitio de Wing: un dron con un pedido de Walmart, una tienda Walmart y una persona retirando el paquete en la puerta.*
 > **Walmart** es el supermercado más grande del mundo. **Wing** es la empresa de drones de **Alphabet**, la dueña de Google. Juntos reparten pedidos con drones en Estados Unidos. El dron **no aterriza**: baja el paquete **con una cuerda**, en un lugar del tamaño de un mantel de picnic. En 2026 ya superaron el **millón de entregas** a casas.
 
-### Diapositiva 42 · El GIS detrás de cada vuelo
+### Diapositiva 43 · El GIS detrás de cada vuelo
 *El recorrido: Pedís · Sale de la tienda · Vuela · Baja con cuerda. Se iluminan las funciones: "Área de cobertura · ¿A qué casas llega cada tienda?" y "Mapa del cielo · ¿Por dónde puede volar el dron?".*
 > Detrás de cada vuelo hay **dos funciones de GIS**: el **área de cobertura**, que dice a qué casas llega cada tienda, y el **mapa del cielo**, que dice por dónde puede volar el dron.
 
-### Diapositiva 43 · Función GIS 1 · Área de cobertura
+### Diapositiva 44 · Función GIS 1 · Área de cobertura
 *Animación 3D: varias tiendas, cada una con su círculo y su dron; las casas cubiertas se pintan de verde.*
 - **Un círculo por tienda:** el dron va y vuelve, unos 19 km en total (12 millas), a unos 100 km/h. Eso dibuja un círculo alrededor de cada tienda.
 - **Casas cubiertas:** en verde, las que pueden recibir en minutos. Con el mapa se ve dónde conviene sumar una tienda nueva. **La tienda se vuelve depósito.**
 
-### Diapositiva 44 · Función GIS 2 · Mapa del cielo
+### Diapositiva 45 · Función GIS 2 · Mapa del cielo
 *Animación 3D: el radio de vuelo; se levantan las zonas prohibidas (hospital, aeropuerto); se dibuja la ruta que las esquiva hasta la casa del cliente.*
 - **Radio de vuelo:** hasta dónde puede ir el dron desde la tienda.
 - **Zonas prohibidas:** encima se cargan las zonas donde no se puede volar, como un hospital o un aeropuerto.
@@ -492,7 +502,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositiva 45 · Libros para seguir leyendo
+## Diapositiva 46 · Libros para seguir leyendo
 
 **Tiempo:** ~10 segundos (mostrarla, no leerla)
 **En pantalla:** las tapas de los cinco libros, en perspectiva (con un clic se abre el sitio de cada uno). Debajo de cada tapa, para qué sirve.
@@ -508,7 +518,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositiva 46 · Para probar: pruébenlo ustedes
+## Diapositiva 47 · Para probar: pruébenlo ustedes
 
 **Tiempo:** ~15 segundos
 **En pantalla:** seis tarjetas con las herramientas de la charla y su dirección a la vista (con un clic se abren).
@@ -523,7 +533,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositiva 47 · Los casos en video
+## Diapositiva 48 · Los casos en video
 
 **Tiempo:** ~10 segundos (mostrarla, no reproducir salvo que pregunten)
 **En pantalla:** *los videos de cuatro casos, separados por tema: **Ubicación** (Mercado Libre), **Demanda** (Uber), **Rutas** (UPS) y **Por el aire** (Walmart + Wing). Maersk todavía no tiene video verificado. Con un clic se abren grandes; se cierran con la cruz, con Esc o tocando afuera.*
@@ -532,7 +542,7 @@ Integrantes: Gonzalez Matias · Lima Matias · Gaston Lovera
 
 ---
 
-## Diapositiva 48 · Muchas gracias
+## Diapositiva 49 · Muchas gracias
 
 **En pantalla:** solo "MUCHAS GRACIAS" sobre el video del planeta de la portada.
 

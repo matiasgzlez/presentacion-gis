@@ -7,6 +7,7 @@ import { ExplainSlide } from "@/components/explain";
 import { GisSlide, type Station } from "@/components/journey";
 import { RouteMap } from "@/scenes/route-neon";
 import { OrionHow } from "@/scenes/orion-how";
+import { LeftTurn } from "@/scenes/left-turn";
 import type { CaseVideo } from "@/components/video-peek";
 
 /* Caso 03 · UPS · ORION. Lo distinto de este caso: EL ORDEN EXACTO de las paradas (optimización pura).
@@ -86,6 +87,26 @@ const Como = () => (
   />
 );
 
+const Izquierda = () => (
+  <ExplainSlide
+    id="ups-izquierda"
+    {...L}
+    pill="Lo más famoso de UPS"
+    title="Doblar a la izquierda cuesta"
+    question={<>ORION le pone una <b>penalidad de tiempo</b> a cada giro a la izquierda.</>}
+    color={NEON.amber}
+    points={[
+      { b: "A la izquierda", t: <>hay que <b>esperar y cruzar</b> el tránsito.</> },
+      { b: "Tres a la derecha", t: <>se rodea la manzana <b>sin frenar</b>.</> },
+    ]}
+    techs={[
+      { name: "Mapa de calles", gis: true },
+      { name: "Optimización de rutas", gis: true },
+    ]}
+    scene={(s) => <LeftTurn step={s} />}
+  />
+);
+
 const Resultado = () => (
   <ExplainSlide
     id="ups-orion"
@@ -95,8 +116,8 @@ const Resultado = () => (
     question={<>El mismo camión y las mismas paradas.</>}
     color={NEON.green}
     points={[
-      { b: "Más corto", t: <>ORION recorre menos.</> },
       { b: "1 milla menos", t: <>por chofer = <b>US$ 50 M</b> al año.</> },
+      { b: "100 millones de millas", t: <>menos por año (unos 160 millones de km).</> },
       { b: "En total", t: <><b>US$ 300 a 400 M</b> por año.</> },
     ]}
     techs={[{ name: "ORION", gis: true }]}
@@ -109,5 +130,6 @@ export const UPS_SLIDES: DeckSlide[] = [
   { id: "ups-quien", label: "UPS · ¿Quién es?", C: Quien },
   { id: "ups-donde-gis", label: "UPS · El GIS detrás de cada entrega", steps: 1, C: DondeGis },
   { id: "ups-orion-como", label: "UPS · ¿Cómo funciona ORION?", steps: 4, phase: 6000, C: Como },
+  { id: "ups-izquierda", label: "UPS · Doblar a la izquierda cuesta", steps: 2, phase: 5500, C: Izquierda },
   { id: "ups-orion", label: "UPS · El resultado", steps: 3, phase: 3500, C: Resultado },
 ];

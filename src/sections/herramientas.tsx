@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import type { DeckSlide } from "@/components/deck";
 import { NeonFrame, Pill } from "@/components/neon";
 import { Photo, PhotoPage, type Point } from "@/components/photo-page";
+import { useStep } from "@/components/deck";
+import { KeplerHow } from "@/scenes/kepler-how";
 
 /* Herramientas de GIS en logística poco conocidas. Cada una se cuenta igual:
    ¿Qué es? · ¿Cómo funciona? · ¿Para qué sirve? (y un ejemplo cercano).
@@ -14,7 +16,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const W3W = "#e11f26", PLUS = "#4285f4", MARINE = "#22d3ee", KEPLER = "#3cf2b5";
 
 /** Diapositiva de herramienta: la etiqueta dice "Herramienta n". */
-function ToolPage({ tool, n, ...rest }: { id: string; tool: string; color: string; n: number; part: string; lead?: ReactNode; points?: Point[]; right: ReactNode }) {
+function ToolPage({ tool, n, ...rest }: { id: string; tool: string; color: string; n: number; part: string; lead?: ReactNode; points?: Point[]; active?: number; right: ReactNode }) {
   return <PhotoPage pill={`Herramienta ${n}`} name={tool} {...rest} />;
 }
 
@@ -24,7 +26,7 @@ export function Herramientas() {
     { n: "what3words", d: "Cualquier dirección usando solo tres palabras", img: "/tools/w3w/playa.jpg", c: W3W },
     { n: "Plus Codes", d: "Direcciones para todos, en Google Maps", img: "/tools/plus/kolkata.png", c: PLUS },
     { n: "MarineTraffic", d: "Todos los barcos del mundo, en vivo", img: "/tools/marine/ais.jpg", c: MARINE },
-    { n: "Kepler.gl", d: "Millones de datos en un mapa, sin programar", img: "/tools/kepler/columnas.jpg", c: KEPLER },
+    { n: "Kepler.gl", d: "Convierte una planilla en un mapa", img: "/tools/kepler/columnas.jpg", c: KEPLER },
   ];
   return (
     <NeonFrame id="herramientas">
@@ -331,37 +333,41 @@ const KeplerQue = () => (
     part="¿Qué es?"
     lead={
       <>
-        <p className="display text-[clamp(1.6rem,2.4vw,2.8rem)] leading-tight" style={{ color: KEPLER }}>Millones de datos en un mapa, sin programar.</p>
+        <p className="display text-[clamp(1.6rem,2.4vw,2.8rem)] leading-tight" style={{ color: KEPLER }}>Convierte una planilla en un mapa.</p>
         <p className="mt-[clamp(0.8rem,2vh,1.3rem)]">
-          Una herramienta <b>gratis y de código abierto</b> que <b>creó Uber</b> y liberó en <b>2018</b>. Se abre en el navegador y dibuja <b>millones de puntos</b> con ubicación —viajes, pedidos, camiones— en segundos.
+          Imaginá un Excel con <b>100.000 envíos</b>, cada uno con su latitud y longitud. Leído como tabla, no se entiende nada. Kepler.gl lo dibuja en un <b>mapa</b> en segundos.
         </p>
+        <p className="mt-[clamp(0.6rem,1.5vh,1rem)] text-white/75">Gratis, en el navegador y sin programar. Lo creó <b className="text-white">Uber</b> en 2018.</p>
       </>
     }
-    right={<Photo src="/tools/kepler/app.jpg" className="size-full" caption="A la izquierda, los datos y las capas; a la derecha, el mapa." />}
+    right={<Photo src="/tools/kepler/app.jpg" className="size-full" caption="A la izquierda, la planilla y las capas; a la derecha, el mapa." />}
   />
 );
 
-const KeplerComo = () => (
-  <ToolPage
-    id="kepler-como"
-    tool="Kepler.gl"
-    color={KEPLER}
-    n={4}
-    part="¿Cómo funciona?"
-    points={[
-      { b: "Cargás los datos", t: <>arrastrás un archivo <b>CSV o GeoJSON</b> con latitud y longitud. No hace falta programar.</> },
-      { b: "Elegís una capa", t: <><b>puntos, arcos, hexágonos, mapa de calor, H3</b> o <b>viajes animados</b>.</> },
-      { b: "Filtrás y reproducís", t: <>por hora, por día o por tipo, y mirás cómo <b>cambia en el tiempo</b>.</> },
-      { b: "Exportás", t: <>una imagen, un video o el mapa para compartir.</> },
-    ]}
-    right={
-      <div className="grid size-full grid-rows-2 gap-[clamp(0.8rem,1.4vw,1.4rem)]">
-        <Photo src="/tools/kepler/hexagonos.jpg" className="min-h-0" caption="Capa de hexágonos: la altura es cuántos datos caen en cada uno" />
-        <Photo src="/tools/kepler/columnas.jpg" className="min-h-0" caption="Columnas 3D sobre la bahía de San Francisco" />
-      </div>
-    }
-  />
-);
+function KeplerComo() {
+  const step = useStep();
+  return (
+    <ToolPage
+      id="kepler-como"
+      tool="Kepler.gl"
+      color={KEPLER}
+      n={4}
+      part="¿Cómo funciona?"
+      active={step}
+      points={[
+        { b: "Una planilla", t: <>cada fila, un envío con su ubicación.</> },
+        { b: "La arrastrás", t: <>al navegador, <b>sin programar</b>.</> },
+        { b: "Cada fila, un punto", t: <>aparece en el mapa.</> },
+        { b: "Elegís cómo verlo", t: <>puntos, <b>hexágonos</b>, arcos, viajes…</> },
+      ]}
+      right={
+        <div className="size-full overflow-hidden rounded-3xl border border-white/10 bg-[#0b1018]/40">
+          <KeplerHow step={step} />
+        </div>
+      }
+    />
+  );
+}
 
 const KeplerPara = () => (
   <ToolPage
@@ -371,16 +377,15 @@ const KeplerPara = () => (
     n={4}
     part="¿Para qué sirve?"
     points={[
-      { b: "Dónde hay más pedidos", t: <>los hexágonos muestran <b>las zonas calientes</b> de la ciudad.</> },
-      { b: "De dónde a dónde", t: <>los arcos unen <b>origen y destino</b> de cada envío o viaje.</> },
-      { b: "Cómo se mueve la flota", t: <>los viajes animados muestran <b>el recorrido de cada vehículo</b> a lo largo del día.</> },
-      { b: "Quién lo usa", t: <>Uber lo usa en sus propios tableros, y cualquiera lo puede usar gratis.</> },
+      { b: "¿Dónde se piden más envíos?", t: <>los <b>hexágonos</b> muestran las zonas calientes.</> },
+      { b: "¿De dónde a dónde van?", t: <>los <b>arcos</b> unen origen y destino.</> },
+      { b: "¿Cómo se movió la flota hoy?", t: <>los <b>viajes animados</b> repiten el recorrido de cada vehículo.</> },
     ]}
     right={
       <div className="grid size-full grid-cols-2 grid-rows-2 gap-[clamp(0.8rem,1.4vw,1.4rem)]">
         <Photo src="/tools/kepler/arcos.jpg" className="col-span-2 min-h-0" caption="Arcos: de dónde sale y a dónde llega cada viaje" />
         <Photo src="/tools/kepler/viajes.gif" className="min-h-0" caption="Viajes animados" />
-        <Photo src="/tools/kepler/hexagonos.jpg" className="min-h-0" caption="Zonas con más datos" />
+        <Photo src="/tools/kepler/hexagonos.jpg" className="min-h-0" caption="Hexágonos: zonas con más envíos" />
       </div>
     }
   />
@@ -400,6 +405,6 @@ export const TOOL_SLIDES: DeckSlide[] = [
   { id: "marine-para", label: "MarineTraffic · ¿Para qué sirve?", C: MarinePara },
   { id: "marine-caso", label: "MarineTraffic · El Ever Given", C: MarineCaso },
   { id: "kepler-que", label: "Kepler.gl · ¿Qué es?", C: KeplerQue },
-  { id: "kepler-como", label: "Kepler.gl · ¿Cómo funciona?", C: KeplerComo },
+  { id: "kepler-como", label: "Kepler.gl · ¿Cómo funciona?", steps: 4, phase: 4000, C: KeplerComo },
   { id: "kepler-para", label: "Kepler.gl · ¿Para qué sirve?", C: KeplerPara },
 ];

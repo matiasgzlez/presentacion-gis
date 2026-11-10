@@ -56,7 +56,7 @@ export function PhotoPage({ id, logo, logoClass, pill, name, color, part, lead, 
                 >
                   <span className="mt-[0.45em] size-[0.55em] shrink-0 rounded-full" style={{ background: color }} />
                   <span>
-                    <b className="text-white">{p.b}:</b> {p.t}
+                    <b className="text-white">{p.b}{/[?!]$/.test(p.b) ? "" : ":"}</b> {p.t}
                   </span>
                 </motion.li>
               );
