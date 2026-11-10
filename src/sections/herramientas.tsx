@@ -8,12 +8,12 @@ import { KeplerHow } from "@/scenes/kepler-how";
 
 /* Herramientas de GIS en logística poco conocidas. Cada una se cuenta igual:
    ¿Qué es? · ¿Cómo funciona? · ¿Para qué sirve? (y un ejemplo cercano).
-   Las imágenes son de los sitios de cada herramienta (what3words.com/es/about, maps.google.com/pluscodes,
+   Las imágenes son de los sitios de cada herramienta (what3words.com/es/about,
    docs.kepler.gl). MarineTraffic bloquea las descargas: sus capturas vienen de Wikimedia Commons.
    Lo que se dice en voz alta está en exposicion.md. */
 
 const ease = [0.16, 1, 0.3, 1] as const;
-const W3W = "#e11f26", PLUS = "#4285f4", MARINE = "#22d3ee", KEPLER = "#3cf2b5";
+const W3W = "#e11f26", MARINE = "#22d3ee", KEPLER = "#3cf2b5";
 
 /** Diapositiva de herramienta: la etiqueta dice "Herramienta n". */
 function ToolPage({ tool, n, ...rest }: { id: string; tool: string; color: string; n: number; part: string; lead?: ReactNode; points?: Point[]; active?: number; right: ReactNode }) {
@@ -24,7 +24,6 @@ function ToolPage({ tool, n, ...rest }: { id: string; tool: string; color: strin
 export function Herramientas() {
   const tools = [
     { n: "what3words", d: "Cualquier dirección usando solo tres palabras", img: "/tools/w3w/playa.jpg", c: W3W },
-    { n: "Plus Codes", d: "Direcciones para todos, en Google Maps", img: "/tools/plus/kolkata.png", c: PLUS },
     { n: "MarineTraffic", d: "Todos los barcos del mundo, en vivo", img: "/tools/marine/ais.jpg", c: MARINE },
     { n: "Kepler.gl", d: "Convierte una planilla en un mapa", img: "/tools/kepler/columnas.jpg", c: KEPLER },
   ];
@@ -37,7 +36,7 @@ export function Herramientas() {
         <h2 className="display mt-3 text-[clamp(2.2rem,4vw,4.4rem)] uppercase leading-none">
           GIS en logística que <span className="text-[#3cf2b5]">casi nadie conoce</span>
         </h2>
-        <div className="mt-[clamp(1.5rem,4vh,3rem)] grid h-[52vh] grid-cols-4 gap-[clamp(1rem,2vw,2rem)]">
+        <div className="mt-[clamp(1.5rem,4vh,3rem)] grid h-[52vh] grid-cols-3 gap-[clamp(1rem,2vw,2rem)]">
           {tools.map((t, i) => (
             <motion.div key={t.n} className="flex min-h-0 flex-col" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease }}>
               <Photo src={t.img} className="min-h-0 flex-1" />
@@ -115,7 +114,7 @@ const W3wPara = () => (
   />
 );
 
-/** La puerta del patio de la UTN FRRe: Plus Code G2XC+F96 → coordenadas → what3words (mapapi.what3words.com). */
+/** La puerta del patio de la UTN FRRe: sus coordenadas convertidas a what3words (mapapi.what3words.com). */
 const W3wUtn = () => (
   <ToolPage
     id="w3w-utn"
@@ -132,128 +131,13 @@ const W3wUtn = () => (
   />
 );
 
-/* ── Plus Codes (Google) ── */
-/** El código de la puerta del patio, partido en pedazos: cada pedazo achica el cuadrado. */
-function CodeParts() {
-  const parts = [
-    { c: "5843", d: "región", m: "~100 km", dim: true },
-    { c: "G2XC", d: "manzana", m: "~275 m" },
-    { c: "+F9", d: "cuadrado", m: "14 m" },
-    { c: "6", d: "puerta", m: "3 m" },
-  ];
-  return (
-    <div className="flex size-full min-h-0 flex-col justify-center rounded-3xl border-2 border-white/15 bg-white/[0.04] px-[clamp(1rem,2vw,2rem)]">
-      <div className="flex items-end justify-center gap-[clamp(0.4rem,1vw,1.2rem)]">
-        {parts.map((p, i) => (
-          <motion.div key={p.c} className="flex flex-col items-center" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 + i * 0.25, ease }}>
-            <span className="font-mono text-[clamp(2rem,3.6vw,4.2rem)] font-bold leading-none" style={{ color: p.dim ? "rgba(255,255,255,0.45)" : PLUS }}>{p.c}</span>
-            <span className="mt-2 h-1 w-full rounded-full" style={{ background: p.dim ? "rgba(255,255,255,0.3)" : PLUS }} />
-            <span className="mt-2 text-[clamp(0.95rem,1.2vw,1.4rem)] font-semibold text-white">{p.d}</span>
-            <span className="text-[clamp(0.85rem,1vw,1.2rem)] text-white/60">{p.m}</span>
-          </motion.div>
-        ))}
-      </div>
-      <p className="mt-[clamp(0.8rem,2vh,1.4rem)] text-center text-[clamp(0.95rem,1.15vw,1.35rem)] text-white/75">
-        La región se puede cambiar por el nombre de la ciudad: <b className="text-white">G2XC+F96 Resistencia</b>
-      </p>
-    </div>
-  );
-}
-
-const PlusQue = () => (
-  <ToolPage
-    id="plus-que"
-    tool="Plus Codes"
-    color={PLUS}
-    n={2}
-    part="¿Qué es?"
-    lead={
-      <>
-        <p className="display text-[clamp(1.6rem,2.4vw,2.8rem)] leading-tight" style={{ color: PLUS }}>Direcciones para todos.</p>
-        <p className="mt-[clamp(0.8rem,2vh,1.3rem)]">
-          El sistema de <b>Google</b> que convierte la latitud y la longitud en un <b>código corto de letras y números</b>. Es <b>gratis, de código abierto</b> y ya viene en <b>Google Maps</b>: sirve para darle dirección a cualquier lugar que no la tiene.
-        </p>
-      </>
-    }
-    right={<Photo src="/tools/plus/kolkata.png" className="size-full" caption="Calcuta, India · la placa azul de la puerta es su Plus Code" />}
-  />
-);
-
-const PlusComo = () => (
-  <ToolPage
-    id="plus-como"
-    tool="Plus Codes"
-    color={PLUS}
-    n={2}
-    part="¿Cómo funciona?"
-    points={[
-      { b: "Cuadrícula que se achica", t: <>cada par de caracteres achica el cuadrado: <b>5843</b> es la región, <b>G2XC</b> la manzana, <b>+F9</b> un cuadrado de <b>14 m</b> y <b>6</b> uno de <b>3 m</b>.</> },
-      { b: "Código corto + ciudad", t: <><b style={{ color: PLUS }}>G2XC+F96 Resistencia</b> es lo mismo que el código completo <b>5843G2XC+F96</b>.</> },
-      { b: "20 caracteres sin vocales", t: <>no forman palabras y no se confunden (no hay O ni 0, ni I ni 1).</> },
-      { b: "Sin internet", t: <>se calcula en el teléfono: en Google Maps soltás un pin y aparece el código.</> },
-    ]}
-    right={
-      <div className="grid size-full grid-rows-[1.6fr_1fr] gap-[clamp(0.8rem,1.4vw,1.4rem)]">
-        <Photo src="/tools/plus/utn.jpg" className="min-h-0" caption="La puerta del patio de la UTN FRRe · G2XC+F96" />
-        <CodeParts />
-      </div>
-    }
-  />
-);
-
-const PlusPara = () => (
-  <ToolPage
-    id="plus-para"
-    tool="Plus Codes"
-    color={PLUS}
-    n={2}
-    part="¿Para qué sirve?"
-    points={[
-      { b: "Entregas", t: <>llevar paquetes a <b>barrios sin nombres de calle</b>, zonas rurales o asentamientos.</> },
-      { b: "Emergencias", t: <>ambulancias y rescatistas llegan al punto exacto con un código que se comparte.</> },
-      { b: "Gobiernos", t: <>correo, servicios sociales y <b>padrón electoral</b> para gente que no tenía dirección.</> },
-      { b: "Comercios", t: <>que los clientes encuentren un local que no aparece en el mapa.</> },
-    ]}
-    right={
-      <div className="grid size-full grid-cols-2 grid-rows-2 gap-[clamp(0.8rem,1.4vw,1.4rem)]">
-        <Photo src="/tools/plus/entrega.jpg" className="col-span-2 min-h-0" caption="Entregas sin calles ni números" />
-        <Photo src="/tools/plus/emergencia.jpg" className="min-h-0" caption="Emergencias" />
-        <Photo src="/tools/plus/pyme.jpg" className="min-h-0" caption="Comercios" />
-      </div>
-    }
-  />
-);
-
-const PlusCasos = () => (
-  <ToolPage
-    id="plus-casos"
-    tool="Plus Codes"
-    color={PLUS}
-    n={2}
-    part="Casos de éxito"
-    points={[
-      { b: "Calcuta, India", t: <>una ONG le puso una <b>placa con su código a cada puerta</b>: <b>más de 500.000 personas</b> pudieron abrir una cuenta en el banco, votar y recibir compras online.</> },
-      { b: "Nepal", t: <>el <b>correo nacional</b> los adoptó y los <b>753 gobiernos locales</b> tienen que usarlos.</> },
-      { b: "Favelas de Brasil", t: <><b>120.000 vecinos</b> con dirección digital para recibir sus <b>paquetes</b>.</> },
-      { b: "Kenia", t: <>unas <b>40.000 direcciones</b> nuevas para comercios y servicios.</> },
-    ]}
-    right={
-      <div className="grid size-full grid-cols-2 grid-rows-2 gap-[clamp(0.8rem,1.4vw,1.4rem)]">
-        <Photo src="/tools/plus/kolkata2.jpg" className="row-span-2 min-h-0" caption="Calcuta · el código en la puerta" />
-        <Photo src="/tools/plus/nepal2.png" className="min-h-0" caption="Nepal · placa con el Plus Code" />
-        <Photo src="/tools/plus/favela.png" className="min-h-0" caption="Favela Brasil Xpress" />
-      </div>
-    }
-  />
-);
-
 /* ── MarineTraffic ── */
 const MarineQue = () => (
   <ToolPage
     id="marine-que"
     tool="MarineTraffic"
     color={MARINE}
-    n={3}
+    n={2}
     part="¿Qué es?"
     lead={
       <>
@@ -272,7 +156,7 @@ const MarineComo = () => (
     id="marine-como"
     tool="MarineTraffic"
     color={MARINE}
-    n={3}
+    n={2}
     part="¿Cómo funciona?"
     points={[
       { b: "El barco avisa", t: <>lleva un equipo <b>AIS</b> que transmite por radio su <b>nombre, posición, rumbo y velocidad</b> cada pocos segundos. Es obligatorio en los barcos grandes.</> },
@@ -289,7 +173,7 @@ const MarinePara = () => (
     id="marine-para"
     tool="MarineTraffic"
     color={MARINE}
-    n={3}
+    n={2}
     part="¿Para qué sirve?"
     points={[
       { b: "¿Cuándo llega mi carga?", t: <>importadores y exportadores siguen el barco con <b>su contenedor</b> y planifican los camiones.</> },
@@ -306,7 +190,7 @@ const MarineCaso = () => (
     id="marine-caso"
     tool="MarineTraffic"
     color={MARINE}
-    n={3}
+    n={2}
     part="Caso: el Ever Given"
     points={[
       { b: "Qué pasó", t: <>el <b>23 de marzo de 2021</b> un portacontenedores de <b>400 m</b> quedó atravesado en el <b>Canal de Suez</b> durante <b>6 días</b>.</> },
@@ -329,7 +213,7 @@ const KeplerQue = () => (
     id="kepler-que"
     tool="Kepler.gl"
     color={KEPLER}
-    n={4}
+    n={3}
     part="¿Qué es?"
     lead={
       <>
@@ -351,7 +235,7 @@ function KeplerComo() {
       id="kepler-como"
       tool="Kepler.gl"
       color={KEPLER}
-      n={4}
+      n={3}
       part="¿Cómo funciona?"
       active={step}
       points={[
@@ -374,7 +258,7 @@ const KeplerPara = () => (
     id="kepler-para"
     tool="Kepler.gl"
     color={KEPLER}
-    n={4}
+    n={3}
     part="¿Para qué sirve?"
     points={[
       { b: "¿Dónde se piden más envíos?", t: <>los <b>hexágonos</b> muestran las zonas calientes.</> },
@@ -396,10 +280,6 @@ export const TOOL_SLIDES: DeckSlide[] = [
   { id: "w3w-como", label: "what3words · ¿Cómo funciona?", C: W3wComo },
   { id: "w3w-para", label: "what3words · ¿Para qué sirve?", C: W3wPara },
   { id: "w3w-utn", label: "what3words · La UTN", C: W3wUtn },
-  { id: "plus-que", label: "Plus Codes · ¿Qué es?", C: PlusQue },
-  { id: "plus-como", label: "Plus Codes · ¿Cómo funciona?", C: PlusComo },
-  { id: "plus-para", label: "Plus Codes · ¿Para qué sirve?", C: PlusPara },
-  { id: "plus-casos", label: "Plus Codes · Casos de éxito", C: PlusCasos },
   { id: "marine-que", label: "MarineTraffic · ¿Qué es?", C: MarineQue },
   { id: "marine-como", label: "MarineTraffic · ¿Cómo funciona?", C: MarineComo },
   { id: "marine-para", label: "MarineTraffic · ¿Para qué sirve?", C: MarinePara },

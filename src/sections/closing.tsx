@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Route, Hexagon, MapPin, Plus, Ship, Layers3, ExternalLink } from "lucide-react";
+import { Route, Hexagon, MapPin, Ship, Layers3, ExternalLink } from "lucide-react";
 import { NEON, NeonFrame, Pill } from "@/components/neon";
 import { BackgroundVideo } from "@/components/bg-video";
 
@@ -56,7 +56,6 @@ export function Resources() {
 /** Para probar: las herramientas que mostramos, con la dirección a la vista (el público no puede hacer clic en la pantalla). */
 const TOOLS = [
   { icon: MapPin, t: "what3words", d: "Buscá ///pasen.sueldos.leyes: la puerta del patio de la UTN.", url: "what3words.com", href: "https://what3words.com/pasen.sueldos.leyes", c: "#e11f26" },
-  { icon: Plus, t: "Plus Codes", d: "En Google Maps, tocá cualquier punto y aparece su código.", url: "maps.google.com/pluscodes", href: "https://maps.google.com/pluscodes/", c: "#4285f4" },
   { icon: Ship, t: "MarineTraffic", d: "Mirá en vivo los barcos que entran al puerto de Buenos Aires.", url: "marinetraffic.com", href: "https://www.marinetraffic.com", c: "#22d3ee" },
   { icon: Layers3, t: "Kepler.gl", d: "Abrí la demo y cargá un mapa de ejemplo, sin programar.", url: "kepler.gl/demo", href: "https://kepler.gl/demo", c: "#3cf2b5" },
   { icon: Hexagon, t: "H3 de Uber", d: "Los hexágonos de Uber: documentación y ejemplos.", url: "h3geo.org", href: "https://h3geo.org", c: NEON.amber },
